@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
-
 android {
     namespace = "tech.kjo.kjo_mind_care"
     compileSdk = 35
@@ -58,4 +57,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("androidx.compose.ui:ui-text-google-fonts:1.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 }
