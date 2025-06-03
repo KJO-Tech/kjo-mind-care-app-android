@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">KJO Mind Care</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to continue with your account</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Sign In</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_register">Sign Up</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Create an Account</string>
+    <string name="register_subtitle">Join our mental wellness community</string>
+    <string name="register_fullname">Full Name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_confirm_password">Confirm Password</string>
+    <string name="register_button">Create Account</string>
+    <string name="register_terms">By signing up, you agree to our Terms of Service and Privacy Policy.</string>
+
+    <!-- Common Components -->
+    <string name="back">Back</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="app_logo">App logo</string>
+</resources>
