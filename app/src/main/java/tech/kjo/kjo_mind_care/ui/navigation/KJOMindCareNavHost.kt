@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import tech.kjo.kjo_mind_care.ui.auth.login.LoginScreen
 import tech.kjo.kjo_mind_care.ui.auth.register.RegisterScreen
 import tech.kjo.kjo_mind_care.ui.main.MainAppScreen
+import tech.kjo.kjo_mind_care.ui.main.blog.CreateNewEntryScreen
+import tech.kjo.kjo_mind_care.ui.main.notifications.NotificationsScreen
 import tech.kjo.kjo_mind_care.ui.splash.SplashScreen
 import tech.kjo.kjo_mind_care.ui.theme.KJOMindCareTheme
 
@@ -62,28 +64,21 @@ fun KJOMindCareNavHost() {
         // Main App Screen
         composable(Screen.MainAppScreen.route) {
             // Este composable es el "contenedor" del flujo principal
-//            MainAppScreen(mainNavController = navController) // Pasa el NavController global
+            MainAppScreen(mainNavController = navController) // Pasa el NavController global
         }
-
-        // Global Settings Screen
-//        composable(Screen.GlobalSettingsScreen.route) {
-//            GlobalSettingsScreen(
-//                onNavigateBack = { navController.popBackStack() }
-//            )
-//        }
 
         // Pantalla superpuesta/modal para crear (con su TopBar de regreso) y que se puede superponer sobre el flujo principal.
         composable(Screen.CreateNewEntryScreen.route) {
-//            CreateNewEntryScreen(
-//                onCreationComplete = { navController.popBackStack() }, // Volver atrás cuando se complete
-//                onNavigateBack = { navController.popBackStack() }
-//            )
+            CreateNewEntryScreen(
+                onCreationComplete = { navController.popBackStack() }, // Volver atrás cuando se complete
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable(Screen.NotificationsScreen.route) {
-//            NotificationsScreen(
-//                onNavigateBack = { navController.popBackStack() }
-//            )
+            NotificationsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
@@ -121,3 +116,26 @@ fun RegisterScreenPreview() {
     }
 }
 
+@Preview
+@Composable
+fun MainAppScreenPreview() {
+    KJOMindCareTheme {
+        MainAppScreen(mainNavController = rememberNavController())
+    }
+}
+
+@Preview
+@Composable
+fun NotificationsScreenPreview() {
+    KJOMindCareTheme {
+        NotificationsScreen(onNavigateBack = { })
+    }
+}
+
+@Preview
+@Composable
+fun CreateNewEntryScreenPreview() {
+    KJOMindCareTheme {
+        CreateNewEntryScreen(onCreationComplete = { }, onNavigateBack = { })
+    }
+}

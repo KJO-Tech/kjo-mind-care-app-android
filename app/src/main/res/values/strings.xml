@@ -25,4 +25,11 @@
     <string name="show_password">Mostrar contraseña</string>
     <string name="hide_password">Ocultar contraseña</string>
     <string name="app_logo">Logo de la aplicación</string>
+
+    <!-- Barra de navegación-->
+    <string name="home_bottom_navigation">Inicio</string>
+    <string name="mood_bottom_navigation">Mi Estado</string>
+    <string name="blog_bottom_navigation">Comunidad</string>
+    <string name="resources_bottom_navigation">Recursos</string>
+    <string name="profile_bottom_navigation">Perfil</string>
 </resources>
