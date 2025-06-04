@@ -58,4 +58,10 @@ dependencies {
 
     implementation("androidx.compose.ui:ui-text-google-fonts:1.8.2")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Icons
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    // Animations
+    implementation("androidx.compose.animation:animation:1.8.2")
 }

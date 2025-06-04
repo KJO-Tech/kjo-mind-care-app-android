@@ -16,7 +16,8 @@ import tech.kjo.kjo_mind_care.R
 
 @Composable
 fun AppLogo(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    modifierImage: Modifier = Modifier.size(60.dp),
 ) {
     Surface(
         modifier = modifier,
@@ -30,7 +31,7 @@ fun AppLogo(
             Image(
                 painter = painterResource(id = R.drawable.ic_kjo),
                 contentDescription = "Logo de la aplicación",
-                modifier = Modifier.size(60.dp)
+                modifier = modifierImage
             )
         }
     }

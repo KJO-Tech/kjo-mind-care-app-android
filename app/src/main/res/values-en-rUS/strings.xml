@@ -25,4 +25,12 @@
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
     <string name="app_logo">App logo</string>
+
+    <!-- Barra de navegación-->
+    <string name="home_bottom_navigation">Home</string>
+    <string name="mood_bottom_navigation">Mood</string>
+    <string name="blog_bottom_navigation">Community</string>
+    <string name="resources_bottom_navigation">Resources</string>
+    <string name="profile_bottom_navigation">Profile</string>
+
 </resources>
