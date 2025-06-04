@@ -61,4 +61,7 @@ dependencies {
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    // Animations
+    implementation("androidx.compose.animation:animation:1.8.2")
 }

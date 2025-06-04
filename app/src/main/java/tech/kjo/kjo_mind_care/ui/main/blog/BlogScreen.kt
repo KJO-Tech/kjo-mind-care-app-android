@@ -61,7 +61,6 @@ fun BlogScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
         ) {
 
             OutlinedTextField(

@@ -34,7 +34,7 @@ fun KJOMindCareNavHost() {
             )
         }
 
-        composable(Screen.WelcomeLoginScreen.route) {
+        modalComposable(Screen.WelcomeLoginScreen.route) {
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigate(Screen.MainAppScreen.route) {
@@ -47,7 +47,7 @@ fun KJOMindCareNavHost() {
             )
         }
 
-        composable(Screen.RegisterScreen.route) {
+        modalComposable(Screen.RegisterScreen.route) {
             RegisterScreen(
                 onRegistrationSuccess = {
                     // Quizás ir a main, o de vuelta al login
@@ -64,18 +64,20 @@ fun KJOMindCareNavHost() {
         // Main App Screen
         composable(Screen.MainAppScreen.route) {
             // Este composable es el "contenedor" del flujo principal
-            MainAppScreen(mainNavController = navController) // Pasa el NavController global
+            MainAppScreen(mainNavController = navController)
         }
 
         // Pantalla superpuesta/modal para crear (con su TopBar de regreso) y que se puede superponer sobre el flujo principal.
-        composable(Screen.CreateNewEntryScreen.route) {
+        modalComposable(
+            Screen.CreateNewEntryScreen.route
+        ) {
             CreateNewEntryScreen(
                 onCreationComplete = { navController.popBackStack() }, // Volver atrás cuando se complete
                 onNavigateBack = { navController.popBackStack() }
             )
         }
 
-        composable(Screen.NotificationsScreen.route) {
+        modalComposable(Screen.NotificationsScreen.route) {
             NotificationsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
