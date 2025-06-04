@@ -1,4 +1,4 @@
-package tech.kjo.kjo_mind_care.ui.register.ui
+package tech.kjo.kjo_mind_care.ui.auth.register
 
 import androidx.lifecycle.ViewModel
 

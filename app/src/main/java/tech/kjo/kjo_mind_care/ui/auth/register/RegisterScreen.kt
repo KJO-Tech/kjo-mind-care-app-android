@@ -1,16 +1,15 @@
-package tech.kjo.kjo_mind_care.ui.register.ui
+package tech.kjo.kjo_mind_care.ui.auth.register
 
 
-import tech.kjo.kjo_mind_care.ui.components.ThemedTextField
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,11 +18,13 @@ import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
 import tech.kjo.kjo_mind_care.ui.components.ThemedPasswordTextField
-import tech.kjo.kjo_mind_care.ui.screen.AuthScreenContainer
+import tech.kjo.kjo_mind_care.ui.components.ThemedTextField
+import tech.kjo.kjo_mind_care.ui.auth.AuthScreenContainer
 
 
 @Composable
 fun RegisterScreen(
+    onRegistrationSuccess: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var fullName by remember { mutableStateOf("") }
@@ -70,7 +71,8 @@ fun RegisterScreen(
 
         ThemedButton(
             onClick = {
-                //Logica
+                //Logica de registro y pasarle el callback de onRegistrationSuccess
+                onRegistrationSuccess()
             },
             text = stringResource(id = R.string.register_button)
         )

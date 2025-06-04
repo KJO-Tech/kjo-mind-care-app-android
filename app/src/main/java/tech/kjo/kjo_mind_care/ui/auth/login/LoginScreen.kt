@@ -1,4 +1,4 @@
-package tech.kjo.kjo_mind_care.ui.login.ui
+package tech.kjo.kjo_mind_care.ui.auth.login
 
 import tech.kjo.kjo_mind_care.ui.components.ThemedTextField
 import androidx.compose.foundation.clickable
@@ -22,10 +22,11 @@ import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
 import tech.kjo.kjo_mind_care.ui.components.ThemedPasswordTextField
-import tech.kjo.kjo_mind_care.ui.screen.AuthScreenContainer
+import tech.kjo.kjo_mind_care.ui.auth.AuthScreenContainer
 
 @Composable
 fun LoginScreen(
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -54,7 +55,8 @@ fun LoginScreen(
 
         ThemedButton(
             onClick = {
-                //Logica
+                // Logica de login y pasarle el callback de onLoginSuccess
+                onLoginSuccess()
             },
             text = stringResource(id = R.string.login_button)
         )
