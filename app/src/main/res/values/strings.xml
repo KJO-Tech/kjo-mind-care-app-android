@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">KJO Mind Care</string>
 
+    <!-- HomeScreen -->
+    <string name="welcome_title">Bienvenido a Inicio</string>
+    <string name="notifications">Notificaciones</string>
+
     <!-- Pantalla de inicio de sesión -->
     <string name="login_title">Bienvenido de nuevo</string>
     <string name="login_subtitle">Inicie sesión para continuar con su cuenta</string>
@@ -32,4 +36,38 @@
     <string name="blog_bottom_navigation">Comunidad</string>
     <string name="resources_bottom_navigation">Recursos</string>
     <string name="profile_bottom_navigation">Perfil</string>
+
+
+
+    <!-- MoodSection -->
+    <string name="mood_question">¿Cómo te sientes?</string>
+    <string name="mood_joyful">Alegre</string>
+    <string name="mood_happy">Feliz</string>
+    <string name="mood_anxious">Ansioso</string>
+    <string name="mood_neutral">Neutral</string>
+    <string name="mood_sad">Triste</string>
+
+    <!-- DailyActivitiesSection -->
+    <string name="daily_activities">Actividades Diarias</string>
+    <string name="breathing_exercise">Ejercicio de Respiración</string>
+    <string name="breathing_description">Practica respiración profunda por 5 minutos</string>
+    <string name="meditation">Meditación Consciente</string>
+    <string name="meditation_description">Meditación guiada de 10 minutos</string>
+    <string name="journal">Diario</string>
+    <string name="journal_description">Escribe tus pensamientos</string>
+    <string name="percent_complete">%1$d%% completado</string>
+
+    <!-- WellnessTipSection -->
+    <string name="daily_wellness_tip">Consejo Diario de Bienestar</string>
+    <string name="gratitude_title">Practica la Gratitud Diariamente</string>
+    <string name="gratitude_description">Tómate unos minutos cada día para escribir tres cosas por las que estás agradecido. Esta simple práctica puede cambiar tu enfoque hacia emociones y experiencias positivas, mejorando tu bienestar mental general.</string>
+    <string name="try_today">Prueba esto hoy</string>
+
+    <!-- CommunitySection -->
+    <string name="from_community">De la Comunidad</string>
+    <string name="see_all">Ver Todo</string>
+    <string name="community_post_title">Encontrar Paz en las Rutinas Diarias</string>
+    <string name="community_post_author">Por Sarah Johnson</string>
+    <string name="time_ago">hace 2 horas</string>
+
 </resources>

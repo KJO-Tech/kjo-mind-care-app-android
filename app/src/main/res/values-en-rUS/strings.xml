@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">KJO Mind Care</string>
-
+    <!-- HomeScreen -->
+    <string name="welcome_title">Welcome Home</string>
+    <string name="notifications">Notifications</string>
     <!-- Login Screen -->
     <string name="login_title">Welcome Back</string>
     <string name="login_subtitle">Sign in to continue with your account</string>
@@ -32,5 +34,37 @@
     <string name="blog_bottom_navigation">Community</string>
     <string name="resources_bottom_navigation">Resources</string>
     <string name="profile_bottom_navigation">Profile</string>
+
+
+    <!-- MoodSection -->
+    <string name="mood_question">How are you feeling?</string>
+    <string name="mood_joyful">Joyful</string>
+    <string name="mood_happy">Happy</string>
+    <string name="mood_anxious">Anxious</string>
+    <string name="mood_neutral">Neutral</string>
+    <string name="mood_sad">Sad</string>
+
+    <!-- DailyActivitiesSection -->
+    <string name="daily_activities">Daily Activities</string>
+    <string name="breathing_exercise">Breathing Exercise</string>
+    <string name="breathing_description">Practice deep breathing for 5 minutes</string>
+    <string name="meditation">Mindfulness Meditation</string>
+    <string name="meditation_description">10 minute guided meditation</string>
+    <string name="journal">Journal</string>
+    <string name="journal_description">Write down your thoughts</string>
+    <string name="percent_complete">%1$d%% complete</string>
+
+    <!-- WellnessTipSection -->
+    <string name="daily_wellness_tip">Daily Wellness Tip</string>
+    <string name="gratitude_title">Practice Gratitude Daily</string>
+    <string name="gratitude_description">Take a few minutes each day to write down three things you\'re grateful for. This simple practice can shift your focus toward positive emotions and experiences, improving your overall mental well-being.</string>
+    <string name="try_today">Try this today</string>
+
+    <!-- CommunitySection -->
+    <string name="from_community">From Community</string>
+    <string name="see_all">See All</string>
+    <string name="community_post_title">Finding Peace in Daily Routines</string>
+    <string name="community_post_author">By Sarah Johnson</string>
+    <string name="time_ago">2 hours ago</string>
 
 </resources>
