@@ -135,7 +135,7 @@ fun MoodEntryScreen(
     }
 }
 
-// Data class para cada opción de humor
+
 data class MoodOption(
     val title: String,
     val description: String,

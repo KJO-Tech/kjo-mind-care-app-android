@@ -31,21 +31,17 @@ fun MoodScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
-        // 1) Header + Gráfico + Insights
         item {
             MoodOverviewScreen(
-//                modifier = Modifier.fillMaxWidth(),
                 onRecordMoodClicked = onRecordMoodClicked,
                 onNavigateToMoodEntry = { /* opcional */ }
             )
         }
 
-        // 2) Formulario de entrada justo después
         item {
             MoodEntryScreen(
-//                modifier = Modifier.fillMaxWidth(),
                 onCancel = onCancelEntry,
-                onSave   = onSaveEntry
+                onSave = onSaveEntry
             )
         }
     }

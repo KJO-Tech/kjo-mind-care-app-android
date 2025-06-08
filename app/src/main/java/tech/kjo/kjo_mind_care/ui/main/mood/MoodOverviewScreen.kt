@@ -37,7 +37,6 @@ fun MoodOverviewScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        // ——————— Row sólo para el header ———————
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -60,7 +59,6 @@ fun MoodOverviewScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ——————— Row sólo para el selector Week/Month ———————
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
@@ -78,30 +76,22 @@ fun MoodOverviewScreen(
                 label = { Text("Month") }
             )
         }
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ——————— Título del chart ———————
         Text(
             text = "Mood Trends",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
-
-        // ——————— Gráfico ———————
         MoodChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
         )
-
         Spacer(modifier = Modifier.height(24.dp))
-
-        // ——————— Insights ———————
         MoodInsights(modifier = Modifier.fillMaxWidth())
     }
-
 
 
 }

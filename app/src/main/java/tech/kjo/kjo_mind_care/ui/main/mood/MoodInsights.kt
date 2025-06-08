@@ -27,10 +27,9 @@ fun MoodInsights(
     val moodTrend = "Improving"    // TODO: reemplazar con estado real del ViewModel
     val overallMood = "Neutral"      // TODO: reemplazar con estado real del ViewModel
     val distribution = listOf(
-        "Happy" to 0.20f,    // TODO: calcular valores reales del ViewModel
+        "Happy" to 0.20f,
         "Anxious" to 0.20f,
         "Sad" to 0.20f
-        // podrías agregar más categorías si es necesario
     )
 
     Card(
@@ -101,7 +100,7 @@ private fun InsightItem(
 @Composable
 private fun DistributionBar(
     label: String,
-    percent: Float // entre 0f y 1f
+    percent: Float
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
