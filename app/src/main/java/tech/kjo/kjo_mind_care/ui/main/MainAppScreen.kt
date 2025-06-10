@@ -1,6 +1,5 @@
 package tech.kjo.kjo_mind_care.ui.main
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -17,9 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
-import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryScreen
-import tech.kjo.kjo_mind_care.ui.main.mood.MoodOverviewScreen
-import tech.kjo.kjo_mind_care.ui.main.mood.MoodScreen
+import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
+import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
 import tech.kjo.kjo_mind_care.ui.navigation.BottomNavigationBar
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
@@ -65,6 +63,7 @@ fun MainAppScreen(
                 composable(Screen.HomeStart.route) {
                     HomeScreen(
                         onNavigateToNotifications = { mainNavController.navigate(Screen.NotificationsScreen.route) },
+                        navController = bottomNavController
                     )
                 }
             }
@@ -100,13 +99,11 @@ fun MainAppScreen(
                 route = Screen.MoodTrackingGraph.route
             ) {
                 composable(Screen.MoodTrackerStart.route) {
-                    MoodScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        onRecordMoodClicked = { /* quizá scroll to entry */ },
-                        onCancelEntry       = { /* limpia o vuelve atrás */ },
-                        onSaveEntry         = { mood, note ->
-                            // guarda en ViewModel…
-                        }
+                    MoodTrackerStart(
+                        onRecordMoodClicked = {
+                            bottomNavController.navigate(Screen.MoodEntryDetail.route)
+                        },
+                        onNavigateToMoodEntry = { }
                     )
                 }
                 composable(
@@ -118,6 +115,12 @@ fun MainAppScreen(
 //                            entryId = entryId ?: "N/A",
 //                            onNavigateBack = { bottomNavController.popBackStack() }
 //                        )
+                    MoodEntryDetail(
+                        onCancel = { bottomNavController.popBackStack() },
+                        onSave = { mood, note ->
+                            bottomNavController.popBackStack()
+                        }
+                    )
                 }
             }
 

@@ -11,21 +11,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import tech.kjo.kjo_mind_care.R
 
 
 @Composable
-fun MoodOverviewScreen(
+fun MoodTrackerStart(
     modifier: Modifier = Modifier,
     onRecordMoodClicked: () -> Unit = {},
     onNavigateToMoodEntry: () -> Unit
@@ -35,6 +39,7 @@ fun MoodOverviewScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
         Row(
@@ -53,7 +58,18 @@ fun MoodOverviewScreen(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = "Record Mood", color = MaterialTheme.colorScheme.onPrimary)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_plus_circle),
+                        contentDescription = "Añadir",
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text(text = "Record Mood", color = MaterialTheme.colorScheme.onPrimary)
+                }
             }
         }
 

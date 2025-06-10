@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,12 +21,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,10 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import tech.kjo.kjo_mind_care.R
 
 @Composable
-fun MoodEntryScreen(
+fun MoodEntryDetail(
     onCancel: () -> Unit = {},
     onSave: (mood: MoodOption?, note: String) -> Unit = { _, _ -> }
 ) {
@@ -46,8 +50,21 @@ fun MoodEntryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+//            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth(),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            TextButton(onClick = onCancel) {
+//                Text("Atras", color = MaterialTheme.colorScheme.primary)
+//            }
+//            Spacer(modifier = Modifier.weight(1f))
+//        }
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "How are you feeling?",
             style = MaterialTheme.typography.titleLarge,
@@ -55,17 +72,50 @@ fun MoodEntryScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        val moodOptions = listOf(
-            MoodOption("Joyful", "Feeling great joy or delight", "😀"),
-            MoodOption("Happy", "Content, pleased", "🙂"),
-            MoodOption("Excited", "Enthusiastic, eager", "🤩"),
-            MoodOption("Neutral", "Neither good nor bad", "😐"),
-            MoodOption("Tired", "Fatigued, low energy", "😴"),
-            MoodOption("Sad", "Unhappy, down", "😔"),
-            MoodOption("Anxious", "Worried, uneasy", "😰"),
-            MoodOption("Angry", "Mad, upset", "😡"),
-            MoodOption("Frustrated", "Annoyed, irritated", "😣")
+        val moodOptionResources = listOf(
+            MoodOptionResource(
+                R.string.mood_joyful_title,
+                R.string.mood_joyful_desc,
+                R.drawable.ic_mood_joyful
+            ),
+            MoodOptionResource(
+                R.string.mood_neutral_title,
+                R.string.mood_neutral_desc,
+                R.drawable.ic_mood_neutral
+            ),
+            MoodOptionResource(
+                R.string.mood_tired_title,
+                R.string.mood_tired_desc,
+                R.drawable.ic_mood_tired
+            ),
+            MoodOptionResource(
+                R.string.mood_sad_title,
+                R.string.mood_sad_desc,
+                R.drawable.ic_mood_sad
+            ),
+            MoodOptionResource(
+                R.string.mood_anxious_title,
+                R.string.mood_anxious_desc,
+                R.drawable.ic_mood_anxious
+            ),
+            MoodOptionResource(
+                R.string.mood_angry_title,
+                R.string.mood_angry_desc,
+                R.drawable.ic_mood_angry
+            ),
+            MoodOptionResource(
+                R.string.mood_frustrated_title,
+                R.string.mood_frustrated_desc,
+                R.drawable.ic_mood_frustrated
+            )
         )
+        val moodOptions = moodOptionResources.map {
+            MoodOption(
+                title = stringResource(it.titleRes),
+                description = stringResource(it.descRes),
+                iconResId = it.iconRes
+            )
+        }
         var selectedMood by remember { mutableStateOf<MoodOption?>(null) }
 
         LazyVerticalGrid(
@@ -132,15 +182,10 @@ fun MoodEntryScreen(
                 Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
             }
         }
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
-
-data class MoodOption(
-    val title: String,
-    val description: String,
-    val emoji: String
-)
 
 @Composable
 private fun MoodOptionItem(
@@ -166,19 +211,22 @@ private fun MoodOptionItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = moodOption.emoji,
-                style = MaterialTheme.typography.titleLarge
+            Icon(
+                painter = painterResource(id = moodOption.iconResId),
+                contentDescription = moodOption.title,
+                modifier = Modifier.size(26.dp),
+                tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = moodOption.title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = moodOption.description,
+                textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 maxLines = 2
