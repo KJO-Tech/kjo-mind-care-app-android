@@ -11,10 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,7 +45,8 @@ data class MoodOption(
 
 @Composable
 fun MoodSection(
-    onMoodSelected: (MoodOption) -> Unit = {}
+    onMoodSelected: (MoodOption) -> Unit = {},
+    onDetailCheckInClicked: () -> Unit = {}
 ) {
     val moodOptions = listOf<MoodOption>(
         MoodOption(R.drawable.ic_mood_joyful, stringResource(id = R.string.mood_joyful)),
@@ -49,54 +57,77 @@ fun MoodSection(
     )
     var selectedIndex by remember { mutableIntStateOf(-1) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(id = R.string.mood_question),
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
         )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            moodOptions.forEachIndexed { index, mood ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.clickable {
-                        selectedIndex = index
-                        onMoodSelected(mood)
-                    }
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        tonalElevation = if (selectedIndex == index) 8.dp else 0.dp,
-                        shadowElevation = if (selectedIndex == index) 4.dp else 0.dp,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
+            Text(
+                text = stringResource(id = R.string.mood_question),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                moodOptions.forEachIndexed { index, mood ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable {
+                            selectedIndex = index
+                            onMoodSelected(mood)
+                        }
                     ) {
-                        Image(
-                            painter = painterResource(id = mood.iconRes),
-                            contentDescription = mood.label,
-                            contentScale = ContentScale.Crop,
+                        Surface(
+                            shape = CircleShape,
+                            tonalElevation = if (selectedIndex == index) 8.dp else 0.dp,
+                            shadowElevation = if (selectedIndex == index) 4.dp else 0.dp,
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                        ) {
+                            Image(
+                                painter = painterResource(id = mood.iconRes),
+                                contentDescription = mood.label,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = mood.label,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = mood.label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                    )
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(
+                onClick = onDetailCheckInClicked,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.detailed_check_in),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
-
-
     }
-
 }

@@ -25,13 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToNotifications: () -> Unit,
-    userName: String = "Friend"
+    userName: String = "Friend",
+    navController: NavController
 ) {
     val scrollState = rememberScrollState()
 
@@ -72,8 +75,11 @@ fun HomeScreen(
         ) {
             MoodSection(
                 onMoodSelected = {
-
+                },
+                onDetailCheckInClicked = {
+                    navController.navigate(Screen.MoodEntryDetail.route)
                 }
+
             )
 
             Spacer(modifier = Modifier.height(32.dp))
