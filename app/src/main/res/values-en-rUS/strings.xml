@@ -43,7 +43,7 @@
     <string name="mood_anxious">Anxious</string>
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Sad</string>
-
+    <string name="detailed_check_in">Detailed check-in</string>
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Daily Activities</string>
     <string name="breathing_exercise">Breathing Exercise</string>

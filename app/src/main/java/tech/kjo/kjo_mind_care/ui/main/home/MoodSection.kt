@@ -123,7 +123,7 @@ fun MoodSection(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = "Registro detallado",
+                    text = stringResource(id = R.string.detailed_check_in),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )

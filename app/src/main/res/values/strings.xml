@@ -45,6 +45,7 @@
     <string name="mood_anxious">Ansioso</string>
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Triste</string>
+    <string name="detailed_check_in">Registro detallado</string>
 
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Actividades Diarias</string>
