@@ -65,7 +65,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(10.dp))
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "¿Olvidaste tu contraseña?",
+                text = stringResource(id = R.string.forgot_password),
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(vertical = 4.dp),
@@ -114,7 +114,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Iniciar sesión con Google",
+                    text = stringResource(id = R.string.login_with_google),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

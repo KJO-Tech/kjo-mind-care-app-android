@@ -11,7 +11,8 @@
     <string name="login_button">Sign In</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_register">Sign Up</string>
-
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="login_with_google">Sign in with Google</string>
     <!-- Register Screen -->
     <string name="register_title">Create an Account</string>
     <string name="register_subtitle">Join our mental wellness community</string>
