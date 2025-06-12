@@ -68,4 +68,5 @@ dependencies {
 
     // Animations
     implementation("androidx.compose.animation:animation:1.8.2")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
 }
