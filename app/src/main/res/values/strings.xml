@@ -153,6 +153,9 @@
     <string name="filter_dialog_apply_filters">Aplicar filtros</string>
     <string name="pull_to_refresh_content_description">Arrastrar para recargar</string>
 
+    <string name="share_blog_content_description">Compartir blog</string>
+    <string name="share_blog_title">Compartir Blog</string>
+
     <!-- BlogFormScreen -->
     <string name="blog_status_pending">Pendiente</string>
     <string name="blog_status_published">Publicado</string>

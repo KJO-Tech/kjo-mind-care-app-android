@@ -24,7 +24,8 @@ fun BlogList(
     onToggleLike: (String) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    selectedTabIndex: Int
+    selectedTabIndex: Int,
+    onBlogShare: (String, String) -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -60,7 +61,8 @@ fun BlogList(
                 BlogPostCard(
                     blog = blog,
                     onBlogClick = onBlogClick,
-                    onToggleLike = onToggleLike
+                    onToggleLike = onToggleLike,
+                    onBlogShare = onBlogShare
                 )
             }
         }

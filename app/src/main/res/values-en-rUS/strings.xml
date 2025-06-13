@@ -147,6 +147,9 @@
     <string name="filter_dialog_apply_filters">Apply Filters</string>
     <string name="pull_to_refresh_content_description">Pull to refresh</string>
 
+    <string name="share_blog_content_description">Share blog</string>
+    <string name="share_blog_title">Share Blog</string>
+
     <!-- BlogFormScreen -->
     <string name="blog_status_pending">Pending</string>
     <string name="blog_status_published">Published</string>
