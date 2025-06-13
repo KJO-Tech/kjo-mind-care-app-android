@@ -7,9 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import tech.kjo.kjo_mind_care.ui.navigation.KJOMindCareNavHost
 import tech.kjo.kjo_mind_care.ui.theme.KJOMindCareTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val profileViewModel: ProfileViewModel by viewModels()
 
