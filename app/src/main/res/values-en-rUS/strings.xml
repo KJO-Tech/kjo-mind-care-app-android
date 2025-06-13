@@ -44,7 +44,7 @@
     <string name="mood_anxious">Anxious</string>
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Sad</string>
-
+    <string name="detailed_check_in">Detailed check-in</string>
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Daily Activities</string>
     <string name="breathing_exercise">Breathing Exercise</string>
@@ -68,4 +68,25 @@
     <string name="community_post_author">By Sarah Johnson</string>
     <string name="time_ago">2 hours ago</string>
 
+
+    <!--    Mood Section -->
+
+    <string name="mood_joyful_title">Joyful</string>
+    <string name="mood_joyful_desc">Feeling great joy or delight</string>
+    <string name="mood_happy_title">Happy</string>
+    <string name="mood_happy_desc">Content, pleased</string>
+    <string name="mood_excited_title">Excited</string>
+    <string name="mood_excited_desc">Enthusiastic, eager</string>
+    <string name="mood_neutral_title">Neutral</string>
+    <string name="mood_neutral_desc">Neither good nor bad</string>
+    <string name="mood_tired_title">Tired</string>
+    <string name="mood_tired_desc">Fatigued, low energy</string>
+    <string name="mood_sad_title">Sad</string>
+    <string name="mood_sad_desc">Unhappy, down</string>
+    <string name="mood_anxious_title">Anxious</string>
+    <string name="mood_anxious_desc">Worried, uneasy</string>
+    <string name="mood_angry_title">Angry</string>
+    <string name="mood_angry_desc">Mad, upset</string>
+    <string name="mood_frustrated_title">Frustrated</string>
+    <string name="mood_frustrated_desc">Annoyed, irritated</string>
 </resources>

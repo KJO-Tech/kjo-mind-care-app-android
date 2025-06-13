@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
+import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
+import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
 import tech.kjo.kjo_mind_care.ui.navigation.BottomNavigationBar
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
@@ -61,6 +63,7 @@ fun MainAppScreen(
                 composable(Screen.HomeStart.route) {
                     HomeScreen(
                         onNavigateToNotifications = { mainNavController.navigate(Screen.NotificationsScreen.route) },
+                        navController = bottomNavController
                     )
                 }
             }
@@ -96,9 +99,12 @@ fun MainAppScreen(
                 route = Screen.MoodTrackingGraph.route
             ) {
                 composable(Screen.MoodTrackerStart.route) {
-//                        MoodTrackingScreen(
-//                            onNavigateToMoodEntryDetail = { entryId -> bottomNavController.navigate(Screen.MoodEntryDetail.createRoute(entryId)) }
-//                        )
+                    MoodTrackerStart(
+                        onRecordMoodClicked = {
+                            bottomNavController.navigate(Screen.MoodEntryDetail.route)
+                        },
+                        onNavigateToMoodEntry = { }
+                    )
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
@@ -109,6 +115,12 @@ fun MainAppScreen(
 //                            entryId = entryId ?: "N/A",
 //                            onNavigateBack = { bottomNavController.popBackStack() }
 //                        )
+                    MoodEntryDetail(
+                        onCancel = { bottomNavController.popBackStack() },
+                        onSave = { mood, note ->
+                            bottomNavController.popBackStack()
+                        }
+                    )
                 }
             }
 
