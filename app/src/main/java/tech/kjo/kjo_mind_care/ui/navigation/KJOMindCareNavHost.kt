@@ -10,11 +10,12 @@ import tech.kjo.kjo_mind_care.ui.auth.register.RegisterScreen
 import tech.kjo.kjo_mind_care.ui.main.MainAppScreen
 import tech.kjo.kjo_mind_care.ui.main.blog.CreateNewEntryScreen
 import tech.kjo.kjo_mind_care.ui.main.notifications.NotificationsScreen
+import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
 import tech.kjo.kjo_mind_care.ui.splash.SplashScreen
 import tech.kjo.kjo_mind_care.ui.theme.KJOMindCareTheme
 
 @Composable
-fun KJOMindCareNavHost() {
+fun KJOMindCareNavHost(profileViewModel: ProfileViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
@@ -64,7 +65,7 @@ fun KJOMindCareNavHost() {
         // Main App Screen
         composable(Screen.MainAppScreen.route) {
             // Este composable es el "contenedor" del flujo principal
-            MainAppScreen(mainNavController = navController)
+            MainAppScreen(mainNavController = navController, profileViewModel = profileViewModel)
         }
 
         // Pantalla superpuesta/modal para crear (con su TopBar de regreso) y que se puede superponer sobre el flujo principal.

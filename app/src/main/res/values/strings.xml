@@ -94,5 +94,18 @@
     <string name="mood_angry_desc">Furioso, molesto</string>
     <string name="mood_frustrated_title">Frustrado</string>
     <string name="mood_frustrated_desc">Irritado, molesto</string>
-
+    <!-- Sección de Perfil -->
+    <string name="logout">Cerrar sesión</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="account_settings">Configuración de Cuenta</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="help_support">Ayuda y Soporte</string>
+    <string name="about">Acerca de KJO Mind Care</string>
+    <string name="profile_title">Perfil</string>
+    <!-- Más elementos de la sección de perfil -->
+    <string name="support_section">Soporte</string>
+    <string name="account_section">Cuenta</string>
+    <string name="check_ins">Check-ins</string>
+    <string name="posts">Publicaciones</string>
+    <string name="badges">Insignias</string>
 </resources>
