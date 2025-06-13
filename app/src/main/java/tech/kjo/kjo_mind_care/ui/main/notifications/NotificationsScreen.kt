@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -25,11 +26,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +56,10 @@ fun NotificationsScreen(
     viewModel: NotificationsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
+
+    val pullRefreshState = rememberPullToRefreshState()
 
     Scaffold(
         topBar = {
@@ -81,8 +89,6 @@ fun NotificationsScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
-                // Aquí el expandedHeight no tiene efecto en TopAppBar normal, sería para Medium/Large
-                // expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight
             )
         }
     ) { paddingValues ->
@@ -111,26 +117,35 @@ fun NotificationsScreen(
                 )
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.notifications, key = { it.id }) { notification ->
-                    NotificationItem(
-                        notification = notification,
-                        onNotificationClick = { notificationId ->
-                            viewModel.markNotificationAsRead(notificationId)
-                            // Navegar a la ruta correspondiente
-                            if (notification.targetRoute.isNotBlank()) {
-                                onNavigateToRoute(notification.targetRoute)
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = viewModel::refreshNotifications,
+                modifier = Modifier.fillMaxSize(),
+                state = pullRefreshState,
+                contentAlignment = Alignment.TopCenter,
+
+                ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.notifications, key = { it.id }) { notification ->
+                        NotificationItem(
+                            notification = notification,
+                            onNotificationClick = { notificationId ->
+                                viewModel.markNotificationAsRead(notificationId)
+                                // Navegar a la ruta correspondiente
+                                if (notification.targetRoute.isNotBlank()) {
+                                    onNavigateToRoute(notification.targetRoute)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
             }
         }
     }
@@ -166,6 +181,7 @@ fun NotificationsScreen(
     ) {
         FloatingActionButton(onClick = {
             viewModel.addDummyNotification(
+                context,
                 Notification(
                     id = UUID.randomUUID().toString(),
                     type = NotificationType.LIKE,

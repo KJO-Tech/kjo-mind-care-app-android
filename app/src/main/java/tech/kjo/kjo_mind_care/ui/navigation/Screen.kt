@@ -8,7 +8,9 @@ sealed class Screen(val route: String) {
     object MainAppScreen : Screen("main_app_screen")
 
     object CreateBlogScreen : Screen("create_blog_screen")
-    object NotificationsScreen : Screen("notifications_screen")
+    object NotificationsScreen : Screen("notifications_screen") {
+        const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/notifications"
+    }
 
     // Sub-Grafos para cada pestaña del Bottom Navigation Bar
     object HomeGraph : Screen("home_graph")
@@ -23,6 +25,9 @@ sealed class Screen(val route: String) {
     object BlogList : Screen("blog_list")
     object BlogPostDetail : Screen("blog_post_detail/{blogId}") {
         fun createRoute(blogId: String) = "blog_post_detail/$blogId"
+
+        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/blog/{blogId}" // Tu dominio web
+        const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/blog/{blogId}" // Tu esquema personalizado
     }
     object EditBlog: Screen("edit_blog/{blogId}") {
         fun createRoute(blogId: String) = "edit_blog/$blogId"

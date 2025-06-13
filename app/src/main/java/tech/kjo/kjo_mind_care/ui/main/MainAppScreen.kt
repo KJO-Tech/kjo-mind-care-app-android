@@ -1,6 +1,5 @@
 package tech.kjo.kjo_mind_care.ui.main
 
-import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,17 +9,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
-import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
+import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
@@ -37,9 +39,43 @@ import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopExitTransition
 @Composable
 fun MainAppScreen(
     profileViewModel: ProfileViewModel = viewModel(),
-    mainNavController: NavController // Recibe el NavController global para navegar fuera del bottom bar
+    mainNavController: NavController, // Recibe el NavController global para navegar fuera del bottom bar
+    initialDeepLinkRoute: String? = null
 ) {
     val bottomNavController = rememberNavController() // NavController para las pestañas
+
+    // Manejar el deep link inicial
+    LaunchedEffect(initialDeepLinkRoute) {
+        if (initialDeepLinkRoute != null) {
+            bottomNavController.navigate(initialDeepLinkRoute) {
+
+                val targetGraphRoute = when {
+                    initialDeepLinkRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
+//                    initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                    // ... añade más si tienes otros deep links a graphs específicos
+                    else -> Screen.HomeGraph.route // Default, si no se reconoce
+                }
+
+                bottomNavController.navigate(targetGraphRoute) {
+                    // Limpia la pila del bottomNavController hasta la pestaña raíz del deep link
+                    // Esto asegura que si ya estabas en otra pestaña, te muevas a la correcta.
+                    popUpTo(bottomNavController.graph.findStartDestination().id) {
+                        saveState = true // Guarda el estado de otras pestañas
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+                // Ahora que estamos en la pestaña correcta, navegamos al detalle si corresponde
+//                if (initialDeepLinkRoute != targetGraphRoute) { // Si el deep link no era simplemente la raíz del graph
+//                    bottomNavController.navigate(initialDeepLinkRoute) {
+//                        // popUpTo NO aquí, ya que queremos que el detalle se apile sobre la pestaña raíz.
+//                        launchSingleTop = true
+//                    }
+//                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {},
         bottomBar = {
@@ -97,7 +133,11 @@ fun MainAppScreen(
 
                 composable(
                     route = Screen.BlogPostDetail.route,
-                        arguments = listOf(navArgument("blogId") { type = NavType.StringType })
+                    arguments = listOf(navArgument("blogId") { type = NavType.StringType }),
+                    deepLinks = listOf(
+                        navDeepLink { uriPattern = Screen.BlogPostDetail.DEEPLINK_WEB_PATTERN },
+                        navDeepLink { uriPattern = Screen.BlogPostDetail.DEEPLINK_APP_PATTERN }
+                    )
                 ) { backStackEntry ->
                     val blogId = backStackEntry.arguments?.getString("blogId")
                     if (blogId != null) {
@@ -126,13 +166,23 @@ fun MainAppScreen(
                             if (blogId != null) {
                                 // Navega de nuevo al detalle del blog actualizado y limpia la pila para no apilar.
                                 // La idea es que al guardar, el detalle se refresque con los nuevos datos.
-                                bottomNavController.navigate(Screen.BlogPostDetail.createRoute(blogId)) {
-                                    popUpTo(Screen.BlogPostDetail.route) { inclusive = true } // Elimina todas las instancias anteriores de detalle
-                                    launchSingleTop = true // Evita múltiples copias de la misma pantalla si ya está en la parte superior
+                                bottomNavController.navigate(
+                                    Screen.BlogPostDetail.createRoute(
+                                        blogId
+                                    )
+                                ) {
+                                    popUpTo(Screen.BlogPostDetail.route) {
+                                        inclusive = true
+                                    } // Elimina todas las instancias anteriores de detalle
+                                    launchSingleTop =
+                                        true // Evita múltiples copias de la misma pantalla si ya está en la parte superior
                                 }
                             } else {
                                 // Esto no debería ocurrir si se viene de "editar", pero por seguridad
-                                bottomNavController.popBackStack(Screen.BlogList.route, inclusive = false)
+                                bottomNavController.popBackStack(
+                                    Screen.BlogList.route,
+                                    inclusive = false
+                                )
                             }
                         },
                         onBackClick = { bottomNavController.popBackStack() }
