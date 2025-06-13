@@ -1,4 +1,4 @@
-package tech.kjo.kjo_mind_care.ui.main.blog
+package tech.kjo.kjo_mind_care.ui.main.blog_detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.data.model.BlogPost
+import tech.kjo.kjo_mind_care.data.model.BlogStatus
 import tech.kjo.kjo_mind_care.data.model.Comment
 import tech.kjo.kjo_mind_care.data.model.StaticBlogData
+import tech.kjo.kjo_mind_care.data.repository.BlogRepository
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,14 +21,20 @@ data class BlogDetailUiState(
     val comments: List<Comment> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val showCommentInput: Boolean = false, // Para mostrar/ocultar el input de comentario
-    val commentToReplyTo: String? = null, // ID del comentario al que se responde
-    val commentToEdit: String? = null, // ID del comentario a editar
-    val currentCommentText: String = "" // Texto actual del input de comentario
+    val showCommentInput: Boolean = false,
+    val commentToReplyTo: String? = null,
+    val commentToEdit: String? = null,
+    val currentCommentText: String = "",
+    val isSendingComment: Boolean = false,
+    val isDeletingBlog: Boolean = false,
+    val showDeleteDialog: Boolean = false,
+    val deleteSuccess: Boolean = false,
+    val blogStatusMessage: String? = null
 )
 
 class BlogDetailViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val blogRepository: BlogRepository = BlogRepository()
 ) : ViewModel() {
 
     private val blogId: String = checkNotNull(savedStateHandle["blogId"])
@@ -37,16 +45,50 @@ class BlogDetailViewModel(
     private val currentUser = StaticBlogData.currentUser // Asume un usuario logueado
 
     init {
+        // Cargar blog al inicializar el ViewModel
         loadBlogDetail()
+
+        // Observar cambios en los blogs del repositorio por si se actualiza desde otro lugar (ej. formulario de edición)
+        viewModelScope.launch {
+            blogRepository.blogPosts.collect { blogs ->
+                val updatedBlog = blogs.find { it.id == blogId }
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        blogPost = updatedBlog,
+                        blogStatusMessage = updatedBlog?.let {
+                            when (it.status) {
+                                BlogStatus.DELETED -> "Este blog ha sido eliminado."
+                                BlogStatus.PENDING -> "Este blog está pendiente de publicación."
+                                else -> null
+                            }
+                        }
+                    )
+                }
+            }
+        }
     }
 
     private fun loadBlogDetail() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val blog = StaticBlogData.getSampleBlogPosts().find { it.id == blogId }
+                // Usar el repositorio para obtener el blog
+                val blog = blogRepository.getBlogById(blogId)
                 val comments = StaticBlogData.getSampleCommentsForBlog(blogId)
-                _uiState.update { it.copy(blogPost = blog, comments = comments, isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        blogPost = blog,
+                        comments = comments,
+                        isLoading = false,
+                        blogStatusMessage = blog?.let {
+                            when (it.status) {
+                                BlogStatus.DELETED -> "Este blog ha sido eliminado."
+                                BlogStatus.PENDING -> "Este blog está pendiente de publicación."
+                                else -> null
+                            }
+                        }
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -69,10 +111,46 @@ class BlogDetailViewModel(
                 )
             } ?: current
         }
+        // En una app real: actualizar el like en el repositorio/backend
+    }
+
+    fun isCurrentUserAuthor(): Boolean {
+        return uiState.value.blogPost?.author?.id == currentUser.id
+    }
+
+    fun showDeleteConfirmation(show: Boolean) {
+        _uiState.update { it.copy(showDeleteDialog = show) }
+    }
+
+    fun deleteBlog() {
+        val blogToDeleteId = uiState.value.blogPost?.id ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeletingBlog = true, error = null) }
+            val result = blogRepository.deleteBlog(blogToDeleteId)
+            result
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isDeletingBlog = false,
+                            deleteSuccess = true,
+                            showDeleteDialog = false,
+                            blogStatusMessage = "Este blog ha sido eliminado." // Actualizar mensaje de estado
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isDeletingBlog = false,
+                            showDeleteDialog = false,
+                            error = "Error al eliminar el blog: ${e.localizedMessage}"
+                        )
+                    }
+                }
+        }
     }
 
     // --- Funciones para manejar el input de comentarios ---
-
     fun onAddCommentClick() {
         _uiState.update {
             it.copy(
@@ -125,12 +203,12 @@ class BlogDetailViewModel(
         viewModelScope.launch {
             val currentText = _uiState.value.currentCommentText
             if (currentText.isBlank()) {
-                // Manejar error o mensaje al usuario: el comentario no puede estar vacío
+                _uiState.update { it.copy(error = "El comentario no puede estar vacío.") }
                 return@launch
             }
+            _uiState.update { it.copy(isSendingComment = true) }
 
             if (_uiState.value.commentToEdit != null) {
-                // Lógica para editar un comentario existente
                 val commentIdToEdit = _uiState.value.commentToEdit!!
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -142,9 +220,8 @@ class BlogDetailViewModel(
                     )
                 }
             } else {
-                // Lógica para añadir un nuevo comentario o responder
                 val newComment = Comment(
-                    id = UUID.randomUUID().toString(), // Generar ID único
+                    id = UUID.randomUUID().toString(),
                     author = currentUser,
                     content = currentText,
                     createdAt = LocalDateTime.now(),
@@ -153,26 +230,22 @@ class BlogDetailViewModel(
 
                 _uiState.update { currentState ->
                     val updatedComments = if (_uiState.value.commentToReplyTo != null) {
-                        // Es una respuesta
                         addReplyToCommentRecursive(
                             currentState.comments,
                             _uiState.value.commentToReplyTo!!,
                             newComment
                         )
                     } else {
-                        // Es un comentario de nivel superior
                         currentState.comments + newComment
                     }
                     currentState.copy(comments = updatedComments)
                 }
             }
-
-            // Limpiar y ocultar el input
             onCancelCommentInput()
+            _uiState.update { it.copy(isSendingComment = false, error = null) }
         }
     }
 
-    // Funciones helper recursivas para comentarios anidados
     private fun addReplyToCommentRecursive(
         comments: List<Comment>,
         parentId: String,
@@ -215,13 +288,11 @@ class BlogDetailViewModel(
 
     fun onDeleteComment(commentId: String) {
         viewModelScope.launch {
-            // Lógica para eliminar un comentario propio
             _uiState.update { currentState ->
                 currentState.copy(
                     comments = removeCommentRecursive(currentState.comments, commentId)
                 )
             }
-            // En una app real: llamar a un repositorio para eliminar en el backend
         }
     }
 

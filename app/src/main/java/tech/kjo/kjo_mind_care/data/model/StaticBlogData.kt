@@ -18,7 +18,8 @@ object StaticBlogData {
                 likes = 24,
                 comments = 8,
                 isLiked = false,
-                categoryId = "cat_anxiety"
+                categoryId = "cat_anxiety",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_2",
@@ -31,7 +32,8 @@ object StaticBlogData {
                 likes = 42,
                 comments = 15,
                 isLiked = true,
-                categoryId = "cat_stress"
+                categoryId = "cat_stress",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_3",
@@ -44,7 +46,8 @@ object StaticBlogData {
                 likes = 36,
                 comments = 12,
                 isLiked = false,
-                categoryId = "cat_meditation"
+                categoryId = "cat_meditation",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_4",
@@ -57,7 +60,8 @@ object StaticBlogData {
                 likes = 50,
                 comments = 20,
                 isLiked = false,
-                categoryId = "cat_nutrition"
+                categoryId = "cat_nutrition",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_5",
@@ -70,7 +74,8 @@ object StaticBlogData {
                 likes = 60,
                 comments = 25,
                 isLiked = true,
-                categoryId = "cat_sleep"
+                categoryId = "cat_sleep",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_6",
@@ -83,7 +88,8 @@ object StaticBlogData {
                 likes = 18,
                 comments = 5,
                 isLiked = false,
-                categoryId = "cat_meditation"
+                categoryId = "cat_meditation",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_7",
@@ -96,7 +102,8 @@ object StaticBlogData {
                 likes = 75,
                 comments = 30,
                 isLiked = true,
-                categoryId = "cat_stress"
+                categoryId = "cat_stress",
+                status = BlogStatus.PUBLISHED
             ),
             BlogPost(
                 id = "blog_8",
@@ -109,7 +116,8 @@ object StaticBlogData {
                 likes = 90,
                 comments = 40,
                 isLiked = false,
-                categoryId = "cat_other"
+                categoryId = "cat_other",
+                status = BlogStatus.PUBLISHED
             )
         )
     }

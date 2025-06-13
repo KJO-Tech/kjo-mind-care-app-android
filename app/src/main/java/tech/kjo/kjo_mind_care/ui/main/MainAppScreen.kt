@@ -17,8 +17,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import tech.kjo.kjo_mind_care.ui.main.blog.BlogPostDetailScreen
+import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
+import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
@@ -42,7 +43,7 @@ fun MainAppScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                mainNavController.navigate(Screen.CreateNewEntryScreen.route)
+                mainNavController.navigate(Screen.CreateBlogScreen.route)
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Crear Nuevo")
             }
@@ -83,6 +84,7 @@ fun MainAppScreen(
                         }
                     )
                 }
+
                 composable(
                     route = Screen.BlogPostDetail.route,
                         arguments = listOf(navArgument("blogId") { type = NavType.StringType })
@@ -91,12 +93,40 @@ fun MainAppScreen(
                     if (blogId != null) {
                         BlogPostDetailScreen(
                             blogId = blogId,
-                            onNavigateBack = { bottomNavController.popBackStack() }
+                            onNavigateBack = { bottomNavController.popBackStack() },
+                            onNavigateToEditBlog = { idToEdit ->
+                                // Navega a la ruta de edición, pasando el ID del blog
+                                bottomNavController.navigate(Screen.EditBlog.createRoute(idToEdit))
+                            }
                         )
                     } else {
                         // TODO: Manejar el caso donde blogId es nulo (ej. mostrar error o volver)
                         Text("Error: ID de blog no proporcionado.")
                     }
+                }
+
+                composable(
+                    route = Screen.EditBlog.route,
+                    arguments = listOf(navArgument("blogId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val blogId = backStackEntry.arguments?.getString("blogId")
+                    BlogFormScreen(
+                        blogId = blogId,
+                        onBlogSaved = {
+                            if (blogId != null) {
+                                // Navega de nuevo al detalle del blog actualizado y limpia la pila para no apilar.
+                                // La idea es que al guardar, el detalle se refresque con los nuevos datos.
+                                bottomNavController.navigate(Screen.BlogPostDetail.createRoute(blogId)) {
+                                    popUpTo(Screen.BlogPostDetail.route) { inclusive = true } // Elimina todas las instancias anteriores de detalle
+                                    launchSingleTop = true // Evita múltiples copias de la misma pantalla si ya está en la parte superior
+                                }
+                            } else {
+                                // Esto no debería ocurrir si se viene de "editar", pero por seguridad
+                                bottomNavController.popBackStack(Screen.BlogList.route, inclusive = false)
+                            }
+                        },
+                        onBackClick = { bottomNavController.popBackStack() }
+                    )
                 }
             }
 

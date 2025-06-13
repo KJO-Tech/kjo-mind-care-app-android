@@ -35,6 +35,21 @@ data class Category(
     }
 }
 
+enum class BlogStatus {
+    PENDING,    // Creado, pero no visible públicamente
+    PUBLISHED,  // Visible públicamente
+    DELETED;    // Eliminado lógicamente (no se muestra, pero puede recuperarse)
+
+    @Composable
+    fun getLocalizedName(): String {
+        return when (this) {
+            PENDING -> stringResource(R.string.blog_status_pending)
+            PUBLISHED -> stringResource(R.string.blog_status_published)
+            DELETED -> stringResource(R.string.blog_status_deleted)
+        }
+    }
+}
+
 // Modelo de Blog Post
 data class BlogPost(
     val id: String,
@@ -47,7 +62,8 @@ data class BlogPost(
     val likes: Int,
     val comments: Int,
     val isLiked: Boolean = false,
-    val categoryId: String? = null
+    val categoryId: String? = null,
+    val status: BlogStatus
 ) {
     @Composable
     fun getTimeAgo(): String {

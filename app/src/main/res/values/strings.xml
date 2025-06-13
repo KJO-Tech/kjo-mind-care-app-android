@@ -152,4 +152,39 @@
     <string name="filter_dialog_clear_selection">Borrar selección</string>
     <string name="filter_dialog_apply_filters">Aplicar filtros</string>
     <string name="pull_to_refresh_content_description">Arrastrar para recargar</string>
+
+    <!-- BlogFormScreen -->
+    <string name="blog_status_pending">Pendiente</string>
+    <string name="blog_status_published">Publicado</string>
+    <string name="blog_status_deleted">Eliminado</string>
+
+    <string name="create_blog_title">Crear Nuevo Blog</string>
+    <string name="edit_blog_title">Editar Blog</string>
+    <string name="blog_title_hint">Título del blog</string>
+    <string name="blog_content_hint">Contenido del blog</string>
+    <string name="blog_category_label">Categoría</string>
+    <string name="select_category_placeholder">Seleccionar categoría</string>
+    <string name="blog_media_label">Imagen/Video (Opcional)</string>
+    <string name="select_media_button">Seleccionar Imagen o Video</string>
+    <string name="clear_media_button">Borrar Medio</string>
+    <string name="blog_status_label">Estado</string>
+    <string name="publish_button">Publicar Blog</string>
+    <string name="save_changes_button">Guardar Cambios</string>
+    <string name="upload_failed">Fallo al subir: %s</string>
+    <string name="blog_created_success">Blog creado exitosamente!</string>
+    <string name="blog_updated_success">Blog actualizado exitosamente!</string>
+    <string name="error_saving_blog">Error al guardar el blog: %s</string>
+    <string name="required_field_error">Este campo es requerido</string>
+    <string name="blog_title_error">El título no puede estar vacío</string>
+    <string name="blog_content_error">El contenido no puede estar vacío</string>
+    <string name="blog_category_error">Debe seleccionar una categoría</string>
+
+    <string name="edit_blog_button">Editar Blog</string>
+    <string name="delete_blog_button">Eliminar Blog</string>
+    <string name="delete_blog_dialog_title">Eliminar Blog</string>
+    <string name="delete_blog_dialog_message">¿Estás seguro de que quieres eliminar este blog? Esta acción no se puede deshacer.</string>
+    <string name="delete_blog_dialog_confirm">Eliminar</string>
+    <string name="dialog_add_comment_title">Añadir Comentario</string>
+    <string name="comment_input_placeholder">Escribe tu comentario...</string>
+    <string name="send_comment_button">Enviar Comentario</string>
 </resources>

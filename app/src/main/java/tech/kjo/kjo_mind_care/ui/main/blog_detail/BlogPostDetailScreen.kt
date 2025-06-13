@@ -1,8 +1,9 @@
-package tech.kjo.kjo_mind_care.ui.main.blog
+package tech.kjo.kjo_mind_care.ui.main.blog_detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,55 +12,80 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.data.model.BlogStatus
 import tech.kjo.kjo_mind_care.ui.main.blog.components.Avatar
 import tech.kjo.kjo_mind_care.ui.main.blog.components.BlogMediaPreview
 import tech.kjo.kjo_mind_care.ui.main.blog.components.CommentSection
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogPostDetailScreen(
     blogId: String,
     onNavigateBack: () -> Unit,
-    viewModel: BlogDetailViewModel = viewModel()
+    onNavigateToEditBlog: (String) -> Unit,
+    viewModel: BlogDetailViewModel = viewModel(
+        factory = BlogDetailViewModelFactory(blogId)
+    )
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // Este LaunchedEffect asegura que el ViewModel reciba el blogId si no lo hizo por SavedStateHandle
-    // O si el ViewModel se inicializa en otro punto y necesita el ID.
-    // Sin embargo, con SavedStateHandle, el ViewModel ya tiene el blogId al ser creado.
-    // Lo mantenemos aquí para claridad si el ViewModel fuera a recargar en base a un cambio de ID.
-    LaunchedEffect(blogId) {
-        // ViewModel ya maneja la carga con SavedStateHandle
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(message = it, withDismissAction = true)
+        }
+    }
+    LaunchedEffect(uiState.deleteSuccess) {
+        if (uiState.deleteSuccess) {
+            snackbarHostState.showSnackbar(
+//                message = stringResource(R.string.blog_deleted_success),
+                message = "Blog eliminado exitosamente.",
+                withDismissAction = true
+            )
+            onNavigateBack() // Volver atrás después de eliminar
+            // Importante: No hay necesidad de resetear deleteSuccess si ya se va a salir de la pantalla
+        }
     }
 
     Scaffold(
@@ -74,13 +100,31 @@ fun BlogPostDetailScreen(
                         )
                     }
                 },
+                actions = {
+                    // Mostrar botones de editar y eliminar si el usuario es el autor y el blog no está eliminado
+                    if (viewModel.isCurrentUserAuthor() && uiState.blogPost?.status != BlogStatus.DELETED) {
+                        IconButton(
+                            onClick = { onNavigateToEditBlog(blogId) },
+                            enabled = !uiState.isDeletingBlog // Deshabilitar si se está eliminando
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_blog_button))
+                        }
+                        IconButton(
+                            onClick = { viewModel.showDeleteConfirmation(true) },
+                            enabled = !uiState.isDeletingBlog
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_blog_button))
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 ),
                 windowInsets = WindowInsets(0.dp)
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
@@ -132,6 +176,20 @@ fun BlogPostDetailScreen(
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     item {
+                        // Mensaje de estado (Pendiente, Eliminado)
+                        uiState.blogStatusMessage?.let { message ->
+                            Text(
+                                text = message,
+                                color = MaterialTheme.colorScheme.error, // O un color de advertencia
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
                         BlogMediaPreview(
                             mediaUrl = blog.mediaUrl,
                             mediaType = blog.mediaType,
@@ -181,7 +239,7 @@ fun BlogPostDetailScreen(
                                 contentPadding = PaddingValues(
                                     horizontal = 8.dp,
                                     vertical = 4.dp
-                                ) // Menos padding
+                                )
                             ) {
                                 Icon(
                                     imageVector = if (blog.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -252,4 +310,64 @@ fun BlogPostDetailScreen(
             }
         }
     }
+
+    // Diálogo de confirmación de eliminación (siempre al final de tu Composable)
+    if (uiState.showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.showDeleteConfirmation(false) },
+            title = { Text(stringResource(R.string.delete_blog_dialog_title)) },
+            text = { Text(stringResource(R.string.delete_blog_dialog_message)) },
+            confirmButton = {
+                Button(
+                    onClick = viewModel::deleteBlog,
+                    enabled = !uiState.isDeletingBlog,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error) // Resalta el botón de eliminar
+                ) {
+                    if (uiState.isDeletingBlog) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    } else {
+                        Text(stringResource(R.string.delete_blog_dialog_confirm))
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.showDeleteConfirmation(false) }) {
+                    Text(stringResource(R.string.cancel_comment_button))
+                }
+            }
+        )
+    }
+
+//    // Diálogo para añadir/editar comentario (también al final del Composable)
+//    if (uiState.showCommentInput) {
+//        AlertDialog(
+//            onDismissRequest = { viewModel.onCancelCommentInput() },
+//            title = { Text(stringResource(R.string.dialog_add_comment_title)) },
+//            text = {
+//                OutlinedTextField(
+//                    value = uiState.currentCommentText,
+//                    onValueChange = viewModel::onCommentTextChanged,
+//                    label = { Text(stringResource(R.string.comment_input_placeholder)) },
+//                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+//                )
+//            },
+//            confirmButton = {
+//                Button(
+//                    onClick = viewModel::onSaveComment,
+//                    enabled = !uiState.isSendingComment && uiState.currentCommentText.isNotBlank()
+//                ) {
+//                    if (uiState.isSendingComment) {
+//                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+//                    } else {
+//                        Text(stringResource(R.string.send_comment_button))
+//                    }
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = { viewModel.onCancelCommentInput() }) {
+//                    Text(stringResource(R.string.cancel_comment_button))
+//                }
+//            }
+//        )
+//    }
 }
