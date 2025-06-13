@@ -35,6 +35,7 @@ import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalExitTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopEnterTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopExitTransition
+import tech.kjo.kjo_mind_care.ui.main.resources.EmergencyResourcesScreen
 
 @Composable
 fun MainAppScreen(
@@ -227,9 +228,13 @@ fun MainAppScreen(
                 route = Screen.ResourcesGraph.route
             ) {
                 composable(Screen.ResourcesList.route) {
-//                        ResourcesListScreen(
-//                            onNavigateToResourceDetail = { resourceId -> bottomNavController.navigate(Screen.ResourceDetail.createRoute(resourceId)) }
-//                        )
+                    EmergencyResourcesScreen(
+                        onNavigateToResourceDetail = { resourceId ->
+                            bottomNavController.navigate(
+                                Screen.ResourceDetail.createRoute(resourceId)
+                            )
+                        }
+                    )
                 }
                 composable(
                     route = Screen.ResourceDetail.route,
