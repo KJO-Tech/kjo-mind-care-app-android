@@ -19,7 +19,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.ui.main.blog.User
+import tech.kjo.kjo_mind_care.data.model.User
 
 @Composable
 fun Avatar(

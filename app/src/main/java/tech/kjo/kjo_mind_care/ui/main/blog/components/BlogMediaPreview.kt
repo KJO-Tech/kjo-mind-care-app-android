@@ -29,7 +29,7 @@ import androidx.media3.ui.PlayerView
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.ui.main.blog.MediaType
+import tech.kjo.kjo_mind_care.data.model.MediaType
 
 @Composable
 fun BlogMediaPreview(

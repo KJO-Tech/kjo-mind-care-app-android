@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.ui.main.blog.BlogPost
+import tech.kjo.kjo_mind_care.data.model.BlogPost
 
 @Composable
 fun BlogPostCard(

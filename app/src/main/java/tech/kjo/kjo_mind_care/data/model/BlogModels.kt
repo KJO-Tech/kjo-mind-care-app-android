@@ -1,4 +1,4 @@
-package tech.kjo.kjo_mind_care.ui.main.blog
+package tech.kjo.kjo_mind_care.data.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -16,6 +16,25 @@ data class User(
     val profileImageUrl: String? = null // URL de la imagen de perfil
 )
 
+
+data class Category(
+    val id: String = "",
+    val nameTranslations: Map<String, String> = emptyMap(), // Mapa: "es" -> "Ansiedad", "en" -> "Anxiety"
+    val isActive: Boolean = true // Para activo/inactivo
+) {
+    /**
+     * Devuelve el nombre de la categoría en el idioma actual del dispositivo.
+     * Si no encuentra una traducción específica, intenta un idioma por defecto (ej. "en").
+     * Si tampoco lo encuentra, devuelve un valor por defecto o el primer valor disponible.
+     */
+    fun getLocalizedName(languageCode: String): String {
+        return nameTranslations[languageCode] ?: // Intenta con el idioma exacto
+        nameTranslations["en"] ?:          // Si no hay, intenta con inglés como fallback
+        nameTranslations.values.firstOrNull() ?: // Si no hay inglés, toma la primera disponible
+        "Unnamed Category"                 // Si todo falla
+    }
+}
+
 // Modelo de Blog Post
 data class BlogPost(
     val id: String,
@@ -27,9 +46,10 @@ data class BlogPost(
     val mediaType: MediaType? = null,
     val likes: Int,
     val comments: Int,
-    val isLiked: Boolean = false
+    val isLiked: Boolean = false,
+    val categoryId: String? = null
 ) {
-    @Composable // Ahora es un composable porque usa stringResource
+    @Composable
     fun getTimeAgo(): String {
         val now = LocalDateTime.now()
         val minutes = ChronoUnit.MINUTES.between(createdAt, now)

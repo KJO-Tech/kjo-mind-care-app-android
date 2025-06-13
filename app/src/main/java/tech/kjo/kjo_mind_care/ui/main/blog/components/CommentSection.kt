@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
-import tech.kjo.kjo_mind_care.ui.main.blog.Comment
+import tech.kjo.kjo_mind_care.data.model.Comment
 
 @Composable
 fun CommentSection(

@@ -146,4 +146,10 @@
     <string name="delete_comment_dialog_message">¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer.</string>
     <string name="delete_comment_dialog_confirm">Eliminar</string>
     <string name="delete_comment_dialog_cancel">Cancelar</string>
+
+    <string name="content_description_filter_button">Botón Filtrar por categoría</string>
+    <string name="filter_dialog_title">Filtrar por categoría</string>
+    <string name="filter_dialog_clear_selection">Borrar selección</string>
+    <string name="filter_dialog_apply_filters">Aplicar filtros</string>
+    <string name="pull_to_refresh_content_description">Arrastrar para recargar</string>
 </resources>

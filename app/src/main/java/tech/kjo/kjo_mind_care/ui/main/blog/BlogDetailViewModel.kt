@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import tech.kjo.kjo_mind_care.data.model.BlogPost
+import tech.kjo.kjo_mind_care.data.model.Comment
+import tech.kjo.kjo_mind_care.data.model.StaticBlogData
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -31,7 +34,7 @@ class BlogDetailViewModel(
     private val _uiState = MutableStateFlow(BlogDetailUiState())
     val uiState: StateFlow<BlogDetailUiState> = _uiState.asStateFlow()
 
-    private val currentUser = StaticBlogDetailData.currentUser // Asume un usuario logueado
+    private val currentUser = StaticBlogData.currentUser // Asume un usuario logueado
 
     init {
         loadBlogDetail()
@@ -42,7 +45,7 @@ class BlogDetailViewModel(
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val blog = StaticBlogData.getSampleBlogPosts().find { it.id == blogId }
-                val comments = StaticBlogDetailData.getSampleCommentsForBlog(blogId)
+                val comments = StaticBlogData.getSampleCommentsForBlog(blogId)
                 _uiState.update { it.copy(blogPost = blog, comments = comments, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update {
@@ -228,72 +231,6 @@ class BlogDetailViewModel(
     ): List<Comment> {
         return comments.filter { it.id != commentIdToRemove }.map { comment ->
             comment.copy(replies = removeCommentRecursive(comment.replies, commentIdToRemove))
-        }
-    }
-}
-
-
-// Datos estáticos de ejemplo para comentarios
-object StaticBlogDetailData {
-    val user1 = User(
-        id = "user_1",
-        username = "carlos_m",
-        fullName = "Carlos M.",
-        profileImageUrl = "https://randomuser.me/api/portraits/men/1.jpg"
-    )
-    val user2 = User(
-        id = "user_2",
-        username = "ana_p",
-        fullName = "Ana P.",
-        profileImageUrl = "https://randomuser.me/api/portraits/women/2.jpg"
-    )
-    val currentUser = User(
-        id = "user_current",
-        username = "kjo_dev",
-        fullName = "Kjo Developer",
-        profileImageUrl = null
-    )
-
-
-    fun getSampleCommentsForBlog(blogId: String): List<Comment> {
-        return when (blogId) {
-            "blog_1" -> listOf(
-                Comment(
-                    id = "comment_1_1",
-                    author = user1,
-                    content = "¡Excelente artículo! Muy útil para la temporada de exámenes.",
-                    createdAt = LocalDateTime.now().minusHours(1),
-                    isMine = false,
-                    replies = listOf(
-                        Comment(
-                            id = "comment_1_1_1",
-                            author = currentUser,
-                            content = "Me alegro de que te sea útil, ¡gracias por el comentario!",
-                            createdAt = LocalDateTime.now().minusMinutes(30),
-                            isMine = true
-                        )
-                    )
-                ),
-                Comment(
-                    id = "comment_1_2",
-                    author = user2,
-                    content = "La parte de la respiración me ayudó mucho.",
-                    createdAt = LocalDateTime.now().minusMinutes(45),
-                    isMine = false
-                )
-            )
-
-            "blog_3" -> listOf(
-                Comment(
-                    id = "comment_3_1",
-                    author = currentUser,
-                    content = "¡Qué interesante! Justo lo que necesitaba leer.",
-                    createdAt = LocalDateTime.now().minusDays(1),
-                    isMine = true
-                )
-            )
-
-            else -> emptyList()
         }
     }
 }
