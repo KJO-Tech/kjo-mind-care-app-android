@@ -29,12 +29,13 @@ fun Avatar(
     val context = LocalContext.current
     val initials = user.fullName.split(" ").mapNotNull { it.firstOrNull()?.uppercaseChar() }.take(2)
         .joinToString("")
-        ?: user.username.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+//        ?: user.username.firstOrNull()?.uppercaseChar()?.toString()
+        ?: "?"
 
-    if (user.profileImageUrl != null && user.profileImageUrl.isNotBlank()) {
+    if (user.profileImage != null && user.profileImage!!.isNotBlank()) {
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context)
-                .data(user.profileImageUrl)
+                .data(user.profileImage)
                 .apply(block = {
                     transformations(CircleCropTransformation())
                     crossfade(true)

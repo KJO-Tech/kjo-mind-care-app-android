@@ -49,7 +49,7 @@ class BlogFormViewModel(
     private val _uiState = MutableStateFlow(BlogFormUiState())
     val uiState: StateFlow<BlogFormUiState> = _uiState.asStateFlow()
 
-    private val currentUserId = StaticBlogData.currentUser.id
+    private val currentUserId = StaticBlogData.currentUser.uid
 
     init {
         // Cargar categorías disponibles

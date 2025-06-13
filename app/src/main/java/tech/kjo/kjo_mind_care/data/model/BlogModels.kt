@@ -9,12 +9,12 @@ import java.time.temporal.ChronoUnit
 // TODO: Refactorizar este archivo a su propio paquete de model y también los nombres de los atributos y/o clases
 
 // Modelo de Usuario (creador del blog/comentario)
-data class User(
-    val id: String,
-    val username: String,
-    val fullName: String,
-    val profileImageUrl: String? = null // URL de la imagen de perfil
-)
+//data class User(
+//    val id: String,
+//    val username: String,
+//    val fullName: String,
+//    val profileImageUrl: String? = null // URL de la imagen de perfil
+//)
 
 
 data class Category(

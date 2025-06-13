@@ -115,7 +115,7 @@ class BlogDetailViewModel(
     }
 
     fun isCurrentUserAuthor(): Boolean {
-        return uiState.value.blogPost?.author?.id == currentUser.id
+        return uiState.value.blogPost?.author?.uid == currentUser.uid
     }
 
     fun showDeleteConfirmation(show: Boolean) {
