@@ -87,7 +87,8 @@ fun KJOMindCareNavHost(profileViewModel: ProfileViewModel) {
 
         modalComposable(Screen.NotificationsScreen.route) {
             NotificationsScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToRoute = { route -> navController.navigate(route) }
             )
         }
     }
@@ -138,7 +139,7 @@ fun MainAppScreenPreview() {
 @Composable
 fun NotificationsScreenPreview() {
     KJOMindCareTheme {
-        NotificationsScreen(onNavigateBack = { })
+        NotificationsScreen(onNavigateBack = { }, onNavigateToRoute = { })
     }
 }
 

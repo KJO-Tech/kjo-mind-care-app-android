@@ -117,7 +117,6 @@
     <string name="content_description_play_video">Play video</string>
 
     <string name="blog_detail_title">Blog Details</string>
-    <string name="content_description_back_button">Back button</string>
     <string name="loading_blog">Loading blog...</string>
     <string name="error_loading_blog">Error loading blog: %s</string>
     <string name="blog_not_found">Blog not found.</string>
@@ -197,4 +196,32 @@
     <string name="check_ins">Check-ins</string>
     <string name="posts">Posts</string>
     <string name="badges">Badges</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="content_description_back_button">Back button</string>
+    <string name="no_notifications_yet">You have no notifications at the moment.</string>
+    <string name="all_notifications_read">All notifications marked as read.</string>
+    <string name="mark_all_as_read">Mark All as Read</string>
+    <string name="notification_item_new">New</string>
+    <string name="notification_item_read">Read</string>
+
+    <string name="notification_like_blog_title">New Like on Your Blog</string>
+    <string name="notification_like_blog_body">%1$s liked your blog: "%2$s"</string>
+    <string name="notification_comment_blog_title">New Comment on Your Blog</string>
+    <string name="notification_comment_blog_body">%1$s commented on your blog: "%2$s"</string>
+    <string name="notification_mood_reminder_title">Mood Reminder!</string>
+    <string name="notification_mood_reminder_body">It\'s time to log your mood. Take a moment to reflect.</string>
+    <string name="notification_activity_reminder_title">Activity Reminder!</string>
+    <string name="notification_activity_reminder_body">Don\'t forget to complete your daily activity: "%1$s".</string>
+    <string name="notification_system_update_title">System Update</string>
+    <string name="notification_system_update_body">We\'ve released new features. Check them out now!</string>
+    <string name="notification_new_blog_post_title">New Blog Post</string>
+    <string name="notification_new_blog_post_body">A new blog from %1$s has been published: "%2$s".</string>
+
+    <string name="notification_type_like">Like</string>
+    <string name="notification_type_comment">Comment</string>
+    <string name="notification_type_reminder">Reminder</string>
+    <string name="notification_type_system">System</string>
+    <string name="notification_type_new_blog">New Blog</string>
 </resources>
