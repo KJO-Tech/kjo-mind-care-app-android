@@ -95,4 +95,55 @@
     <string name="mood_frustrated_title">Frustrado</string>
     <string name="mood_frustrated_desc">Irritado, molesto</string>
 
+    <!-- BlogScreen -->
+    <string name="blog_community_title">Blog Comunitario</string>
+    <string name="search_blogs_placeholder">Buscar blogs...</string>
+    <string name="tab_all_blogs">Todo</string>
+    <string name="tab_popular_blogs">Populares</string>
+    <string name="tab_latest_blogs">Recientes</string>
+    <string name="tab_my_blogs">Mis Blogs</string>
+
+    <string name="content_description_like_button">Botón Me gusta</string>
+    <string name="content_description_comment_button">Botón Comentarios</string>
+    <string name="content_description_share_button">Botón Compartir</string>
+    <string name="time_ago_now">Ahora</string>
+    <string name="time_ago_minute">Hace 1 minuto</string>
+    <string name="time_ago_minutes">Hace %d minutos</string>
+    <string name="time_ago_hour">Hace 1 hora</string>
+    <string name="time_ago_hours">Hace %d horas</string>
+    <string name="time_ago_day">Hace 1 día</string>
+    <string name="time_ago_days">Hace %d días</string>
+    <string name="time_ago_month">Hace 1 mes</string>
+    <string name="time_ago_months">Hace %d meses</string>
+    <string name="time_ago_year">Hace 1 año</string>
+    <string name="time_ago_years">Hace %d años</string>
+    <string name="content_description_blog_preview_image">Imagen de vista previa del blog</string>
+    <string name="content_description_blog_preview_video">Video de vista previa del blog</string>
+    <string name="content_description_play_video">Reproducir video</string>
+
+    <string name="blog_detail_title">Detalles del Blog</string>
+    <string name="content_description_back_button">Botón Volver</string>
+    <string name="loading_blog">Cargando blog...</string>
+    <string name="error_loading_blog">Error al cargar el blog: %s</string>
+    <string name="blog_not_found">Blog no encontrado.</string>
+    <string name="comments_section_title">Comentarios (%d)</string>
+    <string name="add_comment_button">Añadir comentario</string>
+    <string name="reply_comment_button">Responder</string>
+    <string name="edit_comment_button">Editar</string>
+    <string name="delete_comment_button">Eliminar</string>
+    <string name="write_comment_placeholder">Escribe tu comentario...</string>
+    <string name="save_comment_button">Guardar</string>
+    <string name="cancel_comment_button">Cancelar</string>
+    <string name="content_description_avatar">Avatar de %s</string>
+    <string name="content_description_reply">Responder al comentario</string>
+    <string name="content_description_edit">Editar comentario</string>
+    <string name="content_description_delete">Eliminar comentario</string>
+    <string name="content_description_add_comment">Añadir nuevo comentario</string>
+
+    <string name="content_description_search_icon">Icono de búsqueda</string>
+
+    <string name="delete_comment_dialog_title">Eliminar comentario</string>
+    <string name="delete_comment_dialog_message">¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer.</string>
+    <string name="delete_comment_dialog_confirm">Eliminar</string>
+    <string name="delete_comment_dialog_cancel">Cancelar</string>
 </resources>

@@ -20,30 +20,36 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.main.blog.components.BlogList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogScreen(
     onNavigateToBlogPostDetail: (String) -> Unit,
+    viewModel: BlogViewModel = viewModel()
 ) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("Recientes", "Populares", "Mis Blogs")
-    var searchQuery by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val tabs = listOf(
+        stringResource(R.string.tab_all_blogs),
+        stringResource(R.string.tab_popular_blogs),
+        stringResource(R.string.tab_latest_blogs),
+        stringResource(R.string.tab_my_blogs)
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Blog Comunitario",
+                        stringResource(R.string.blog_community_title),
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -64,47 +70,42 @@ fun BlogScreen(
         ) {
 
             OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
+                value = uiState.searchQuery,
+                onValueChange = { viewModel.onSearchQueryChanged(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Buscar blogs...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                placeholder = { Text(stringResource(R.string.search_blogs_placeholder)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = stringResource(R.string.content_description_search_icon)
+                    )
+                },
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true
             )
 
             TabRow(
-                selectedTabIndex = selectedTabIndex,
+                selectedTabIndex = uiState.selectedTabIndex,
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(title) },
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index }
+                        selected = uiState.selectedTabIndex == index,
+                        onClick = { viewModel.onTabSelected(index) }
                     )
                 }
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                BlogList()
-
-//            FloatingActionButton(
-//                onClick = { /* TODO: Implementar creación de nuevo blog */ },
-//                modifier = Modifier
-//                    .align(Alignment.BottomEnd)
-//                    .padding(16.dp),
-//                containerColor = MaterialTheme.colorScheme.primary,
-//                contentColor = MaterialTheme.colorScheme.onPrimary
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Add,
-//                    contentDescription = "Crear nuevo blog"
-//                )
-//            }
+                BlogList(
+                    blogs = uiState.filteredBlogs,
+                    onBlogClick = onNavigateToBlogPostDetail,
+                    onToggleLike = { blogId -> viewModel.toggleLike(blogId) }
+                )
             }
         }
     }

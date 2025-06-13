@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.ui.main.blog.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
@@ -21,53 +22,58 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.ui.main.blog.BlogPost
 
 @Composable
-fun BlogPostCard(blog: BlogPost) {
-    var isLiked by remember { mutableStateOf(blog.isLiked) }
-    var likeCount by remember { mutableStateOf(blog.likes) }
-
+fun BlogPostCard(
+    blog: BlogPost,
+    onBlogClick: (String) -> Unit,
+    onToggleLike: (String) -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onBlogClick(blog.id) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
-        ),
-        onClick = { /* TODO: Navegar al detalle del blog */ }
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            BlogMediaPreview(
+                mediaUrl = blog.mediaUrl,
+                mediaType = blog.mediaType,
+                isDetailScreen = false
+            )
+            if (blog.mediaUrl != null && blog.mediaUrl.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Avatar(
-//                    size = 40.dp,
-                    placeholder = blog.author.first().toString()
-                )
-
+                Avatar(user = blog.author)
                 Spacer(modifier = Modifier.width(12.dp))
-
                 Column {
                     Text(
-                        text = blog.author,
+                        text = blog.author.fullName,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
-                        text = blog.timeAgo,
+                        text = blog.getTimeAgo(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -84,10 +90,12 @@ fun BlogPostCard(blog: BlogPost) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Contenido limitado a 3 líneas para la Card
             Text(
                 text = blog.content,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis // Añade puntos suspensivos si el texto es muy largo
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -100,31 +108,28 @@ fun BlogPostCard(blog: BlogPost) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = {
-                            isLiked = !isLiked
-                            likeCount += if (isLiked) 1 else -1
-                        }
+                        onClick = { onToggleLike(blog.id) }
                     ) {
                         Icon(
-                            imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Me gusta",
-                            tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            imageVector = if (blog.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = stringResource(R.string.content_description_like_button),
+                            tint = if (blog.isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
 
                     Text(
-                        text = likeCount.toString(),
+                        text = blog.likes.toString(),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     IconButton(
-                        onClick = { /* TODO: Mostrar comentarios */ }
+                        onClick = { onBlogClick(blog.id) }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Comment,
-                            contentDescription = "Comentarios"
+                            imageVector = Icons.AutoMirrored.Filled.Comment,
+                            contentDescription = stringResource(R.string.content_description_comment_button)
                         )
                     }
 
@@ -135,11 +140,11 @@ fun BlogPostCard(blog: BlogPost) {
                 }
 
                 IconButton(
-                    onClick = { /* TODO: Compartir blog */ }
+                    onClick = { /* TODO: Implementar compartir */ }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
-                        contentDescription = "Compartir"
+                        contentDescription = stringResource(R.string.content_description_share_button)
                     )
                 }
             }
