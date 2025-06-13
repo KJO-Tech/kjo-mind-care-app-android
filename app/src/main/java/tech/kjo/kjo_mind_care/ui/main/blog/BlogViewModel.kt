@@ -55,11 +55,12 @@ class BlogViewModel(
                                     it.author.fullName.contains(
                                         uiState.searchQuery,
                                         ignoreCase = true
-                                    ) ||
-                                    it.author.username.contains(
-                                        uiState.searchQuery,
-                                        ignoreCase = true
                                     )
+//                                    ||
+//                                    it.author.username.contains(
+//                                        uiState.searchQuery,
+//                                        ignoreCase = true
+//                                    )
                         }
                     } else {
                         allBlogs
@@ -78,7 +79,7 @@ class BlogViewModel(
                         0 -> filteredByCategories
                         1 -> filteredByCategories.sortedByDescending { it.likes }
                         2 -> filteredByCategories.sortedByDescending { it.createdAt }
-                        3 -> filteredByCategories.filter { it.author.id == StaticBlogData.currentUser.id }
+                        3 -> filteredByCategories.filter { it.author.uid == StaticBlogData.currentUser.uid }
                         else -> filteredByCategories
                     }
                     finalFilteredBlogs
