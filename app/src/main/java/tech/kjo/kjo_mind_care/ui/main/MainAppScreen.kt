@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.ui.main
 
+import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +25,8 @@ import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
+import tech.kjo.kjo_mind_care.ui.main.profile.ProfileScreen
+import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
 import tech.kjo.kjo_mind_care.ui.navigation.BottomNavigationBar
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
@@ -32,10 +36,10 @@ import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopExitTransition
 
 @Composable
 fun MainAppScreen(
+    profileViewModel: ProfileViewModel = viewModel(),
     mainNavController: NavController // Recibe el NavController global para navegar fuera del bottom bar
 ) {
     val bottomNavController = rememberNavController() // NavController para las pestañas
-
     Scaffold(
         topBar = {},
         bottomBar = {
@@ -64,7 +68,10 @@ fun MainAppScreen(
         ) {
 
             // HOME GRAPH
-            navigation(startDestination = Screen.HomeStart.route, route = Screen.HomeGraph.route) {
+            navigation(
+                startDestination = Screen.HomeStart.route,
+                route = Screen.HomeGraph.route
+            ) {
                 composable(Screen.HomeStart.route) {
                     HomeScreen(
                         onNavigateToNotifications = { mainNavController.navigate(Screen.NotificationsScreen.route) },
@@ -74,7 +81,10 @@ fun MainAppScreen(
             }
 
             // BLOG GRAPH
-            navigation(startDestination = Screen.BlogList.route, route = Screen.BlogGraph.route) {
+            navigation(
+                startDestination = Screen.BlogList.route,
+                route = Screen.BlogGraph.route
+            ) {
                 composable(Screen.BlogList.route) {
                     BlogScreen(
                         onNavigateToBlogPostDetail = { blogId ->
@@ -189,9 +199,20 @@ fun MainAppScreen(
                 route = Screen.ProfileGraph.route
             ) {
                 composable(Screen.ProfileDetails.route) {
-//                        ProfileScreen(
-//                            onNavigateToEditProfile = { bottomNavController.navigate(Screen.EditProfile.route) }
-//                        )
+                    ProfileScreen(
+                        viewModel = profileViewModel,
+                        onEditProfile = {
+                            bottomNavController.navigate(Screen.EditProfile.route)
+                        },
+                        onAccountSettings = {
+                            //Logica
+                        },
+                        onLogout = {
+                            mainNavController.navigate(Screen.WelcomeLoginScreen.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
                 }
                 composable(Screen.EditProfile.route) {
 //                        EditProfileScreen(

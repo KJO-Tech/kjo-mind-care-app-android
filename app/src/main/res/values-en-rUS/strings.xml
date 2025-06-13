@@ -182,4 +182,19 @@
     <string name="dialog_add_comment_title">Add Comment</string>
     <string name="comment_input_placeholder">Write your comment...</string>
     <string name="send_comment_button">Send Comment</string>
+
+    <!-- Profile Section -->
+    <string name="logout">Log out</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="about">About KJO Mind Care</string>
+    <string name="profile_title">Profile</string>
+    <!-- More profile section items -->
+    <string name="support_section">Support</string>
+    <string name="account_section">Account</string>
+    <string name="check_ins">Check-ins</string>
+    <string name="posts">Posts</string>
+    <string name="badges">Badges</string>
 </resources>
