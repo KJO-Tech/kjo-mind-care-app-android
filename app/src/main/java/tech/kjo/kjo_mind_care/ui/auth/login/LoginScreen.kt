@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.ui.auth.login
 
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.BorderStroke
 import tech.kjo.kjo_mind_care.ui.components.ThemedTextField
@@ -15,34 +16,56 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
 import tech.kjo.kjo_mind_care.ui.components.ThemedPasswordTextField
 import tech.kjo.kjo_mind_care.ui.auth.AuthScreenContainer
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import tech.kjo.kjo_mind_care.utils.Resource
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: LoginViewModel = hiltViewModel()
+    val state by viewModel.loginState.collectAsStateWithLifecycle()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(state) {
+        when (state) {
+            is Resource.Success -> {
+                onLoginSuccess()
+                viewModel.resetState()
+            }
+            else -> Unit
+        }
+    }
 
     AuthScreenContainer(
         title = stringResource(id = R.string.login_title),
@@ -75,12 +98,24 @@ fun LoginScreen(
         }
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (state is Resource.Error) {
+            Text(
+                text = (state as Resource.Error).message ?: "Error desconocido",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+            )
+        }
+
         ThemedButton(
             onClick = {
-                // Logica de login y pasarle el callback de onLoginSuccess
-                onLoginSuccess()
+                viewModel.login(email, password)
             },
-            text = stringResource(id = R.string.login_button)
+            text = stringResource(id = R.string.login_button),
+            enabled = state !is Resource.Loading
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -135,6 +170,12 @@ fun LoginScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )
+        }
+
+        if (state is Resource.Loading) {
+            CircularProgressIndicator(modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp))
         }
     }
 }
