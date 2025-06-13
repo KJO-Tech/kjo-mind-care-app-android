@@ -7,13 +7,17 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import tech.kjo.kjo_mind_care.ui.main.blog.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
@@ -72,24 +76,27 @@ fun MainAppScreen(
             navigation(startDestination = Screen.BlogList.route, route = Screen.BlogGraph.route) {
                 composable(Screen.BlogList.route) {
                     BlogScreen(
-                        onNavigateToBlogPostDetail = { postId ->
+                        onNavigateToBlogPostDetail = { blogId ->
                             bottomNavController.navigate(
-                                Screen.BlogPostDetail.createRoute(
-                                    postId
-                                )
+                                Screen.BlogPostDetail.createRoute(blogId)
                             )
                         }
                     )
                 }
                 composable(
                     route = Screen.BlogPostDetail.route,
-//                        arguments = listOf(navArgument("postId") { type = NavType.StringType })
+                        arguments = listOf(navArgument("blogId") { type = NavType.StringType })
                 ) { backStackEntry ->
-                    val postId = backStackEntry.arguments?.getString("postId")
-//                        BlogPostDetailScreen(
-//                            postId = postId ?: "N/A",
-//                            onNavigateBack = { bottomNavController.popBackStack() }
-//                        )
+                    val blogId = backStackEntry.arguments?.getString("blogId")
+                    if (blogId != null) {
+                        BlogPostDetailScreen(
+                            blogId = blogId,
+                            onNavigateBack = { bottomNavController.popBackStack() }
+                        )
+                    } else {
+                        // TODO: Manejar el caso donde blogId es nulo (ej. mostrar error o volver)
+                        Text("Error: ID de blog no proporcionado.")
+                    }
                 }
             }
 

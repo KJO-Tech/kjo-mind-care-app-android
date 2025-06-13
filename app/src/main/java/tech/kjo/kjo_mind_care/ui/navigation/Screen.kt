@@ -19,9 +19,10 @@ sealed class Screen(val route: String) {
 
     // Rutas específicas dentro de cada sub-grafo
     object HomeStart : Screen("home_start")
+
     object BlogList : Screen("blog_list")
-    object BlogPostDetail : Screen("blog_post_detail/{postId}") {
-        fun createRoute(postId: String) = "blog_post_detail/$postId"
+    object BlogPostDetail : Screen("blog_post_detail/{blogId}") {
+        fun createRoute(blogId: String) = "blog_post_detail/$blogId"
     }
 
     object MoodTrackerStart : Screen("mood_tracker_start")
