@@ -7,7 +7,7 @@ sealed class Screen(val route: String) {
     object RegisterScreen : Screen("register_screen")
     object MainAppScreen : Screen("main_app_screen")
 
-    object CreateNewEntryScreen : Screen("create_new_entry_screen")
+    object CreateBlogScreen : Screen("create_blog_screen")
     object NotificationsScreen : Screen("notifications_screen")
 
     // Sub-Grafos para cada pestaña del Bottom Navigation Bar
@@ -19,9 +19,13 @@ sealed class Screen(val route: String) {
 
     // Rutas específicas dentro de cada sub-grafo
     object HomeStart : Screen("home_start")
+
     object BlogList : Screen("blog_list")
-    object BlogPostDetail : Screen("blog_post_detail/{postId}") {
-        fun createRoute(postId: String) = "blog_post_detail/$postId"
+    object BlogPostDetail : Screen("blog_post_detail/{blogId}") {
+        fun createRoute(blogId: String) = "blog_post_detail/$blogId"
+    }
+    object EditBlog: Screen("edit_blog/{blogId}") {
+        fun createRoute(blogId: String) = "edit_blog/$blogId"
     }
 
     object MoodTrackerStart : Screen("mood_tracker_start")

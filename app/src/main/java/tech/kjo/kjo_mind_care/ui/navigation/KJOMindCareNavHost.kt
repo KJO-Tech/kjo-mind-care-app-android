@@ -9,6 +9,7 @@ import tech.kjo.kjo_mind_care.ui.auth.login.LoginScreen
 import tech.kjo.kjo_mind_care.ui.auth.register.RegisterScreen
 import tech.kjo.kjo_mind_care.ui.main.MainAppScreen
 import tech.kjo.kjo_mind_care.ui.main.blog.CreateNewEntryScreen
+import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.notifications.NotificationsScreen
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
 import tech.kjo.kjo_mind_care.ui.splash.SplashScreen
@@ -70,11 +71,17 @@ fun KJOMindCareNavHost(profileViewModel: ProfileViewModel) {
 
         // Pantalla superpuesta/modal para crear (con su TopBar de regreso) y que se puede superponer sobre el flujo principal.
         modalComposable(
-            Screen.CreateNewEntryScreen.route
+            Screen.CreateBlogScreen.route
         ) {
-            CreateNewEntryScreen(
-                onCreationComplete = { navController.popBackStack() }, // Volver atrás cuando se complete
-                onNavigateBack = { navController.popBackStack() }
+            BlogFormScreen(
+                blogId = null,
+                onBlogSaved = {
+                    navController.popBackStack(
+                        Screen.BlogList.route,
+                        inclusive = false
+                    )
+                }, // Vuelve a la pantalla de blogs
+                onBackClick = { navController.popBackStack() }
             )
         }
 
@@ -137,8 +144,12 @@ fun NotificationsScreenPreview() {
 
 @Preview
 @Composable
-fun CreateNewEntryScreenPreview() {
+fun CreateBlogScreenPreview() {
     KJOMindCareTheme {
-        CreateNewEntryScreen(onCreationComplete = { }, onNavigateBack = { })
+        BlogFormScreen(
+            blogId = null,
+            onBlogSaved = { },
+            onBackClick = { }
+        )
     }
 }

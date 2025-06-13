@@ -80,7 +80,12 @@ dependencies {
     // Animations
     implementation("androidx.compose.animation:animation:1.8.2")
 
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    // Coil (para cargar imágenes)
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Media3 (Reproductor de Video)
+    implementation("androidx.media3:media3-exoplayer:1.7.1")
+    implementation("androidx.media3:media3-ui:1.7.1")
 
     // Hilt
     implementation(libs.hilt.android)

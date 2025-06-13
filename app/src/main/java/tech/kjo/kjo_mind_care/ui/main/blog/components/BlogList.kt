@@ -5,70 +5,64 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import tech.kjo.kjo_mind_care.data.model.BlogPost
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BlogList() {
-    val blogs = remember {
-        listOf(
-            BlogPost(
-                id = 1,
-                title = "Cómo manejar la ansiedad en exámenes",
-                content = "La ansiedad ante los exámenes es una respuesta común que muchos estudiantes experimentan. Aquí hay algunas estrategias que pueden ayudarte a manejarla...",
-                author = "Carlos M.",
-                authorAvatar = "",
-                timeAgo = "2 horas",
-                likes = 24,
-                comments = 8,
-                isLiked = false
-            ),
-            BlogPost(
-                id = 2,
-                title = "Técnicas de respiración para momentos de estrés",
-                content = "La respiración consciente es una herramienta poderosa para calmar la mente y reducir el estrés. Estas técnicas simples pueden practicarse en cualquier lugar...",
-                author = "Ana P.",
-                authorAvatar = "",
-                timeAgo = "5 horas",
-                likes = 42,
-                comments = 15,
-                isLiked = true
-            ),
-            BlogPost(
-                id = 3,
-                title = "Mi experiencia con la meditación diaria",
-                content = "Hace seis meses comencé a meditar todos los días durante 10 minutos. Al principio fue difícil mantener la constancia, pero los beneficios que he experimentado son...",
-                author = "Miguel L.",
-                authorAvatar = "",
-                timeAgo = "1 día",
-                likes = 36,
-                comments = 12,
-                isLiked = false
-            )
-        )
+fun BlogList(
+    blogs: List<BlogPost>,
+    onBlogClick: (String) -> Unit,
+    onToggleLike: (String) -> Unit,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    selectedTabIndex: Int
+) {
+    val listState = rememberLazyListState()
+
+    // Este LaunchedEffect asegura que el scroll se reinicie a la parte superior
+    // cada vez que la pestaña seleccionada cambie.
+    LaunchedEffect(selectedTabIndex) {
+        listState.scrollToItem(0)
     }
 
-    LazyColumn(
+    val pullRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        state = pullRefreshState,
+        contentAlignment = Alignment.TopCenter,
+        // Puedes personalizar el 'indicator' si quieres, por defecto usa PullToRefreshDefaults.Indicator
+        // indicator = {
+        //     PullToRefreshDefaults.Indicator(
+        //         state = pullRefreshState,
+        //         isRefreshing = isRefreshing
+        //     )
+        // }
     ) {
-        items(blogs) { blog ->
-            BlogPostCard(blog = blog)
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(blogs, key = { it.id }) { blog ->
+                BlogPostCard(
+                    blog = blog,
+                    onBlogClick = onBlogClick,
+                    onToggleLike = onToggleLike
+                )
+            }
         }
     }
 }
-
-data class BlogPost(
-    val id: Int,
-    val title: String,
-    val content: String,
-    val author: String,
-    val authorAvatar: String,
-    val timeAgo: String,
-    val likes: Int,
-    val comments: Int,
-    val isLiked: Boolean
-)
