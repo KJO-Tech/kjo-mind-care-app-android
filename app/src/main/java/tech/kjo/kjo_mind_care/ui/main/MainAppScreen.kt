@@ -1,6 +1,5 @@
 package tech.kjo.kjo_mind_care.ui.main
 
-import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,23 +9,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
+import kotlinx.coroutines.delay
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
+import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileScreen
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
+import tech.kjo.kjo_mind_care.ui.main.resources.EmergencyResourcesScreen
 import tech.kjo.kjo_mind_care.ui.navigation.BottomNavigationBar
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
@@ -37,9 +40,52 @@ import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopExitTransition
 @Composable
 fun MainAppScreen(
     profileViewModel: ProfileViewModel = viewModel(),
-    mainNavController: NavController // Recibe el NavController global para navegar fuera del bottom bar
+    mainNavController: NavController, // Recibe el NavController global para navegar fuera del bottom bar
+    initialDeepLinkRoute: String? = null
 ) {
     val bottomNavController = rememberNavController() // NavController para las pestañas
+
+    // Manejar el deep link inicial con mejor lógica
+    LaunchedEffect(initialDeepLinkRoute) {
+        if (initialDeepLinkRoute != null && initialDeepLinkRoute.isNotBlank()) {
+            // Pequeño delay para asegurar que la UI esté completamente inicializada
+            delay(200)
+
+            // Determinar el grafo correcto basado en la ruta
+            val targetGraphRoute = when {
+                initialDeepLinkRoute.startsWith(Screen.BlogList.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                initialDeepLinkRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                initialDeepLinkRoute.startsWith(Screen.EditBlog.route.substringBefore("/{")) -> Screen.BlogGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.MoodTrackerStart.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.ResourcesList.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+                initialDeepLinkRoute.startsWith(Screen.ResourceDetail.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.ProfileDetails.route.substringBefore("/{")) -> Screen.ProfileGraph.route
+
+                initialDeepLinkRoute == Screen.HomeStart.route -> Screen.HomeGraph.route
+
+                else -> Screen.HomeGraph.route // Default
+            }
+
+            bottomNavController.navigate(targetGraphRoute) {
+                popUpTo(bottomNavController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+
+            if (initialDeepLinkRoute != targetGraphRoute) {
+                bottomNavController.navigate(initialDeepLinkRoute) {
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {},
         bottomBar = {
@@ -97,7 +143,7 @@ fun MainAppScreen(
 
                 composable(
                     route = Screen.BlogPostDetail.route,
-                        arguments = listOf(navArgument("blogId") { type = NavType.StringType })
+                    arguments = listOf(navArgument("blogId") { type = NavType.StringType }),
                 ) { backStackEntry ->
                     val blogId = backStackEntry.arguments?.getString("blogId")
                     if (blogId != null) {
@@ -126,13 +172,23 @@ fun MainAppScreen(
                             if (blogId != null) {
                                 // Navega de nuevo al detalle del blog actualizado y limpia la pila para no apilar.
                                 // La idea es que al guardar, el detalle se refresque con los nuevos datos.
-                                bottomNavController.navigate(Screen.BlogPostDetail.createRoute(blogId)) {
-                                    popUpTo(Screen.BlogPostDetail.route) { inclusive = true } // Elimina todas las instancias anteriores de detalle
-                                    launchSingleTop = true // Evita múltiples copias de la misma pantalla si ya está en la parte superior
+                                bottomNavController.navigate(
+                                    Screen.BlogPostDetail.createRoute(
+                                        blogId
+                                    )
+                                ) {
+                                    popUpTo(Screen.BlogPostDetail.route) {
+                                        inclusive = true
+                                    } // Elimina todas las instancias anteriores de detalle
+                                    launchSingleTop =
+                                        true // Evita múltiples copias de la misma pantalla si ya está en la parte superior
                                 }
                             } else {
                                 // Esto no debería ocurrir si se viene de "editar", pero por seguridad
-                                bottomNavController.popBackStack(Screen.BlogList.route, inclusive = false)
+                                bottomNavController.popBackStack(
+                                    Screen.BlogList.route,
+                                    inclusive = false
+                                )
                             }
                         },
                         onBackClick = { bottomNavController.popBackStack() }
@@ -177,9 +233,13 @@ fun MainAppScreen(
                 route = Screen.ResourcesGraph.route
             ) {
                 composable(Screen.ResourcesList.route) {
-//                        ResourcesListScreen(
-//                            onNavigateToResourceDetail = { resourceId -> bottomNavController.navigate(Screen.ResourceDetail.createRoute(resourceId)) }
-//                        )
+                    EmergencyResourcesScreen(
+                        onNavigateToResourceDetail = { resourceId ->
+                            bottomNavController.navigate(
+                                Screen.ResourceDetail.createRoute(resourceId)
+                            )
+                        }
+                    )
                 }
                 composable(
                     route = Screen.ResourceDetail.route,

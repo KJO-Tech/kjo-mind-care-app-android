@@ -1,5 +1,7 @@
 package tech.kjo.kjo_mind_care.ui.main.blog_detail
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,11 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.BlogPost
 import tech.kjo.kjo_mind_care.data.model.BlogStatus
 import tech.kjo.kjo_mind_care.data.model.Comment
 import tech.kjo.kjo_mind_care.data.model.StaticBlogData
 import tech.kjo.kjo_mind_care.data.repository.BlogRepository
+import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -303,5 +307,26 @@ class BlogDetailViewModel(
         return comments.filter { it.id != commentIdToRemove }.map { comment ->
             comment.copy(replies = removeCommentRecursive(comment.replies, commentIdToRemove))
         }
+    }
+
+    fun shareBlog(context: Context, blogId: String, blogTitle: String) {
+        // Usamos el DEEPLINK_WEB_PATTERN como el enlace que queremos compartir
+        // Aunque aún no tengas un dominio web configurado, este es el formato correcto
+        // para cuando lo tengas. Por ahora, si no tienes dominio, el sistema
+        // intentará abrir tu app si está instalada y maneja el esquema personalizado,
+        // o simplemente mostrará el texto sin abrir una app específica.
+        val shareLink = Screen.BlogPostDetail.DEEPLINK_WEB_PATTERN.replace("{blogId}", blogId)
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Echa un vistazo a este blog: \"$blogTitle\"\n$shareLink")
+            type = "text/plain"
+        }
+        context.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                context.getString(R.string.share_blog_title)
+            )
+        )
     }
 }

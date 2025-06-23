@@ -35,12 +35,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.Category
 import tech.kjo.kjo_mind_care.ui.main.blog.components.BlogList
 import tech.kjo.kjo_mind_care.utils.getCurrentLanguageCode
 
@@ -58,6 +58,8 @@ fun BlogScreen(
         stringResource(R.string.tab_my_blogs)
     )
     val currentLanguageCode = getCurrentLanguageCode()
+
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -94,7 +96,12 @@ fun BlogScreen(
                     onValueChange = { viewModel.onSearchQueryChanged(it) },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text(stringResource(R.string.search_blogs_placeholder)) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.content_description_search_icon)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = stringResource(R.string.content_description_search_icon)
+                        )
+                    },
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true
                 )
@@ -131,7 +138,14 @@ fun BlogScreen(
                     onToggleLike = { blogId -> viewModel.toggleLike(blogId) },
                     isRefreshing = uiState.isRefreshing,
                     onRefresh = { viewModel.refreshBlogs() },
-                    selectedTabIndex = uiState.selectedTabIndex
+                    selectedTabIndex = uiState.selectedTabIndex,
+                    onBlogShare = { blogId, blogTitle ->
+                        viewModel.shareBlog(
+                            context,
+                            blogId,
+                            blogTitle
+                        )
+                    }
                 )
             }
         }
@@ -158,7 +172,10 @@ fun BlogScreen(
                                 selected = tempSelectedCategoryId == null,
                                 onClick = { tempSelectedCategoryId = null }
                             )
-                            Text(stringResource(R.string.filter_dialog_clear_selection), modifier = Modifier.padding(start = 8.dp))
+                            Text(
+                                stringResource(R.string.filter_dialog_clear_selection),
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
                         }
                         // Lista de categorías dinámicas
                         uiState.availableCategories.forEach { category ->
@@ -173,7 +190,10 @@ fun BlogScreen(
                                     selected = tempSelectedCategoryId == category.id,
                                     onClick = { tempSelectedCategoryId = category.id }
                                 )
-                                Text(category.getLocalizedName(currentLanguageCode), modifier = Modifier.padding(start = 8.dp))
+                                Text(
+                                    category.getLocalizedName(currentLanguageCode),
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
                             }
                         }
                     }

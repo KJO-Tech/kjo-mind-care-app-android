@@ -1,14 +1,23 @@
 package tech.kjo.kjo_mind_care.data.model
 
+import android.content.Context
 import java.time.LocalDateTime
 
 object StaticBlogData {
     val currentUser = User(
         uid = "user_current",
 //        username = "kjo_dev",
+        email = "kjo.dev@example.com",
         fullName = "Kjo Developer",
         profileImage = null
     )
+
+    var applicationContext: Context? = null
+        private set
+
+    fun init(context: Context) {
+        applicationContext = context.applicationContext
+    }
 
     fun getSampleBlogPosts(): List<BlogPost> {
         return listOf(
@@ -264,5 +273,110 @@ object StaticBlogData {
 
             else -> emptyList()
         }
+    }
+
+    fun getSampleUsers(): List<User> {
+        return listOf(
+            currentUser,
+            User(
+                uid = "user_1",
+                fullName = "Carlos M.",
+                email = "carlos.m@example.com",
+                profileImage = "https://randomuser.me/api/portraits/men/1.jpg",
+                phone = "+51987654321",
+                age = 30
+            ),
+            User(
+                uid = "user_2",
+                fullName = "Ana P.",
+                email = "ana.p@example.com",
+                profileImage = "https://randomuser.me/api/portraits/women/2.jpg",
+                phone = "+51912345678",
+                age = 25
+            ),
+            User(
+                uid = "user_3",
+                fullName = "Miguel L.",
+                email = "miguel.l@example.com",
+                profileImage = "https://randomuser.me/api/portraits/men/3.jpg",
+                phone = "+51998765432",
+                age = 35
+            ),
+            User(
+                uid = "user_4",
+                fullName = "Laura G.",
+                email = "laura.g@example.com",
+                profileImage = "https://randomuser.me/api/portraits/women/4.jpg",
+                phone = "+51901234567",
+                age = 28
+            ),
+            User(
+                uid = "user_a",
+                fullName = "User A",
+                email = "user.a@example.com",
+                profileImage = "https://randomuser.me/api/portraits/men/5.jpg"
+            ),
+            User(
+                uid = "user_b",
+                fullName = "User B",
+                email = "user.b@example.com",
+                profileImage = "https://randomuser.me/api/portraits/women/6.jpg"
+            ),
+            User(
+                uid = "user_c",
+                fullName = "User C",
+                email = "user.c@example.com",
+                profileImage = "https://randomuser.me/api/portraits/men/7.jpg"
+            )
+        )
+    }
+    fun getSampleDailyActivities(): List<DailyActivity> {
+        return listOf(
+            DailyActivity(
+                id = "activity_1",
+                name = "Meditación guiada",
+                description = "Sesión de 10 minutos de meditación para empezar el día con calma.",
+                category = "Mindfulness",
+                durationMinutes = 10,
+                difficulty = "Fácil",
+                isCompleted = false
+            ),
+            DailyActivity(
+                id = "activity_2",
+                name = "Ejercicio de respiración profunda",
+                description = "Cinco minutos para practicar la respiración diafragmática y reducir el estrés.",
+                category = "Respiración",
+                durationMinutes = 5,
+                difficulty = "Fácil",
+                isCompleted = false
+            ),
+            DailyActivity(
+                id = "activity_3",
+                name = "Escribir en el diario de gratitud",
+                description = "Dedica unos minutos a escribir tres cosas por las que estés agradecido.",
+                category = "Gratitud",
+                durationMinutes = 7,
+                difficulty = "Fácil",
+                isCompleted = true
+            ),
+            DailyActivity(
+                id = "activity_4",
+                name = "Paseo consciente",
+                description = "Un paseo de 15 minutos prestando atención a tus sentidos y al entorno.",
+                category = "Actividad Física",
+                durationMinutes = 15,
+                difficulty = "Fácil",
+                isCompleted = false
+            ),
+            DailyActivity(
+                id = "activity_5",
+                name = "Lectura reflexiva",
+                description = "Lee un pasaje inspirador y reflexiona sobre su significado para ti.",
+                category = "Lectura",
+                durationMinutes = 10,
+                difficulty = "Moderado",
+                isCompleted = false
+            )
+        )
     }
 }

@@ -35,7 +35,8 @@ import tech.kjo.kjo_mind_care.data.model.BlogPost
 fun BlogPostCard(
     blog: BlogPost,
     onBlogClick: (String) -> Unit,
-    onToggleLike: (String) -> Unit
+    onToggleLike: (String) -> Unit,
+    onBlogShare: (String, String) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -140,7 +141,7 @@ fun BlogPostCard(
                 }
 
                 IconButton(
-                    onClick = { /* TODO: Implementar compartir */ }
+                    onClick = { onBlogShare(blog.id, blog.title) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,

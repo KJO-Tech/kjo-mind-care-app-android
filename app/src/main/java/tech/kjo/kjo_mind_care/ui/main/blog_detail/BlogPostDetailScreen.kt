@@ -3,7 +3,6 @@ package tech.kjo.kjo_mind_care.ui.main.blog_detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
@@ -32,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,6 +44,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,6 +68,8 @@ fun BlogPostDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -101,19 +101,37 @@ fun BlogPostDetailScreen(
                     }
                 },
                 actions = {
+                    // Botón de Compartir
+                    IconButton(onClick = {
+                        uiState.blogPost?.let { blog ->
+                            viewModel.shareBlog(context, blog.id, blog.title)
+                        }
+                    }) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = stringResource(R.string.share_blog_content_description)
+                        )
+                    }
+
                     // Mostrar botones de editar y eliminar si el usuario es el autor y el blog no está eliminado
                     if (viewModel.isCurrentUserAuthor() && uiState.blogPost?.status != BlogStatus.DELETED) {
                         IconButton(
                             onClick = { onNavigateToEditBlog(blogId) },
                             enabled = !uiState.isDeletingBlog // Deshabilitar si se está eliminando
                         ) {
-                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_blog_button))
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.edit_blog_button)
+                            )
                         }
                         IconButton(
                             onClick = { viewModel.showDeleteConfirmation(true) },
                             enabled = !uiState.isDeletingBlog
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_blog_button))
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.delete_blog_button)
+                            )
                         }
                     }
                 },

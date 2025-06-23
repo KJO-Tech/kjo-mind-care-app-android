@@ -122,7 +122,7 @@
     <string name="content_description_play_video">Reproducir video</string>
 
     <string name="blog_detail_title">Detalles del Blog</string>
-    <string name="content_description_back_button">Botón Volver</string>
+    <string name="content_description_back_button">Botón de atrás</string>
     <string name="loading_blog">Cargando blog...</string>
     <string name="error_loading_blog">Error al cargar el blog: %s</string>
     <string name="blog_not_found">Blog no encontrado.</string>
@@ -152,6 +152,9 @@
     <string name="filter_dialog_clear_selection">Borrar selección</string>
     <string name="filter_dialog_apply_filters">Aplicar filtros</string>
     <string name="pull_to_refresh_content_description">Arrastrar para recargar</string>
+
+    <string name="share_blog_content_description">Compartir blog</string>
+    <string name="share_blog_title">Compartir Blog</string>
 
     <!-- BlogFormScreen -->
     <string name="blog_status_pending">Pendiente</string>
@@ -202,4 +205,31 @@
     <string name="check_ins">Check-ins</string>
     <string name="posts">Publicaciones</string>
     <string name="badges">Insignias</string>
+
+    <!-- Notificaciones -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="no_notifications_yet">No tienes notificaciones por el momento.</string>
+    <string name="all_notifications_read">Todas las notificaciones marcadas como leídas.</string>
+    <string name="mark_all_as_read">Marcar todo como leído</string>
+    <string name="notification_item_new">Nueva</string>
+    <string name="notification_item_read">Leída</string>
+
+    <string name="notification_like_blog_title">Nuevo Me Gusta en tu Blog</string>
+    <string name="notification_like_blog_body">%1$s le ha dado me gusta a tu blog: "%2$s"</string>
+    <string name="notification_comment_blog_title">Nuevo Comentario en tu Blog</string>
+    <string name="notification_comment_blog_body">%1$s ha comentado en tu blog: "%2$s"</string>
+    <string name="notification_mood_reminder_title">¡Recordatorio de Ánimo!</string>
+    <string name="notification_mood_reminder_body">Es hora de registrar tu estado de ánimo. Tómate un momento para reflexionar.</string>
+    <string name="notification_activity_reminder_title">¡Recordatorio de Actividad!</string>
+    <string name="notification_activity_reminder_body">No olvides realizar tu actividad diaria: "%1$s".</string>
+    <string name="notification_system_update_title">Actualización del Sistema</string>
+    <string name="notification_system_update_body">Hemos lanzado nuevas funciones. ¡Descúbrelas ahora!</string>
+    <string name="notification_new_blog_post_title">Nuevo Blog Publicado</string>
+    <string name="notification_new_blog_post_body">Un nuevo blog de %1$s ha sido publicado: "%2$s".</string>
+
+    <string name="notification_type_like">Me Gusta</string>
+    <string name="notification_type_comment">Comentario</string>
+    <string name="notification_type_reminder">Recordatorio</string>
+    <string name="notification_type_system">Sistema</string>
+    <string name="notification_type_new_blog">Nuevo Blog</string>
 </resources>
