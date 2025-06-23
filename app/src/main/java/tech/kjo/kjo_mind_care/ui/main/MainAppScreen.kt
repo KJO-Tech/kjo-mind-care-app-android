@@ -19,8 +19,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
+import kotlinx.coroutines.delay
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
@@ -29,13 +29,13 @@ import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileScreen
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
+import tech.kjo.kjo_mind_care.ui.main.resources.EmergencyResourcesScreen
 import tech.kjo.kjo_mind_care.ui.navigation.BottomNavigationBar
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalEnterTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalExitTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopEnterTransition
 import tech.kjo.kjo_mind_care.ui.navigation.defaultHorizontalPopExitTransition
-import tech.kjo.kjo_mind_care.ui.main.resources.EmergencyResourcesScreen
 
 @Composable
 fun MainAppScreen(
@@ -45,34 +45,43 @@ fun MainAppScreen(
 ) {
     val bottomNavController = rememberNavController() // NavController para las pestañas
 
-    // Manejar el deep link inicial
+    // Manejar el deep link inicial con mejor lógica
     LaunchedEffect(initialDeepLinkRoute) {
-        if (initialDeepLinkRoute != null) {
-            bottomNavController.navigate(initialDeepLinkRoute) {
+        if (initialDeepLinkRoute != null && initialDeepLinkRoute.isNotBlank()) {
+            // Pequeño delay para asegurar que la UI esté completamente inicializada
+            delay(200)
 
-                val targetGraphRoute = when {
-                    initialDeepLinkRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
-//                    initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
-                    // ... añade más si tienes otros deep links a graphs específicos
-                    else -> Screen.HomeGraph.route // Default, si no se reconoce
+            // Determinar el grafo correcto basado en la ruta
+            val targetGraphRoute = when {
+                initialDeepLinkRoute.startsWith(Screen.BlogList.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                initialDeepLinkRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                initialDeepLinkRoute.startsWith(Screen.EditBlog.route.substringBefore("/{")) -> Screen.BlogGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.MoodTrackerStart.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.ResourcesList.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+                initialDeepLinkRoute.startsWith(Screen.ResourceDetail.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+
+                initialDeepLinkRoute.startsWith(Screen.ProfileDetails.route.substringBefore("/{")) -> Screen.ProfileGraph.route
+
+                initialDeepLinkRoute == Screen.HomeStart.route -> Screen.HomeGraph.route
+
+                else -> Screen.HomeGraph.route // Default
+            }
+
+            bottomNavController.navigate(targetGraphRoute) {
+                popUpTo(bottomNavController.graph.findStartDestination().id) {
+                    saveState = true
                 }
+                launchSingleTop = true
+                restoreState = true
+            }
 
-                bottomNavController.navigate(targetGraphRoute) {
-                    // Limpia la pila del bottomNavController hasta la pestaña raíz del deep link
-                    // Esto asegura que si ya estabas en otra pestaña, te muevas a la correcta.
-                    popUpTo(bottomNavController.graph.findStartDestination().id) {
-                        saveState = true // Guarda el estado de otras pestañas
-                    }
+            if (initialDeepLinkRoute != targetGraphRoute) {
+                bottomNavController.navigate(initialDeepLinkRoute) {
                     launchSingleTop = true
-                    restoreState = true
                 }
-                // Ahora que estamos en la pestaña correcta, navegamos al detalle si corresponde
-//                if (initialDeepLinkRoute != targetGraphRoute) { // Si el deep link no era simplemente la raíz del graph
-//                    bottomNavController.navigate(initialDeepLinkRoute) {
-//                        // popUpTo NO aquí, ya que queremos que el detalle se apile sobre la pestaña raíz.
-//                        launchSingleTop = true
-//                    }
-//                }
             }
         }
     }
@@ -135,10 +144,6 @@ fun MainAppScreen(
                 composable(
                     route = Screen.BlogPostDetail.route,
                     arguments = listOf(navArgument("blogId") { type = NavType.StringType }),
-                    deepLinks = listOf(
-                        navDeepLink { uriPattern = Screen.BlogPostDetail.DEEPLINK_WEB_PATTERN },
-                        navDeepLink { uriPattern = Screen.BlogPostDetail.DEEPLINK_APP_PATTERN }
-                    )
                 ) { backStackEntry ->
                     val blogId = backStackEntry.arguments?.getString("blogId")
                     if (blogId != null) {

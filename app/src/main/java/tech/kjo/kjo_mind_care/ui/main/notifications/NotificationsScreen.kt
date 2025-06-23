@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -39,14 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.Notification
 import tech.kjo.kjo_mind_care.data.model.NotificationStatus
-import tech.kjo.kjo_mind_care.data.model.NotificationType
-import tech.kjo.kjo_mind_care.data.model.StaticBlogData
+import tech.kjo.kjo_mind_care.data.repository.createTestNotification
 import tech.kjo.kjo_mind_care.ui.main.notifications.components.NotificationItem
-import tech.kjo.kjo_mind_care.ui.navigation.Screen
-import java.time.LocalDateTime
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +84,20 @@ fun NotificationsScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
             )
-        }
+        },
+        // Botón flotante para añadir una notificación de prueba (solo para desarrollo)
+
+        // Para probar rápidamente nuevas notificaciones, puedes descomentar esto en desarrollo
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                viewModel.addDummyNotification(
+                    context,
+                    createTestNotification(context, "blog_like")
+                )
+            }) {
+                Icon(Icons.Default.Add, contentDescription = "Add Dummy Notification")
+            }
+        },
     ) { paddingValues ->
         if (uiState.isLoading) {
             Box(
@@ -117,34 +124,39 @@ fun NotificationsScreen(
                 )
             }
         } else {
-            PullToRefreshBox(
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = viewModel::refreshNotifications,
-                modifier = Modifier.fillMaxSize(),
-                state = pullRefreshState,
-                contentAlignment = Alignment.TopCenter,
 
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            ) {
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { viewModel.refreshNotifications() },
+                    modifier = Modifier.fillMaxSize(),
+                    state = pullRefreshState,
+                    contentAlignment = Alignment.TopCenter,
                 ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.notifications, key = { it.id }) { notification ->
-                        NotificationItem(
-                            notification = notification,
-                            onNotificationClick = { notificationId ->
-                                viewModel.markNotificationAsRead(notificationId)
-                                // Navegar a la ruta correspondiente
-                                if (notification.targetRoute.isNotBlank()) {
-                                    onNavigateToRoute(notification.targetRoute)
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.notifications, key = { it.id }) { notification ->
+                            NotificationItem(
+                                notification = notification,
+                                onNotificationClick = { notificationId ->
+                                    viewModel.markNotificationAsRead(notificationId)
+                                    // Primero cerrar NotificationsScreen, luego navegar
+                                    if (notification.targetRoute.isNotBlank()) {
+                                        onNavigateToRoute(notification.targetRoute)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
                     }
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
             }
         }
@@ -167,37 +179,6 @@ fun NotificationsScreen(
                 }
             }
         )
-    }
-
-    // Botón flotante para añadir una notificación de prueba (solo para desarrollo)
-
-    // Para probar rápidamente nuevas notificaciones, puedes descomentar esto en desarrollo
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-//            .padding(paddingValues)
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        FloatingActionButton(onClick = {
-            viewModel.addDummyNotification(
-                context,
-                Notification(
-                    id = UUID.randomUUID().toString(),
-                    type = NotificationType.LIKE,
-                    titleKey = R.string.notification_like_blog_title,
-                    bodyKey = R.string.notification_like_blog_body,
-                    args = listOf("Nuevo Usuario", "Mi Blog de Prueba"),
-                    timestamp = LocalDateTime.now(),
-                    status = NotificationStatus.NEW,
-                    targetRoute = Screen.BlogPostDetail.createRoute(
-                        StaticBlogData.getSampleBlogPosts().first().id
-                    )
-                )
-            )
-        }) {
-            Icon(Icons.Default.Add, contentDescription = "Add Dummy Notification")
-        }
     }
 
 }
