@@ -6,14 +6,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.model.User
-import tech.kjo.kjo_mind_care.data.repository.AuthRepository
+import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
 import tech.kjo.kjo_mind_care.utils.Resource
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
+class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
-): AuthRepository {
+): IAuthRepository {
 
 
     override suspend fun login(email: String, password: String): Resource<String> {

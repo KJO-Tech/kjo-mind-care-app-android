@@ -6,8 +6,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import tech.kjo.kjo_mind_care.data.repository.AuthRepository
-import tech.kjo.kjo_mind_care.data.repository.impl.AuthRepositoryImpl
+import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
+import tech.kjo.kjo_mind_care.data.repository.impl.AuthRepository
 import javax.inject.Singleton
 
 @Module
@@ -27,6 +27,6 @@ object AppModule {
     fun provideAuthRepository(
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
-    ): AuthRepository = AuthRepositoryImpl(auth, firestore)
+    ): IAuthRepository = AuthRepository(auth, firestore)
 
 }
