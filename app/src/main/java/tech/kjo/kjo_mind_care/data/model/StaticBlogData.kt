@@ -1,6 +1,10 @@
 package tech.kjo.kjo_mind_care.data.model
 
 import android.content.Context
+import com.google.firebase.Timestamp
+import tech.kjo.kjo_mind_care.data.enums.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.MediaType
+import tech.kjo.kjo_mind_care.data.model.Blog
 import java.time.LocalDateTime
 
 object StaticBlogData {
@@ -19,9 +23,9 @@ object StaticBlogData {
         applicationContext = context.applicationContext
     }
 
-    fun getSampleBlogPosts(): List<BlogPost> {
+    fun getSampleBlogPosts(): List<Blog> {
         return listOf(
-            BlogPost(
+            Blog(
                 id = "blog_1",
                 title = "Cómo manejar la ansiedad en exámenes",
                 content = "La ansiedad ante los exámenes es una respuesta común que muchos estudiantes experimentan. Aquí hay algunas estrategias que pueden ayudarte a manejarla...",
@@ -31,16 +35,16 @@ object StaticBlogData {
                     fullName = "Carlos M.",
                     profileImage = "https://randomuser.me/api/portraits/men/1.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusHours(2),
+                createdAt = Timestamp.now(),
                 mediaUrl = "https://santiagocidpsicologia.com/wp-content/uploads/ansiedad-ante-los-examanes.jpg",
                 mediaType = MediaType.IMAGE,
-                likes = 24,
+                reaction = 24,
                 comments = 8,
                 isLiked = false,
                 categoryId = "cat_anxiety",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_2",
                 title = "Técnicas de respiración para momentos de estrés",
                 content = "La respiración consciente es una herramienta poderosa para calmar la mente y reducir el estrés. Estas técnicas simples pueden practicarse en cualquier lugar...",
@@ -50,16 +54,16 @@ object StaticBlogData {
                     fullName = "Ana P.",
                     profileImage = "https://randomuser.me/api/portraits/women/2.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusHours(5),
+                createdAt = Timestamp.now(),
                 mediaUrl = null,
                 mediaType = null,
-                likes = 42,
+                reaction = 42,
                 comments = 15,
                 isLiked = true,
                 categoryId = "cat_stress",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_3",
                 title = "Mi experiencia con la meditación diaria",
                 content = "Hace seis meses comencé a meditar todos los días durante 10 minutos. Al principio fue difícil mantener la constancia, pero los beneficios que he experimentado son...",
@@ -69,16 +73,16 @@ object StaticBlogData {
                     fullName = "Miguel L.",
                     profileImage = "https://randomuser.me/api/portraits/men/3.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusDays(1),
+                createdAt = Timestamp.now(),
                 mediaUrl = "https://videos.pexels.com/video-files/3712701/3712701-uhd_2160_4096_25fps.mp4",
                 mediaType = MediaType.VIDEO,
-                likes = 36,
+                reaction = 36,
                 comments = 12,
                 isLiked = false,
                 categoryId = "cat_meditation",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_4",
                 title = "Beneficios de una dieta saludable para la mente",
                 content = "La alimentación juega un papel crucial en nuestra salud mental. Descubre cómo ciertos alimentos pueden mejorar tu estado de ánimo y concentración...",
@@ -88,30 +92,30 @@ object StaticBlogData {
                     fullName = "Laura G.",
                     profileImage = "https://randomuser.me/api/portraits/women/4.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusDays(3),
+                createdAt = Timestamp.now(),
                 mediaUrl = "https://mejorconsalud.as.com/wp-content/uploads/2017/05/alimentos-salud-cerebro.jpg",
                 mediaType = MediaType.IMAGE,
-                likes = 50,
+                reaction = 50,
                 comments = 20,
                 isLiked = false,
                 categoryId = "cat_nutrition",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_5",
                 title = "Superando el insomnio: una guía práctica",
                 content = "El sueño es fundamental para el bienestar. Si luchas contra el insomnio, estas estrategias y consejos pueden ayudarte a mejorar la calidad de tu descanso...",
                 author = currentUser,
-                createdAt = LocalDateTime.now().minusWeeks(1),
+                createdAt = Timestamp.now(),
                 mediaUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5mVtqidHO1-jrCEr0YlO54WbvQarvu4QAhA&s",
                 mediaType = MediaType.IMAGE,
-                likes = 60,
+                reaction = 60,
                 comments = 25,
                 isLiked = true,
                 categoryId = "cat_sleep",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_6",
                 title = "Diario de gratitud: transformando tu perspectiva",
                 content = "Llevar un diario de gratitud puede ser una práctica simple pero poderosa para mejorar tu bienestar emocional y cambiar tu forma de ver el mundo.",
@@ -121,16 +125,16 @@ object StaticBlogData {
                     fullName = "Carlos M.",
                     profileImage = "https://randomuser.me/api/portraits/men/1.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusDays(2),
+                createdAt = Timestamp.now(),
                 mediaUrl = null,
                 mediaType = null,
-                likes = 18,
+                reaction = 18,
                 comments = 5,
                 isLiked = false,
                 categoryId = "cat_meditation",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_7",
                 title = "Ejercicios de mindfulness para la vida diaria",
                 content = "Incorporar el mindfulness en tu rutina diaria no requiere mucho tiempo. Pequeños ejercicios pueden hacer una gran diferencia en tu atención y calma.",
@@ -140,24 +144,24 @@ object StaticBlogData {
                     fullName = "Ana P.",
                     profileImage = "https://randomuser.me/api/portraits/women/2.jpg"
                 ),
-                createdAt = LocalDateTime.now().minusDays(4),
+                createdAt = Timestamp.now(),
                 mediaUrl = "https://img.youtube.com/vi/UjQjE0C825o/0.jpg",
                 mediaType = MediaType.VIDEO,
-                likes = 75,
+                reaction = 75,
                 comments = 30,
                 isLiked = true,
                 categoryId = "cat_stress",
                 status = BlogStatus.PUBLISHED
             ),
-            BlogPost(
+            Blog(
                 id = "blog_8",
                 title = "Manejando el burnout: señales y estrategias",
                 content = "El burnout es un estado de agotamiento físico y emocional. Reconocer las señales tempranas es clave para prevenirlo y recuperarse.",
                 author = currentUser,
-                createdAt = LocalDateTime.now().minusMonths(1),
+                createdAt = Timestamp.now(),
                 mediaUrl = null,
                 mediaType = null,
-                likes = 90,
+                reaction = 90,
                 comments = 40,
                 isLiked = false,
                 categoryId = "cat_other",
@@ -178,7 +182,7 @@ object StaticBlogData {
                         profileImage = "https://randomuser.me/api/portraits/men/5.jpg"
                     ),
                     content = "¡Gran artículo! La ansiedad en los exámenes es un problema real.",
-                    createdAt = LocalDateTime.now().minusMinutes(30),
+                    createdAt = Timestamp.now(),
                     isMine = false,
                     replies = listOf(
                         Comment(
@@ -190,7 +194,7 @@ object StaticBlogData {
                                 profileImage = "https://randomuser.me/api/portraits/women/6.jpg"
                             ),
                             content = "Totalmente de acuerdo. Las técnicas de respiración me han ayudado mucho.",
-                            createdAt = LocalDateTime.now().minusMinutes(20),
+                            createdAt = Timestamp.now(),
                             isMine = false
                         )
                     )
@@ -199,7 +203,7 @@ object StaticBlogData {
                     id = "c2",
                     author = currentUser,
                     content = "Me alegra que encuentres útil la información. ¡Gracias por leer!",
-                    createdAt = LocalDateTime.now().minusMinutes(10),
+                    createdAt = Timestamp.now(),
                     isMine = true
                 )
             )
@@ -214,7 +218,7 @@ object StaticBlogData {
                         profileImage = "https://randomuser.me/api/portraits/men/7.jpg"
                     ),
                     content = "Necesito probar estas técnicas. Últimamente estoy muy estresado.",
-                    createdAt = LocalDateTime.now().minusHours(1),
+                    createdAt = Timestamp.now(),
                     isMine = false
                 )
             )
@@ -229,14 +233,14 @@ object StaticBlogData {
                         profileImage = "https://randomuser.me/api/portraits/women/8.jpg"
                     ),
                     content = "La meditación es un cambio de vida. Llevo un año practicando y me siento mucho mejor.",
-                    createdAt = LocalDateTime.now().minusDays(1),
+                    createdAt = Timestamp.now(),
                     isMine = false
                 ),
                 Comment(
                     id = "c5",
                     author = currentUser,
                     content = "¡Qué bueno escuchar eso! Es un viaje increíble.",
-                    createdAt = LocalDateTime.now().minusHours(12),
+                    createdAt = Timestamp.now(),
                     isMine = true
                 )
             )
@@ -251,7 +255,7 @@ object StaticBlogData {
                         profileImage = "https://randomuser.me/api/portraits/men/9.jpg"
                     ),
                     content = "Gracias por estos consejos. Llevo meses con problemas de sueño.",
-                    createdAt = LocalDateTime.now().minusHours(5),
+                    createdAt = Timestamp.now(),
                     isMine = false
                 )
             )
@@ -266,7 +270,7 @@ object StaticBlogData {
                         profileImage = "https://randomuser.me/api/portraits/women/10.jpg"
                     ),
                     content = "El burnout es más común de lo que pensamos. Buen post.",
-                    createdAt = LocalDateTime.now().minusDays(3),
+                    createdAt = Timestamp.now(),
                     isMine = false
                 )
             )
