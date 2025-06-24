@@ -42,16 +42,17 @@ import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
 import tech.kjo.kjo_mind_care.data.model.Comment
+import tech.kjo.kjo_mind_care.data.model.StaticBlogData
 
 @Composable
 fun CommentSection(
     comments: List<Comment>,
-    onReplyToComment: (String) -> Unit,
-    onEditComment: (String, String) -> Unit,
-    onDeleteComment: (String) -> Unit,
+    onReplyToComment: (Comment) -> Unit,
+    onEditComment: (Comment) -> Unit,
+    onDeleteComment: (Comment) -> Unit,
     showCommentInput: Boolean,
-    commentToReplyTo: String?,
-    commentToEdit: String?,
+    commentToReplyTo: Comment?,
+    commentToEdit: Comment?,
     currentCommentText: String,
     onCommentTextChanged: (String) -> Unit,
     onSaveComment: () -> Unit,
@@ -117,20 +118,23 @@ fun CommentSection(
 @Composable
 fun CommentItem(
     comment: Comment,
-    onReplyToComment: (String) -> Unit,
-    onEditComment: (String, String) -> Unit,
-    onDeleteComment: (String) -> Unit,
+    onReplyToComment: (Comment) -> Unit,
+    onEditComment: (Comment) -> Unit,
+    onDeleteComment: (Comment) -> Unit,
     showCommentInput: Boolean,
-    commentToReplyTo: String?,
-    commentToEdit: String?,
+    commentToReplyTo: Comment?,
+    commentToEdit: Comment?,
     currentCommentText: String,
     onCommentTextChanged: (String) -> Unit,
     onSaveComment: () -> Unit,
     onCancelCommentInput: () -> Unit,
     isRoot: Boolean
 ) {
-    // Estado para controlar la visibilidad del diálogo de confirmación
+
     var showDeleteDialog by remember { mutableStateOf<Comment?>(null) }
+
+    val currentUser = remember { StaticBlogData.currentUser }
+    val isMine = comment.author.uid == currentUser.uid
 
     Column(
         modifier = Modifier
@@ -166,7 +170,7 @@ fun CommentItem(
             }
             Row(horizontalArrangement = Arrangement.End) {
                 IconButton(
-                    onClick = { onReplyToComment(comment.id) },
+                    onClick = { onReplyToComment(comment) },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Reply,
@@ -176,7 +180,7 @@ fun CommentItem(
                 }
                 if (comment.isMine) {
                     IconButton(
-                        onClick = { onEditComment(comment.id, comment.content) },
+                        onClick = { onEditComment(comment) },
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -206,7 +210,7 @@ fun CommentItem(
 
         // Input para responder o editar este comentario específico
         AnimatedVisibility(
-            visible = showCommentInput && (commentToReplyTo == comment.id || commentToEdit == comment.id),
+            visible = showCommentInput && (commentToReplyTo == comment || commentToEdit == comment),
             enter = expandVertically(expandFrom = Alignment.Top),
             exit = shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
@@ -215,7 +219,7 @@ fun CommentItem(
                 onTextChanged = onCommentTextChanged,
                 onSave = onSaveComment,
                 onCancel = onCancelCommentInput,
-                isEditing = commentToEdit == comment.id,
+                isEditing = commentToEdit == comment,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -255,7 +259,7 @@ fun CommentItem(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onDeleteComment(commentToDelete.id)
+                        onDeleteComment(commentToDelete)
                         showDeleteDialog = null // Cerrar diálogo después de confirmar
                     }
                 ) {

@@ -4,46 +4,59 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import tech.kjo.kjo_mind_care.data.model.BlogPost
-import tech.kjo.kjo_mind_care.data.model.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.MediaType
+import tech.kjo.kjo_mind_care.data.model.Blog
 import tech.kjo.kjo_mind_care.data.model.Category
-import tech.kjo.kjo_mind_care.data.model.MediaType
 import tech.kjo.kjo_mind_care.data.model.StaticBlogData
-import tech.kjo.kjo_mind_care.data.repository.BlogRepository
-import tech.kjo.kjo_mind_care.data.repository.CategoryRepository
+import tech.kjo.kjo_mind_care.data.model.StaticBlogData.init
+import tech.kjo.kjo_mind_care.data.model.User
+import tech.kjo.kjo_mind_care.data.repository.impl.BlogRepository
+import tech.kjo.kjo_mind_care.data.repository.impl.CategoryRepository
+import tech.kjo.kjo_mind_care.usecase.blog.CreateBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.blog.GetBlogByIdUseCase
+import tech.kjo.kjo_mind_care.usecase.blog.UpdateBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.category.GetCategoriesUseCase
+import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
 import java.time.LocalDateTime
+import javax.inject.Inject
 
 data class BlogFormUiState(
-    val blogId: String? = null, // null para crear, ID para editar
+    val blogId: String? = null,
     val title: String = "",
     val content: String = "",
     val selectedCategoryId: String? = null,
+    val availableCategories: List<Category> = emptyList(),
     val mediaUri: Uri? = null,
     val existingMediaUrl: String? = null,
     val mediaType: MediaType? = null,
-    val status: BlogStatus = BlogStatus.PUBLISHED,
+    val status: BlogStatus = BlogStatus.PENDING,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
     val errorMessage: String? = null,
-    val availableCategories: List<Category> = emptyList(),
-    val showCategoryDialog: Boolean = false,
-
-    // Validación
     val titleError: String? = null,
     val contentError: String? = null,
-    val categoryError: String? = null
+    val categoryError: String? = null,
+    val showCategoryDialog: Boolean = false,
+    val currentUser: User? = null
 )
 
-class BlogFormViewModel(
-    private val savedStateHandle: SavedStateHandle, // Para el ID del blog si es edición
-    private val blogRepository: BlogRepository = BlogRepository(),
-    private val categoryRepository: CategoryRepository = CategoryRepository()
+@HiltViewModel
+class BlogFormViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val createBlogPostUseCase: CreateBlogUseCase,
+    private val getBlogPostByIdUseCase: GetBlogByIdUseCase,
+    private val updateBlogPostUseCase: UpdateBlogUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BlogFormUiState())
@@ -52,9 +65,18 @@ class BlogFormViewModel(
     private val currentUserId = StaticBlogData.currentUser.uid
 
     init {
+        // Load current user
+        viewModelScope.launch {
+            val user = getCurrentUserUseCase()
+            _uiState.update { it.copy(currentUser = user) }
+            if (user == null) {
+                _uiState.update { it.copy(errorMessage = "Usuario no autenticado. Por favor, inicie sesión.") }
+            }
+        }
+
         // Cargar categorías disponibles
         viewModelScope.launch {
-            categoryRepository.categories.collect { categories ->
+            getCategoriesUseCase().collect { categories ->
                 _uiState.update { it.copy(availableCategories = categories.filter { cat -> cat.isActive }) }
             }
         }
@@ -64,7 +86,7 @@ class BlogFormViewModel(
         if (blogId != null) {
             _uiState.update { it.copy(blogId = blogId, isLoading = true) }
             viewModelScope.launch {
-                val blog = blogRepository.getBlogById(blogId)
+                val blog = getBlogPostByIdUseCase(blogId)
                 if (blog != null) {
                     _uiState.update {
                         it.copy(
@@ -111,7 +133,7 @@ class BlogFormViewModel(
         _uiState.update {
             it.copy(
                 mediaUri = uri,
-                existingMediaUrl = null, // Si se selecciona un nuevo medio, borrar el existente
+                existingMediaUrl = null,
                 mediaType = type
             )
         }
@@ -160,25 +182,24 @@ class BlogFormViewModel(
             return
         }
 
+        val currentUser = _uiState.value.currentUser ?: run {
+            _uiState.update { it.copy(errorMessage = "No se pudo guardar el blog: Usuario no autenticado.") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null, saveSuccess = false) }
 
-            // Aquí iría la lógica de subida de medios a Cloudinary
-            // Por simplicidad, si hay un nuevo mediaUri, lo usaremos como URL directamente
-            // En un caso real, esto implicaría una función suspend para subir el archivo
-            // y obtener la URL de descarga antes de guardar el BlogPost.
-            val finalMediaUrl =
-                _uiState.value.mediaUri?.toString() ?: _uiState.value.existingMediaUrl
+            val finalMediaUrl = _uiState.value.mediaUri?.toString() ?: _uiState.value.existingMediaUrl
             val finalMediaType = _uiState.value.mediaType
-                ?: (if (finalMediaUrl != null) MediaType.IMAGE else null) // Asumir IMAGE si hay URL y no hay tipo
+                ?: (if (finalMediaUrl != null) MediaType.IMAGE else null)
 
-            val blog = BlogPost(
-                id = _uiState.value.blogId
-                    ?: "new_blog_id", // Se generará en el repositorio si es nuevo
+            val blog = Blog(
+                id = _uiState.value.blogId ?: "",
                 title = _uiState.value.title,
                 content = _uiState.value.content,
-                author = StaticBlogData.currentUser, // El autor es el usuario actual
-                createdAt = LocalDateTime.now(), // Se sobrescribirá al crear/actualizar en el repo simulado
+                author = currentUser,
+                createdAt = Timestamp.now(),
                 mediaUrl = finalMediaUrl,
                 mediaType = finalMediaType,
                 likes = 0,
@@ -189,9 +210,9 @@ class BlogFormViewModel(
             )
 
             val result = if (_uiState.value.blogId == null) {
-                blogRepository.createBlog(blog)
+                createBlogPostUseCase(blog)
             } else {
-                blogRepository.updateBlog(blog)
+                updateBlogPostUseCase(blog)
             }
 
             result
@@ -200,7 +221,7 @@ class BlogFormViewModel(
                         it.copy(
                             isSaving = false,
                             saveSuccess = true,
-                            errorMessage = null // Limpiar cualquier error previo
+                            errorMessage = null
                         )
                     }
                 }

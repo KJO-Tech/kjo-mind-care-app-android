@@ -49,9 +49,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.BlogStatus
 import tech.kjo.kjo_mind_care.ui.main.blog.components.Avatar
 import tech.kjo.kjo_mind_care.ui.main.blog.components.BlogMediaPreview
 import tech.kjo.kjo_mind_care.ui.main.blog.components.CommentSection
@@ -62,9 +62,7 @@ fun BlogPostDetailScreen(
     blogId: String,
     onNavigateBack: () -> Unit,
     onNavigateToEditBlog: (String) -> Unit,
-    viewModel: BlogDetailViewModel = viewModel(
-        factory = BlogDetailViewModelFactory(blogId)
-    )
+    viewModel: BlogDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -265,7 +263,7 @@ fun BlogPostDetailScreen(
                                     tint = if (blog.isLiked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(Modifier.width(4.dp))
-                                Text(blog.likes.toString())
+                                Text(blog.reaction.toString())
                             }
                             Button(
                                 onClick = { /* TODO: Posiblemente navegar a los comentarios si están en otra pantalla o hacer scroll */ },
@@ -276,7 +274,7 @@ fun BlogPostDetailScreen(
                                     contentDescription = stringResource(R.string.content_description_comment_button)
                                 )
                                 Spacer(Modifier.width(4.dp))
-                                Text(blog.comments.toString())
+                                Text(uiState.commentCount.toString())
                             }
                             Button(
                                 onClick = { /* TODO: Compartir */ },
@@ -302,14 +300,9 @@ fun BlogPostDetailScreen(
                         // Sección de Comentarios
                         CommentSection(
                             comments = uiState.comments,
-                            onReplyToComment = { commentId -> viewModel.onReplyToComment(commentId) },
-                            onEditComment = { commentId, currentContent ->
-                                viewModel.onEditComment(
-                                    commentId,
-                                    currentContent
-                                )
-                            },
-                            onDeleteComment = { commentId -> viewModel.onDeleteComment(commentId) },
+                            onReplyToComment = { comment -> viewModel.onReplyToComment(comment) },
+                            onEditComment = { comment -> viewModel.onEditComment(comment) },
+                            onDeleteComment = { comment -> viewModel.onDeleteComment(comment) },
                             showCommentInput = uiState.showCommentInput,
                             commentToReplyTo = uiState.commentToReplyTo,
                             commentToEdit = uiState.commentToEdit,

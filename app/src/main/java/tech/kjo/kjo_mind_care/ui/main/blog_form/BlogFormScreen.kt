@@ -54,12 +54,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.MediaType
 import tech.kjo.kjo_mind_care.data.model.Category
-import tech.kjo.kjo_mind_care.data.model.MediaType
 import tech.kjo.kjo_mind_care.utils.getCurrentLanguageCode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,9 +68,7 @@ fun BlogFormScreen(
     blogId: String?,
     onBlogSaved: () -> Unit,
     onBackClick: () -> Unit,
-    viewModel: BlogFormViewModel = viewModel(
-        factory = BlogFormViewModelFactory(blogId = blogId)
-    )
+    viewModel: BlogFormViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current

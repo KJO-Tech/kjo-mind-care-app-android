@@ -4,95 +4,139 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.BlogPost
+import tech.kjo.kjo_mind_care.data.model.Blog
 import tech.kjo.kjo_mind_care.data.model.Category
-import tech.kjo.kjo_mind_care.data.model.StaticBlogData
-import tech.kjo.kjo_mind_care.data.repository.CategoryRepository
+import tech.kjo.kjo_mind_care.data.model.User
+import tech.kjo.kjo_mind_care.data.repository.IReactionRepository
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
+import tech.kjo.kjo_mind_care.usecase.blog.GetBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.reaction.ToggleBlogLikeUseCase
+import tech.kjo.kjo_mind_care.usecase.category.GetCategoriesUseCase
+import tech.kjo.kjo_mind_care.usecase.comments.GetCommentsForBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
+import javax.inject.Inject
 
 data class BlogUiState(
     val searchQuery: String = "",
     val selectedTabIndex: Int = 0,
-    val filteredBlogs: List<BlogPost> = emptyList(),
+    val allBlogs: List<Blog> = emptyList(),
+    val filteredBlogs: List<Blog> = emptyList(),
     val isRefreshing: Boolean = false,
     val availableCategories: List<Category> = emptyList(),
     val selectedCategoryId: String? = null,
-    val showCategoryFilterDialog: Boolean = false
+    val showCategoryFilterDialog: Boolean = false,
+    val errorMessage: String? = null,
+    val currentUser: User? = null,
+    val blogCommentCounts: Map<String, Int> = emptyMap()
 )
 
-@OptIn(FlowPreview::class)
-class BlogViewModel(
-    private val categoryRepository: CategoryRepository = CategoryRepository() // Inyectar o crear
+@HiltViewModel
+class BlogViewModel @Inject constructor(
+    private val getBlogPostsUseCase: GetBlogUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val toggleBlogLikeUseCase: ToggleBlogLikeUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getCommentsForBlogUseCase: GetCommentsForBlogUseCase,
+    private val reactionRepository: IReactionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BlogUiState())
     val uiState: StateFlow<BlogUiState> = _uiState.asStateFlow()
 
-    private val _allBlogs = MutableStateFlow(StaticBlogData.getSampleBlogPosts())
+    private val _allBlogsFromDb = getBlogPostsUseCase()
 
     init {
         viewModelScope.launch {
-            // Observar las categorías disponibles del repositorio
-            categoryRepository.categories.collect { categories ->
+            val user = getCurrentUserUseCase()
+            _uiState.update { it.copy(currentUser = user) }
+        }
+
+        viewModelScope.launch {
+            getCategoriesUseCase().collect { categories ->
                 _uiState.update { it.copy(availableCategories = categories.filter { cat -> cat.isActive }) }
             }
         }
 
         viewModelScope.launch {
-            _uiState
-                .debounce(300)
-                .combine(_allBlogs) { uiState, allBlogs ->
-                    val filteredBySearch = if (uiState.searchQuery.isNotBlank()) {
-                        allBlogs.filter {
-                            it.title.contains(uiState.searchQuery, ignoreCase = true) ||
-                                    it.content.contains(uiState.searchQuery, ignoreCase = true) ||
-                                    it.author.fullName.contains(
-                                        uiState.searchQuery,
-                                        ignoreCase = true
+            getBlogPostsUseCase().collect { rawBlogs ->
+                val currentUser = _uiState.value.currentUser
+
+                val blogsWithLikesAndComments = rawBlogs.map { blog ->
+                    val isLikedByUser = if (currentUser != null) {
+                        reactionRepository.hasUserLikedBlog(blog.id, currentUser.uid).getOrDefault(false)
+                    } else {
+                        false
+                    }
+                    blog.copy(isLiked = isLikedByUser)
+                }
+                _uiState.update { it.copy(allBlogs = blogsWithLikesAndComments) }
+
+                blogsWithLikesAndComments.forEach { blog ->
+                    if (!_uiState.value.blogCommentCounts.containsKey(blog.id)) {
+                        launch {
+                            getCommentsForBlogUseCase(blog.id).collect { comments ->
+                                _uiState.update { currentState ->
+                                    currentState.copy(
+                                        blogCommentCounts = currentState.blogCommentCounts.toMutableMap().apply {
+                                            this[blog.id] = comments.size
+                                        }
                                     )
-//                                    ||
-//                                    it.author.username.contains(
-//                                        uiState.searchQuery,
-//                                        ignoreCase = true
-//                                    )
+                                }
+                            }
                         }
-                    } else {
-                        allBlogs
                     }
-
-                    // Filtrado por categoría: ahora un solo ID de categoría
-                    val filteredByCategories = if (uiState.selectedCategoryId != null) {
-                        filteredBySearch.filter { blog ->
-                            blog.categoryId == uiState.selectedCategoryId
-                        }
-                    } else {
-                        filteredBySearch
-                    }
-
-                    val finalFilteredBlogs = when (uiState.selectedTabIndex) {
-                        0 -> filteredByCategories
-                        1 -> filteredByCategories.sortedByDescending { it.likes }
-                        2 -> filteredByCategories.sortedByDescending { it.createdAt }
-                        3 -> filteredByCategories.filter { it.author.uid == StaticBlogData.currentUser.uid }
-                        else -> filteredByCategories
-                    }
-                    finalFilteredBlogs
                 }
-                .collect { filteredList ->
-                    _uiState.update { it.copy(filteredBlogs = filteredList) }
-                }
+            }
         }
+
+        @OptIn(FlowPreview::class)
+        _uiState
+            .debounce(300)
+            .onEach { uiState ->
+                val currentBlogs = uiState.allBlogs
+
+                val filteredBySearch = if (uiState.searchQuery.isNotBlank()) {
+                    currentBlogs.filter {
+                        it.title.contains(uiState.searchQuery, ignoreCase = true) ||
+                                it.content.contains(uiState.searchQuery, ignoreCase = true) ||
+                                it.author.fullName.contains(uiState.searchQuery, ignoreCase = true)
+                    }
+                } else {
+                    currentBlogs
+                }
+
+                val filteredByCategories = if (uiState.selectedCategoryId != null) {
+                    filteredBySearch.filter { blog ->
+                        blog.categoryId == uiState.selectedCategoryId
+                    }
+                } else {
+                    filteredBySearch
+                }
+
+                val finalFilteredBlogs = when (uiState.selectedTabIndex) {
+                    0 -> filteredByCategories
+                    1 -> filteredByCategories.sortedByDescending { it.reaction }
+                    2 -> filteredByCategories.sortedByDescending { it.getLocalDateTime() }
+                    3 -> filteredByCategories.filter { it.author.uid == uiState.currentUser?.uid }
+                    else -> filteredByCategories
+                }
+
+                _uiState.update { it.copy(filteredBlogs = finalFilteredBlogs) }
+            }
+            .launchIn(viewModelScope)
     }
+
 
     fun onSearchQueryChanged(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
@@ -103,24 +147,27 @@ class BlogViewModel(
     }
 
     fun toggleLike(blogId: String) {
-        _allBlogs.update { blogs ->
-            blogs.map { blog ->
-                if (blog.id == blogId) {
-                    blog.copy(
-                        isLiked = !blog.isLiked,
-                        likes = if (blog.isLiked) blog.likes - 1 else blog.likes + 1
-                    )
-                } else blog
+        viewModelScope.launch {
+            val currentUser = _uiState.value.currentUser
+            if (currentUser == null) {
+                _uiState.update { it.copy(errorMessage = "Debes iniciar sesión para dar like.") }
+                return@launch
             }
+
+            toggleBlogLikeUseCase(blogId, currentUser.uid)
+                .onSuccess {
+                    _uiState.update { it.copy(errorMessage = null) }
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(errorMessage = "Error al dar/quitar like: ${e.localizedMessage}") }
+                }
         }
     }
 
     fun refreshBlogs() {
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }
-            delay(2000)
-            _allBlogs.update { StaticBlogData.getSampleBlogPosts() }
-            categoryRepository.refreshCategories() // Refrescar también las categorías
+            kotlinx.coroutines.delay(1000)
             _uiState.update { it.copy(isRefreshing = false) }
         }
     }
@@ -129,29 +176,21 @@ class BlogViewModel(
         _uiState.update { it.copy(showCategoryFilterDialog = show) }
     }
 
-    // Función para seleccionar una única categoría
     fun selectCategory(categoryId: String?) {
         _uiState.update { currentState ->
             currentState.copy(
                 selectedCategoryId = categoryId,
-                showCategoryFilterDialog = false // Cierra el diálogo al seleccionar
+                showCategoryFilterDialog = false
             )
         }
     }
 
-    // Para deseleccionar la categoría (el botón "Borrar selección")
     fun clearCategorySelection() {
         _uiState.update { it.copy(selectedCategoryId = null, showCategoryFilterDialog = false) }
     }
 
     fun shareBlog(context: Context, blogId: String, blogTitle: String) {
-        // Usamos el DEEPLINK_WEB_PATTERN como el enlace que queremos compartir
-        // Aunque aún no tengas un dominio web configurado, este es el formato correcto
-        // para cuando lo tengas. Por ahora, si no tienes dominio, el sistema
-        // intentará abrir tu app si está instalada y maneja el esquema personalizado,
-        // o simplemente mostrará el texto sin abrir una app específica.
         val shareLink = Screen.BlogPostDetail.DEEPLINK_WEB_PATTERN.replace("{blogId}", blogId)
-
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, "Echa un vistazo a este blog: \"$blogTitle\"\n$shareLink")

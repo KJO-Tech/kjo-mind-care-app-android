@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.main.blog.components.BlogList
@@ -48,7 +49,7 @@ import tech.kjo.kjo_mind_care.utils.getCurrentLanguageCode
 @Composable
 fun BlogScreen(
     onNavigateToBlogPostDetail: (String) -> Unit,
-    viewModel: BlogViewModel = viewModel()
+    viewModel: BlogViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val tabs = listOf(
@@ -143,9 +144,10 @@ fun BlogScreen(
                         viewModel.shareBlog(
                             context,
                             blogId,
-                            blogTitle
+                            blogTitle,
                         )
-                    }
+                    },
+                    commentCounts = uiState.blogCommentCounts
                 )
             }
         }

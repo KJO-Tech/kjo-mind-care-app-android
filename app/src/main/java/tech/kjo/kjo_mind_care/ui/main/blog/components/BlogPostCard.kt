@@ -29,14 +29,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.BlogPost
+import tech.kjo.kjo_mind_care.data.model.Blog
 
 @Composable
 fun BlogPostCard(
-    blog: BlogPost,
+    blog: Blog,
     onBlogClick: (String) -> Unit,
     onToggleLike: (String) -> Unit,
-    onBlogShare: (String, String) -> Unit
+    onBlogShare: (String, String) -> Unit,
+    commentCount: Int
 ) {
     Card(
         modifier = Modifier
@@ -119,7 +120,7 @@ fun BlogPostCard(
                     }
 
                     Text(
-                        text = blog.likes.toString(),
+                        text = blog.reaction.toString(),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -135,7 +136,7 @@ fun BlogPostCard(
                     }
 
                     Text(
-                        text = blog.comments.toString(),
+                        text = commentCount.toString(),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
