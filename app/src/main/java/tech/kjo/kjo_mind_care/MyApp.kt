@@ -15,6 +15,6 @@ class MyApp : Application() {
 
         StaticBlogData.init(this)
 
-        NotificationUtils.createNotificationChannel(this) // Crear el canal al inicio
+        NotificationUtils.createNotificationChannel(this)
     }
 }

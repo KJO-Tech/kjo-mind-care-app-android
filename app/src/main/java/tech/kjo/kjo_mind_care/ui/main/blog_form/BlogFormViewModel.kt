@@ -65,7 +65,6 @@ class BlogFormViewModel @Inject constructor(
     private val currentUserId = StaticBlogData.currentUser.uid
 
     init {
-        // Load current user
         viewModelScope.launch {
             val user = getCurrentUserUseCase()
             _uiState.update { it.copy(currentUser = user) }
@@ -74,14 +73,12 @@ class BlogFormViewModel @Inject constructor(
             }
         }
 
-        // Cargar categorías disponibles
         viewModelScope.launch {
             getCategoriesUseCase().collect { categories ->
                 _uiState.update { it.copy(availableCategories = categories.filter { cat -> cat.isActive }) }
             }
         }
 
-        // Cargar blog para edición si blogId existe en SavedStateHandle
         val blogId = savedStateHandle.get<String>("blogId")
         if (blogId != null) {
             _uiState.update { it.copy(blogId = blogId, isLoading = true) }

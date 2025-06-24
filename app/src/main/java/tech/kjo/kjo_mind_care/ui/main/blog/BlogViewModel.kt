@@ -9,8 +9,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -54,7 +57,7 @@ class BlogViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BlogUiState())
     val uiState: StateFlow<BlogUiState> = _uiState.asStateFlow()
 
-    private val _allBlogsFromDb = getBlogPostsUseCase()
+    private val _rawBlogsFromDb = getBlogPostsUseCase()
 
     init {
         viewModelScope.launch {
@@ -69,35 +72,47 @@ class BlogViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            getBlogPostsUseCase().collect { rawBlogs ->
-                val currentUser = _uiState.value.currentUser
-
-                val blogsWithLikesAndComments = rawBlogs.map { blog ->
-                    val isLikedByUser = if (currentUser != null) {
-                        reactionRepository.hasUserLikedBlog(blog.id, currentUser.uid).getOrDefault(false)
-                    } else {
-                        false
+            _rawBlogsFromDb
+                .combine(_uiState.map { it.currentUser }.distinctUntilChanged()) { rawBlogs, currentUser ->
+                    rawBlogs.map { blog ->
+                        val isLikedByUser = if (currentUser != null) {
+                            reactionRepository.hasUserLikedBlog(blog.id, currentUser.uid).getOrDefault(false)
+                        } else {
+                            false
+                        }
+                        blog.copy(isLiked = isLikedByUser)
                     }
-                    blog.copy(isLiked = isLikedByUser)
                 }
-                _uiState.update { it.copy(allBlogs = blogsWithLikesAndComments) }
+                .collect { blogsWithLikedStatus ->
+                    _uiState.update { it.copy(allBlogs = blogsWithLikedStatus) }
+                }
+        }
 
-                blogsWithLikesAndComments.forEach { blog ->
-                    if (!_uiState.value.blogCommentCounts.containsKey(blog.id)) {
-                        launch {
-                            getCommentsForBlogUseCase(blog.id).collect { comments ->
-                                _uiState.update { currentState ->
-                                    currentState.copy(
-                                        blogCommentCounts = currentState.blogCommentCounts.toMutableMap().apply {
-                                            this[blog.id] = comments.size
+        viewModelScope.launch {
+            _uiState.map { it.allBlogs }
+                .distinctUntilChanged()
+                .collect { blogs ->
+                    val newCommentCounts = mutableMapOf<String, Int>()
+                    blogs.forEach { blog ->
+                        _uiState.value.blogCommentCounts[blog.id]?.let {
+                            newCommentCounts[blog.id] = it
+                        } ?: run {
+                            launch {
+                                getCommentsForBlogUseCase(blog.id)
+                                    .collect { comments ->
+                                        _uiState.update { currentState ->
+                                            currentState.copy(
+                                                blogCommentCounts = currentState.blogCommentCounts.toMutableMap().apply {
+                                                    this[blog.id] = comments.size
+                                                }
+                                            )
                                         }
-                                    )
-                                }
+                                    }
                             }
                         }
                     }
+                    _uiState.update { it.copy(blogCommentCounts = newCommentCounts) }
                 }
-            }
         }
 
         @OptIn(FlowPreview::class)
@@ -154,15 +169,79 @@ class BlogViewModel @Inject constructor(
                 return@launch
             }
 
+            val currentBlog = _uiState.value.filteredBlogs.find { it.id == blogId }
+                ?: _uiState.value.allBlogs.find { it.id == blogId }
+
+            if (currentBlog == null) {
+                _uiState.update { it.copy(errorMessage = "Blog no encontrado en la lista para dar like.") }
+                return@launch
+            }
+
+            val initialReactionCount = currentBlog.reaction
+            val initialIsLiked = currentBlog.isLiked
+
+            val newReactionCount = initialReactionCount + if (initialIsLiked) -1 else 1
+            val newIsLiked = !initialIsLiked
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    filteredBlogs = currentState.filteredBlogs.map { blog ->
+                        if (blog.id == blogId) {
+                            blog.copy(
+                                reaction = newReactionCount,
+                                isLiked = newIsLiked
+                            )
+                        } else {
+                            blog
+                        }
+                    },
+                    allBlogs = currentState.allBlogs.map { blog ->
+                        if (blog.id == blogId) {
+                            blog.copy(
+                                reaction = newReactionCount,
+                                isLiked = newIsLiked
+                            )
+                        } else {
+                            blog
+                        }
+                    }
+                )
+            }
+
             toggleBlogLikeUseCase(blogId, currentUser.uid)
                 .onSuccess {
                     _uiState.update { it.copy(errorMessage = null) }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(errorMessage = "Error al dar/quitar like: ${e.localizedMessage}") }
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            filteredBlogs = currentState.filteredBlogs.map { blog ->
+                                if (blog.id == blogId) {
+                                    blog.copy(
+                                        reaction = initialReactionCount,
+                                        isLiked = initialIsLiked
+                                    )
+                                } else {
+                                    blog
+                                }
+                            },
+                            allBlogs = currentState.allBlogs.map { blog ->
+                                if (blog.id == blogId) {
+                                    blog.copy(
+                                        reaction = initialReactionCount,
+                                        isLiked = initialIsLiked
+                                    )
+                                } else {
+                                    blog
+                                }
+                            },
+                            errorMessage = "Error al dar/quitar like: ${e.localizedMessage}"
+                        )
+                    }
                 }
         }
     }
+
 
     fun refreshBlogs() {
         viewModelScope.launch {

@@ -23,7 +23,7 @@ data class Blog(
     val likes: Int = 0,
     val reaction: Int = 0,
     val comments: Int = 0,
-    val isLiked: Boolean = false,
+    var isLiked: Boolean = false,
     val categoryId: String? = null,
     val status: BlogStatus = BlogStatus.PENDING,
 ) {

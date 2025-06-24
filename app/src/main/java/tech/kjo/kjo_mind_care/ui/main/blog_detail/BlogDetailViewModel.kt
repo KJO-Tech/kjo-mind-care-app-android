@@ -10,6 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,6 +71,10 @@ class BlogDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BlogDetailUiState())
     val uiState: StateFlow<BlogDetailUiState> = _uiState.asStateFlow()
 
+    private val _blogFromDb = getBlogPostsUseCase()
+        .map { blogs -> blogs.find { it.id == blogId } }
+        .distinctUntilChanged()
+
     init {
         viewModelScope.launch {
             val user = getCurrentUserUseCase()
@@ -76,28 +82,33 @@ class BlogDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            getBlogPostsUseCase() // Observa todos los blogs
-                .map { blogs -> blogs.find { it.id == blogId } }
-                .collect { updatedBlog ->
-                    if (updatedBlog != null) {
-                        val currentUser = _uiState.value.currentUser
-                        val hasLiked = if (currentUser != null) {
-                            reactionRepository.hasUserLikedBlog(blogId, currentUser.uid).getOrDefault(false)
-                        } else {
-                            false
-                        }
-                        _uiState.update {
-                            it.copy(
-                                blogPost = updatedBlog.copy(isLiked = hasLiked),
-                                blogStatusMessage = when (updatedBlog.status) {
-                                    BlogStatus.DELETED -> "Este blog ha sido eliminado."
-                                    BlogStatus.PENDING -> "Este blog está pendiente de publicación."
-                                    else -> null
-                                }
-                            )
-                        }
+            _blogFromDb.combine(_uiState.map { it.currentUser }.distinctUntilChanged()) { blogFromDb, currentUser ->
+                if (blogFromDb != null) {
+                    val hasLiked = if (currentUser != null) {
+                        reactionRepository.hasUserLikedBlog(blogId, currentUser.uid).getOrDefault(false)
+                    } else {
+                        false
                     }
+                    blogFromDb.copy(isLiked = hasLiked)
+                } else {
+                    null
                 }
+            }.collect { combinedBlogWithLikedStatus ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        blogPost = combinedBlogWithLikedStatus,
+                        blogStatusMessage = if (combinedBlogWithLikedStatus != null) {
+                            when (combinedBlogWithLikedStatus.status) {
+                                BlogStatus.DELETED -> "Este blog ha sido eliminado."
+                                BlogStatus.PENDING -> "Este blog está pendiente de publicación."
+                                else -> null
+                            }
+                        } else {
+                            "Este blog ya no existe o fue eliminado."
+                        }
+                    )
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -119,9 +130,25 @@ class BlogDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val currentBlog = _uiState.value.blogPost
             val currentUser = _uiState.value.currentUser
+
             if (currentBlog == null || currentUser == null) {
                 _uiState.update { it.copy(error = "No se puede dar like. Blog o usuario no disponibles.") }
                 return@launch
+            }
+
+            val initialReactionCount = currentBlog.reaction
+            val initialIsLiked = currentBlog.isLiked
+
+            val newReactionCount = initialReactionCount + if (initialIsLiked) -1 else 1
+            val newIsLiked = !initialIsLiked
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    blogPost = currentState.blogPost?.copy(
+                        reaction = newReactionCount,
+                        isLiked = newIsLiked
+                    )
+                )
             }
 
             toggleBlogLikeUseCase(currentBlog.id, currentUser.uid)
@@ -129,7 +156,15 @@ class BlogDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(error = null) }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(error = "Error al dar/quitar like: ${e.localizedMessage}") }
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            blogPost = currentState.blogPost?.copy(
+                                reaction = initialReactionCount,
+                                isLiked = initialIsLiked
+                            ),
+                            error = "Error al dar/quitar like: ${e.localizedMessage}"
+                        )
+                    }
                 }
         }
     }
@@ -154,7 +189,6 @@ class BlogDetailViewModel @Inject constructor(
                             isDeletingBlog = false,
                             deleteSuccess = true,
                             showDeleteDialog = false,
-                            blogStatusMessage = "Este blog ha sido eliminado lógicamente."
                         )
                     }
                 }
