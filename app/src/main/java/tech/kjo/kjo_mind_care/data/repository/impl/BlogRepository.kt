@@ -15,7 +15,7 @@ import javax.inject.Inject
 import kotlin.jvm.java
 
 class BlogRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
 ) : IBlogRepository {
 
     private val blogPostsCollection = firestore.collection("blogs")

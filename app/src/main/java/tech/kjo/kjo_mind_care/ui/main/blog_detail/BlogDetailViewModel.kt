@@ -95,16 +95,21 @@ class BlogDetailViewModel @Inject constructor(
                 }
             }.collect { combinedBlogWithLikedStatus ->
                 _uiState.update { currentState ->
+                    val newBlog = combinedBlogWithLikedStatus
+                    val currentBlog = currentState.blogPost
+
                     currentState.copy(
-                        blogPost = combinedBlogWithLikedStatus,
-                        blogStatusMessage = if (combinedBlogWithLikedStatus != null) {
-                            when (combinedBlogWithLikedStatus.status) {
+                        blogPost = newBlog ?: currentBlog,
+                        blogStatusMessage = if (newBlog != null) {
+                            when (newBlog.status) {
                                 BlogStatus.DELETED -> "Este blog ha sido eliminado."
                                 BlogStatus.PENDING -> "Este blog está pendiente de publicación."
                                 else -> null
                             }
+                        } else if (currentBlog == null) {
+                            "Este blog no existe o fue eliminado."
                         } else {
-                            "Este blog ya no existe o fue eliminado."
+                            null
                         }
                     )
                 }

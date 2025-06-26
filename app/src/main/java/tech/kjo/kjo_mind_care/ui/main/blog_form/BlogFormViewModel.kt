@@ -23,6 +23,7 @@ import tech.kjo.kjo_mind_care.data.repository.impl.CategoryRepository
 import tech.kjo.kjo_mind_care.usecase.blog.CreateBlogUseCase
 import tech.kjo.kjo_mind_care.usecase.blog.GetBlogByIdUseCase
 import tech.kjo.kjo_mind_care.usecase.blog.UpdateBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.blog.UploadMediaUseCase
 import tech.kjo.kjo_mind_care.usecase.category.GetCategoriesUseCase
 import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
 import java.time.LocalDateTime
@@ -56,7 +57,8 @@ class BlogFormViewModel @Inject constructor(
     private val getBlogPostByIdUseCase: GetBlogByIdUseCase,
     private val updateBlogPostUseCase: UpdateBlogUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val uploadMediaUseCase: UploadMediaUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BlogFormUiState())
@@ -187,9 +189,36 @@ class BlogFormViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null, saveSuccess = false) }
 
-            val finalMediaUrl = _uiState.value.mediaUri?.toString() ?: _uiState.value.existingMediaUrl
-            val finalMediaType = _uiState.value.mediaType
-                ?: (if (finalMediaUrl != null) MediaType.IMAGE else null)
+            var finalMediaUrl: String? = _uiState.value.existingMediaUrl
+            var finalMediaType: MediaType? = _uiState.value.mediaType
+
+            val mediaUriToUpload = _uiState.value.mediaUri
+            val selectedMediaType = _uiState.value.mediaType
+
+            if (mediaUriToUpload != null && selectedMediaType != null) {
+                val uploadResult = uploadMediaUseCase(mediaUriToUpload, selectedMediaType)
+                uploadResult
+                    .onSuccess { uploadedUrl ->
+                        finalMediaUrl = uploadedUrl
+                        finalMediaType = selectedMediaType
+                    }
+                    .onFailure { e ->
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                saveSuccess = false,
+                                errorMessage = "Error al subir el medio: ${e.localizedMessage ?: "Desconocido"}"
+                            )
+                        }
+                        return@launch
+                    }
+            } else if (mediaUriToUpload == null && _uiState.value.existingMediaUrl != null && _uiState.value.mediaType != null) {
+
+            } else {
+                finalMediaUrl = null
+                finalMediaType = null
+            }
+
 
             val blog = Blog(
                 id = _uiState.value.blogId ?: "",
@@ -218,7 +247,10 @@ class BlogFormViewModel @Inject constructor(
                         it.copy(
                             isSaving = false,
                             saveSuccess = true,
-                            errorMessage = null
+                            errorMessage = null,
+                            mediaUri = null,
+                            existingMediaUrl = finalMediaUrl,
+                            mediaType = finalMediaType
                         )
                     }
                 }
@@ -233,6 +265,7 @@ class BlogFormViewModel @Inject constructor(
                 }
         }
     }
+
 
     fun resetSaveSuccess() {
         _uiState.update { it.copy(saveSuccess = false) }
