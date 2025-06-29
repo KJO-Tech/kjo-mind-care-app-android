@@ -227,4 +227,18 @@
     <string name="notification_type_reminder">Reminder</string>
     <string name="notification_type_system">System</string>
     <string name="notification_type_new_blog">New Blog</string>
+
+    <string name="tap_to_change_photo">Tap to change photo</string>
+    <string name="name_label">Name</string>
+    <string name="email_label">Email</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="save_button">Save</string>
+    <string name="permission_needed_title">Permission needed</string>
+    <string name="image_permission_message">We need access to your photos to change your profile picture.</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="permission_denied_title">Permission denied</string>
+    <string name="permission_denied_message">To change your profile photo, you need to enable the permission in app settings.</string>
+    <string name="go_to_settings">Go to settings</string>
+    <string name="understood_button">Understood</string>
+
 </resources>
