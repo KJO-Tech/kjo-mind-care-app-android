@@ -227,4 +227,13 @@
     <string name="notification_type_reminder">Reminder</string>
     <string name="notification_type_system">System</string>
     <string name="notification_type_new_blog">New Blog</string>
+
+    <!-- SplashScreen -->
+    <string name="splash_loading_message">Loading...</string>
+    <string name="network_error_title">No Internet Connection</string>
+    <string name="network_error_message">It seems you\'re not connected to the internet. Please check your connection and try again.</string>
+    <string name="general_error_title">An Error Occurred</string>
+    <string name="general_error_message">An unexpected error occurred. Please try again. If the issue persists, please contact support.</string>
+    <string name="try_again_button">Try Again</string>
+    <string name="contact_support_button">Contact Support</string>
 </resources>

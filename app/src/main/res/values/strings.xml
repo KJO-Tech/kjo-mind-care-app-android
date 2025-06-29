@@ -232,4 +232,13 @@
     <string name="notification_type_reminder">Recordatorio</string>
     <string name="notification_type_system">Sistema</string>
     <string name="notification_type_new_blog">Nuevo Blog</string>
+
+    <!-- SplashScreen -->
+    <string name="splash_loading_message">Cargando...</string>
+    <string name="network_error_title">Sin conexión a Internet</string>
+    <string name="network_error_message">Parece que no tienes conexión a Internet. Por favor, revisa tu conexión y vuelve a intentarlo.</string>
+    <string name="general_error_title">Ha ocurrido un error</string>
+    <string name="general_error_message">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo. Si el problema persiste, contacta con soporte.</string>
+    <string name="try_again_button">Reintentar</string>
+    <string name="contact_support_button">Contactar Soporte</string>
 </resources>
