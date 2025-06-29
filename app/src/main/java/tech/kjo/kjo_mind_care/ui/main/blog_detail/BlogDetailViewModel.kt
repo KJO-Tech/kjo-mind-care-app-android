@@ -5,40 +5,65 @@ import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.BlogPost
-import tech.kjo.kjo_mind_care.data.model.BlogStatus
+import tech.kjo.kjo_mind_care.data.enums.BlogStatus
+import tech.kjo.kjo_mind_care.data.model.Blog
 import tech.kjo.kjo_mind_care.data.model.Comment
-import tech.kjo.kjo_mind_care.data.model.StaticBlogData
-import tech.kjo.kjo_mind_care.data.repository.BlogRepository
+import tech.kjo.kjo_mind_care.data.model.User
+import tech.kjo.kjo_mind_care.data.repository.IReactionRepository
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
-import java.time.LocalDateTime
-import java.util.UUID
+import tech.kjo.kjo_mind_care.usecase.blog.DeleteBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.blog.GetBlogByIdUseCase
+import tech.kjo.kjo_mind_care.usecase.blog.GetBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.reaction.ToggleBlogLikeUseCase
+import tech.kjo.kjo_mind_care.usecase.comments.AddCommentUseCase
+import tech.kjo.kjo_mind_care.usecase.comments.DeleteCommentUseCase
+import tech.kjo.kjo_mind_care.usecase.comments.GetCommentsForBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.comments.UpdateCommentUseCase
+import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
+import javax.inject.Inject
 
 data class BlogDetailUiState(
-    val blogPost: BlogPost? = null,
+    val blogPost: Blog? = null,
     val comments: List<Comment> = emptyList(),
+    val commentCount: Int = 0,
     val isLoading: Boolean = false,
     val error: String? = null,
     val showCommentInput: Boolean = false,
-    val commentToReplyTo: String? = null,
-    val commentToEdit: String? = null,
+    val commentToReplyTo: Comment? = null,
+    val commentToEdit: Comment? = null,
     val currentCommentText: String = "",
     val isSendingComment: Boolean = false,
     val isDeletingBlog: Boolean = false,
     val showDeleteDialog: Boolean = false,
     val deleteSuccess: Boolean = false,
-    val blogStatusMessage: String? = null
+    val blogStatusMessage: String? = null,
+    val currentUser: User? = null
 )
 
-class BlogDetailViewModel(
+@HiltViewModel
+class BlogDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val blogRepository: BlogRepository = BlogRepository()
+    private val getBlogPostByIdUseCase: GetBlogByIdUseCase,
+    private val getBlogPostsUseCase: GetBlogUseCase,
+    private val deleteBlogPostUseCase: DeleteBlogUseCase,
+    private val toggleBlogLikeUseCase: ToggleBlogLikeUseCase,
+    private val getCommentsForBlogUseCase: GetCommentsForBlogUseCase,
+    private val addCommentUseCase: AddCommentUseCase,
+    private val updateCommentUseCase: UpdateCommentUseCase,
+    private val deleteCommentUseCase: DeleteCommentUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val reactionRepository: IReactionRepository
 ) : ViewModel() {
 
     private val blogId: String = checkNotNull(savedStateHandle["blogId"])
@@ -46,80 +71,111 @@ class BlogDetailViewModel(
     private val _uiState = MutableStateFlow(BlogDetailUiState())
     val uiState: StateFlow<BlogDetailUiState> = _uiState.asStateFlow()
 
-    private val currentUser = StaticBlogData.currentUser // Asume un usuario logueado
+    private val _blogFromDb = getBlogPostsUseCase()
+        .map { blogs -> blogs.find { it.id == blogId } }
+        .distinctUntilChanged()
 
     init {
-        // Cargar blog al inicializar el ViewModel
-        loadBlogDetail()
-
-        // Observar cambios en los blogs del repositorio por si se actualiza desde otro lugar (ej. formulario de edición)
         viewModelScope.launch {
-            blogRepository.blogPosts.collect { blogs ->
-                val updatedBlog = blogs.find { it.id == blogId }
+            val user = getCurrentUserUseCase()
+            _uiState.update { it.copy(currentUser = user) }
+        }
+
+        viewModelScope.launch {
+            _blogFromDb.combine(_uiState.map { it.currentUser }.distinctUntilChanged()) { blogFromDb, currentUser ->
+                if (blogFromDb != null) {
+                    val hasLiked = if (currentUser != null) {
+                        reactionRepository.hasUserLikedBlog(blogId, currentUser.uid).getOrDefault(false)
+                    } else {
+                        false
+                    }
+                    blogFromDb.copy(isLiked = hasLiked)
+                } else {
+                    null
+                }
+            }.collect { combinedBlogWithLikedStatus ->
                 _uiState.update { currentState ->
+                    val newBlog = combinedBlogWithLikedStatus
+                    val currentBlog = currentState.blogPost
+
                     currentState.copy(
-                        blogPost = updatedBlog,
-                        blogStatusMessage = updatedBlog?.let {
-                            when (it.status) {
+                        blogPost = newBlog ?: currentBlog,
+                        blogStatusMessage = if (newBlog != null) {
+                            when (newBlog.status) {
                                 BlogStatus.DELETED -> "Este blog ha sido eliminado."
                                 BlogStatus.PENDING -> "Este blog está pendiente de publicación."
                                 else -> null
                             }
+                        } else if (currentBlog == null) {
+                            "Este blog no existe o fue eliminado."
+                        } else {
+                            null
                         }
                     )
                 }
             }
         }
-    }
 
-    private fun loadBlogDetail() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                // Usar el repositorio para obtener el blog
-                val blog = blogRepository.getBlogById(blogId)
-                val comments = StaticBlogData.getSampleCommentsForBlog(blogId)
-                _uiState.update {
-                    it.copy(
-                        blogPost = blog,
-                        comments = comments,
-                        isLoading = false,
-                        blogStatusMessage = blog?.let {
-                            when (it.status) {
-                                BlogStatus.DELETED -> "Este blog ha sido eliminado."
-                                BlogStatus.PENDING -> "Este blog está pendiente de publicación."
-                                else -> null
-                            }
-                        }
-                    )
+            getCommentsForBlogUseCase(blogId)
+                .map { rawComments ->
+                    val nestedComments = buildCommentTree(rawComments)
+                    Pair(nestedComments, rawComments.size)
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        error = "Error al cargar el blog: ${e.message}",
-                        isLoading = false
-                    )
+                .collect { (nestedComments, totalCommentCount) ->
+                    _uiState.update { it.copy(
+                        comments = nestedComments,
+                        commentCount = totalCommentCount
+                    ) }
                 }
-            }
         }
     }
 
     fun toggleLike() {
-        _uiState.update { current ->
-            current.blogPost?.let { blog ->
-                current.copy(
-                    blogPost = blog.copy(
-                        isLiked = !blog.isLiked,
-                        likes = if (blog.isLiked) blog.likes - 1 else blog.likes + 1
+        viewModelScope.launch {
+            val currentBlog = _uiState.value.blogPost
+            val currentUser = _uiState.value.currentUser
+
+            if (currentBlog == null || currentUser == null) {
+                _uiState.update { it.copy(error = "No se puede dar like. Blog o usuario no disponibles.") }
+                return@launch
+            }
+
+            val initialReactionCount = currentBlog.reaction
+            val initialIsLiked = currentBlog.isLiked
+
+            val newReactionCount = initialReactionCount + if (initialIsLiked) -1 else 1
+            val newIsLiked = !initialIsLiked
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    blogPost = currentState.blogPost?.copy(
+                        reaction = newReactionCount,
+                        isLiked = newIsLiked
                     )
                 )
-            } ?: current
+            }
+
+            toggleBlogLikeUseCase(currentBlog.id, currentUser.uid)
+                .onSuccess {
+                    _uiState.update { it.copy(error = null) }
+                }
+                .onFailure { e ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            blogPost = currentState.blogPost?.copy(
+                                reaction = initialReactionCount,
+                                isLiked = initialIsLiked
+                            ),
+                            error = "Error al dar/quitar like: ${e.localizedMessage}"
+                        )
+                    }
+                }
         }
-        // En una app real: actualizar el like en el repositorio/backend
     }
 
     fun isCurrentUserAuthor(): Boolean {
-        return uiState.value.blogPost?.author?.uid == currentUser.uid
+        return uiState.value.blogPost?.author?.uid == uiState.value.currentUser?.uid
     }
 
     fun showDeleteConfirmation(show: Boolean) {
@@ -130,7 +186,7 @@ class BlogDetailViewModel(
         val blogToDeleteId = uiState.value.blogPost?.id ?: return
         viewModelScope.launch {
             _uiState.update { it.copy(isDeletingBlog = true, error = null) }
-            val result = blogRepository.deleteBlog(blogToDeleteId)
+            val result = deleteBlogPostUseCase(blogToDeleteId)
             result
                 .onSuccess {
                     _uiState.update {
@@ -138,7 +194,6 @@ class BlogDetailViewModel(
                             isDeletingBlog = false,
                             deleteSuccess = true,
                             showDeleteDialog = false,
-                            blogStatusMessage = "Este blog ha sido eliminado." // Actualizar mensaje de estado
                         )
                     }
                 }
@@ -154,7 +209,6 @@ class BlogDetailViewModel(
         }
     }
 
-    // --- Funciones para manejar el input de comentarios ---
     fun onAddCommentClick() {
         _uiState.update {
             it.copy(
@@ -166,24 +220,24 @@ class BlogDetailViewModel(
         }
     }
 
-    fun onReplyToComment(commentId: String) {
+    fun onReplyToComment(comment: Comment) {
         _uiState.update {
             it.copy(
                 showCommentInput = true,
-                commentToReplyTo = commentId,
+                commentToReplyTo = comment,
                 commentToEdit = null,
                 currentCommentText = ""
             )
         }
     }
 
-    fun onEditComment(commentId: String, currentContent: String) {
+    fun onEditComment(comment: Comment) {
         _uiState.update {
             it.copy(
                 showCommentInput = true,
-                commentToEdit = commentId,
+                commentToEdit = comment,
                 commentToReplyTo = null,
-                currentCommentText = currentContent
+                currentCommentText = comment.content
             )
         }
     }
@@ -212,111 +266,68 @@ class BlogDetailViewModel(
             }
             _uiState.update { it.copy(isSendingComment = true) }
 
+            val blogId = _uiState.value.blogPost?.id ?: run {
+                _uiState.update { it.copy(isSendingComment = false, error = "Blog ID no disponible.") }
+                return@launch
+            }
+
+            val currentUser = _uiState.value.currentUser ?: run {
+                _uiState.update { it.copy(isSendingComment = false, error = "Usuario no autenticado para comentar.") }
+                return@launch
+            }
+
             if (_uiState.value.commentToEdit != null) {
-                val commentIdToEdit = _uiState.value.commentToEdit!!
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        comments = updateCommentContentRecursive(
-                            currentState.comments,
-                            commentIdToEdit,
-                            currentText
-                        )
-                    )
-                }
+                val commentToEdit = _uiState.value.commentToEdit!!
+                val updatedComment = commentToEdit.copy(content = currentText)
+                updateCommentUseCase(blogId, updatedComment)
+                    .onSuccess {
+                        _uiState.update { it.copy(error = null) }
+                    }
+                    .onFailure { e ->
+                        _uiState.update { it.copy(error = "Error al editar el comentario: ${e.localizedMessage}") }
+                    }
             } else {
+                val parentCommentId = _uiState.value.commentToReplyTo?.id
+
                 val newComment = Comment(
-                    id = UUID.randomUUID().toString(),
                     author = currentUser,
                     content = currentText,
-                    createdAt = LocalDateTime.now(),
+                    createdAt = Timestamp.now(),
+                    parentCommentId = parentCommentId,
                     isMine = true
                 )
 
-                _uiState.update { currentState ->
-                    val updatedComments = if (_uiState.value.commentToReplyTo != null) {
-                        addReplyToCommentRecursive(
-                            currentState.comments,
-                            _uiState.value.commentToReplyTo!!,
-                            newComment
-                        )
-                    } else {
-                        currentState.comments + newComment
+                addCommentUseCase(blogId, newComment)
+                    .onSuccess { commentId ->
+                        _uiState.update { it.copy(error = null) }
                     }
-                    currentState.copy(comments = updatedComments)
-                }
+                    .onFailure { e ->
+                        _uiState.update { it.copy(error = "Error al añadir comentario: ${e.localizedMessage}") }
+                    }
             }
             onCancelCommentInput()
-            _uiState.update { it.copy(isSendingComment = false, error = null) }
+            _uiState.update { it.copy(isSendingComment = false) }
         }
     }
 
-    private fun addReplyToCommentRecursive(
-        comments: List<Comment>,
-        parentId: String,
-        newReply: Comment
-    ): List<Comment> {
-        return comments.map { comment ->
-            if (comment.id == parentId) {
-                comment.copy(replies = comment.replies + newReply)
-            } else {
-                comment.copy(
-                    replies = addReplyToCommentRecursive(
-                        comment.replies,
-                        parentId,
-                        newReply
-                    )
-                )
-            }
-        }
-    }
-
-    private fun updateCommentContentRecursive(
-        comments: List<Comment>,
-        commentIdToEdit: String,
-        newContent: String
-    ): List<Comment> {
-        return comments.map { comment ->
-            if (comment.id == commentIdToEdit) {
-                comment.copy(content = newContent)
-            } else {
-                comment.copy(
-                    replies = updateCommentContentRecursive(
-                        comment.replies,
-                        commentIdToEdit,
-                        newContent
-                    )
-                )
-            }
-        }
-    }
-
-    fun onDeleteComment(commentId: String) {
+    fun onDeleteComment(comment: Comment) {
         viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    comments = removeCommentRecursive(currentState.comments, commentId)
-                )
+            val blogId = _uiState.value.blogPost?.id ?: run {
+                _uiState.update { it.copy(error = "Blog ID no disponible para eliminar comentario.") }
+                return@launch
             }
-        }
-    }
-
-    private fun removeCommentRecursive(
-        comments: List<Comment>,
-        commentIdToRemove: String
-    ): List<Comment> {
-        return comments.filter { it.id != commentIdToRemove }.map { comment ->
-            comment.copy(replies = removeCommentRecursive(comment.replies, commentIdToRemove))
+            deleteCommentUseCase(blogId, comment.id)
+                .onSuccess {
+                    _uiState.update { it.copy(error = null) }
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(error = "Error al eliminar comentario: ${e.localizedMessage}") }
+                }
         }
     }
 
     fun shareBlog(context: Context, blogId: String, blogTitle: String) {
-        // Usamos el DEEPLINK_WEB_PATTERN como el enlace que queremos compartir
-        // Aunque aún no tengas un dominio web configurado, este es el formato correcto
-        // para cuando lo tengas. Por ahora, si no tienes dominio, el sistema
-        // intentará abrir tu app si está instalada y maneja el esquema personalizado,
-        // o simplemente mostrará el texto sin abrir una app específica.
         val shareLink = Screen.BlogPostDetail.DEEPLINK_WEB_PATTERN.replace("{blogId}", blogId)
-
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, "Echa un vistazo a este blog: \"$blogTitle\"\n$shareLink")
@@ -328,5 +339,23 @@ class BlogDetailViewModel(
                 context.getString(R.string.share_blog_title)
             )
         )
+    }
+
+    private fun buildCommentTree(allComments: List<Comment>): List<Comment> {
+        val commentsById = allComments.associateBy { it.id }
+        val nestedComments = allComments.filter { it.parentCommentId == null || it.parentCommentId.isBlank() }
+            .map { rootComment ->
+                rootComment.copy(replies = findReplies(rootComment.id, commentsById))
+            }
+        return nestedComments.sortedBy { it.createdAt.toDate() }
+    }
+
+    private fun findReplies(parentId: String, commentsById: Map<String, Comment>): List<Comment> {
+        return commentsById.values
+            .filter { it.parentCommentId == parentId }
+            .map { reply ->
+                reply.copy(replies = findReplies(reply.id, commentsById))
+            }
+            .sortedBy { it.createdAt.toDate() }
     }
 }

@@ -1,6 +1,7 @@
 package tech.kjo.kjo_mind_care.ui.main.blog.components
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,7 +30,7 @@ import androidx.media3.ui.PlayerView
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.MediaType
+import tech.kjo.kjo_mind_care.data.enums.MediaType
 
 @Composable
 fun BlogMediaPreview(
@@ -37,9 +38,12 @@ fun BlogMediaPreview(
     mediaType: MediaType?,
     isDetailScreen: Boolean = false // Nuevo parámetro para controlar el tamaño/funcionalidad
 ) {
-    if (mediaUrl == null || mediaUrl.isBlank()) {
-        return // No hay contenido multimedia para mostrar
+    if (mediaUrl == null || mediaUrl.isBlank() || mediaType == null) {
+        Log.d("MediaDebug", "No media to show. URL: $mediaUrl, Type: $mediaType")
+        return
     }
+
+    Log.d("MediaDebug", "Attempting to load media. URL: $mediaUrl, Type: $mediaType")
 
     val context = LocalContext.current
     val aspectRatio = if (isDetailScreen) 16f / 9f else 16f / 9f

@@ -14,18 +14,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import tech.kjo.kjo_mind_care.data.model.BlogPost
+import tech.kjo.kjo_mind_care.data.model.Blog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogList(
-    blogs: List<BlogPost>,
+    blogs: List<Blog>,
     onBlogClick: (String) -> Unit,
     onToggleLike: (String) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     selectedTabIndex: Int,
-    onBlogShare: (String, String) -> Unit
+    onBlogShare: (String, String) -> Unit,
+    commentCounts: Map<String, Int>
 ) {
     val listState = rememberLazyListState()
 
@@ -58,11 +59,13 @@ fun BlogList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(blogs, key = { it.id }) { blog ->
+                val currentCommentCount = commentCounts[blog.id] ?: 0
                 BlogPostCard(
                     blog = blog,
                     onBlogClick = onBlogClick,
                     onToggleLike = onToggleLike,
-                    onBlogShare = onBlogShare
+                    onBlogShare = onBlogShare,
+                    commentCount = currentCommentCount
                 )
             }
         }
