@@ -49,7 +49,7 @@
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Triste</string>
     <string name="detailed_check_in">Registro detallado</string>
-
+    <string name="recent_entries">Entradas Recientes</string>
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Actividades Diarias</string>
     <string name="breathing_exercise">Ejercicio de Respiración</string>

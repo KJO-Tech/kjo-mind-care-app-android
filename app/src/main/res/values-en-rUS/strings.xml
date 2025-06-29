@@ -89,7 +89,7 @@
     <string name="mood_angry_desc">Mad, upset</string>
     <string name="mood_frustrated_title">Frustrated</string>
     <string name="mood_frustrated_desc">Annoyed, irritated</string>
-
+    <string name="recent_entries">Recent Entries</string>
     <!-- BlogScreen -->
     <string name="blog_community_title">Community Blog</string>
     <string name="search_blogs_placeholder">Search blogs...</string>

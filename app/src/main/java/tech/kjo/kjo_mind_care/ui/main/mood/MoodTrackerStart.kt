@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.data.model.sampleEntries
 
 
 @Composable
@@ -107,6 +108,12 @@ fun MoodTrackerStart(
         )
         Spacer(modifier = Modifier.height(24.dp))
         MoodInsights(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp))
+        RecentEntries(
+            entries = sampleEntries(),
+            modifier = Modifier.fillMaxWidth(),
+            onEntryClick = {  }
+        )
     }
 
 
