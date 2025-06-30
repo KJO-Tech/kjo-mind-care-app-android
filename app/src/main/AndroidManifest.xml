@@ -5,23 +5,32 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+
+
+
+
+
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".MyApp"
         android:allowBackup="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KJOMindCare"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.KJOMindCare">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,83 +38,90 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-<!--            <intent-filter android:autoVerify="true">-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
+            <!--            <intent-filter android:autoVerify="true">-->
+            <!--                <action android:name="android.intent.action.VIEW" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+            <!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
 
-<!--                <data android:scheme="https" />-->
-<!--                <data android:host="app.kjo-mind-care.com" />-->
-<!--                <data android:host="kjo-mind-care.com" />-->
-<!--                <data android:pathPrefix="/blog" />-->
-<!--            </intent-filter>-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
+            <!--                <data android:scheme="https" />-->
+            <!--                <data android:host="app.kjo-mind-care.com" />-->
+            <!--                <data android:host="kjo-mind-care.com" />-->
+            <!--                <data android:pathPrefix="/blog" />-->
+            <!--            </intent-filter>-->
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.VIEW" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+            <!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
 
-<!--                <data android:scheme="kjoapp" />-->
-<!--                <data android:host="app.kjo-mind-care.com" />-->
-<!--                <data android:host="kjo-mind-care.com" />-->
-<!--                <data android:pathPrefix="/blog" />-->
-<!--            </intent-filter>-->
+            <!--                <data android:scheme="kjoapp" />-->
+            <!--                <data android:host="app.kjo-mind-care.com" />-->
+            <!--                <data android:host="kjo-mind-care.com" />-->
+            <!--                <data android:pathPrefix="/blog" />-->
+            <!--            </intent-filter>-->
 
-<!--            <intent-filter android:autoVerify="true">-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
+            <!--            <intent-filter android:autoVerify="true">-->
+            <!--                <action android:name="android.intent.action.VIEW" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+            <!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
 
-<!--                <data-->
-<!--                    android:host="kjo-mind-care.com"-->
-<!--                    android:pathPrefix="/mood"-->
-<!--                    android:scheme="https" />-->
-<!--                <data-->
-<!--                    android:host="app.kjo-mind-care.com"-->
-<!--                    android:pathPrefix="/mood"-->
-<!--                    android:scheme="kjoapp" />-->
-<!--            </intent-filter>-->
+            <!--                <data-->
+            <!--                    android:host="kjo-mind-care.com"-->
+            <!--                    android:pathPrefix="/mood"-->
+            <!--                    android:scheme="https" />-->
+            <!--                <data-->
+            <!--                    android:host="app.kjo-mind-care.com"-->
+            <!--                    android:pathPrefix="/mood"-->
+            <!--                    android:scheme="kjoapp" />-->
+            <!--            </intent-filter>-->
 
-<!--            <intent-filter android:autoVerify="true">-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
+            <!--            <intent-filter android:autoVerify="true">-->
+            <!--                <action android:name="android.intent.action.VIEW" />-->
 
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+            <!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
 
-<!--                <data-->
-<!--                    android:host="kjo-mind-care.com"-->
-<!--                    android:pathPrefix="/notifications"-->
-<!--                    android:scheme="https" />-->
-<!--                <data-->
-<!--                    android:host="app.kjo-mind-care.com"-->
-<!--                    android:pathPrefix="/notifications"-->
-<!--                    android:scheme="kjoapp" />-->
-<!--            </intent-filter>-->
+            <!--                <data-->
+            <!--                    android:host="kjo-mind-care.com"-->
+            <!--                    android:pathPrefix="/notifications"-->
+            <!--                    android:scheme="https" />-->
+            <!--                <data-->
+            <!--                    android:host="app.kjo-mind-care.com"-->
+            <!--                    android:pathPrefix="/notifications"-->
+            <!--                    android:scheme="kjoapp" />-->
+            <!--            </intent-filter>-->
 
             <!-- Intent filter para deeplinks WEB (verificación automática) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- Tu dominio web -->
-                <data android:scheme="https"
-                    android:host="kjo-mind-care.com" />
+                <data
+                    android:host="kjo-mind-care.com"
+                    android:scheme="https" />
             </intent-filter>
 
             <!-- Intent filter para deeplinks de la APP -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- Tu esquema personalizado -->
-                <data android:scheme="kjoapp"
-                    android:host="app.kjo-mind-care.com" />
+                <data
+                    android:host="app.kjo-mind-care.com"
+                    android:scheme="kjoapp" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>

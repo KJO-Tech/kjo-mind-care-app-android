@@ -47,6 +47,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.maps.android.compose.GoogleMap
+import tech.kjo.kjo_mind_care.ui.components.GoogleMaps
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,14 +94,9 @@ fun EmergencyResourcesScreen(
                 .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            // Aquí iría el mapa con geolocalización
-            Icon(
-                imageVector = Icons.Default.Map,
-                contentDescription = "Mapa",
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
+            GoogleMaps()
         }
+
 
         EmergencyResourcesList()
     }
