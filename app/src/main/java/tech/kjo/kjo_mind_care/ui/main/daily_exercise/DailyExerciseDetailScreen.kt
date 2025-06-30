@@ -2,7 +2,6 @@ package tech.kjo.kjo_mind_care.ui.main.daily_exercise
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -38,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.ExerciseContentType
-import tech.kjo.kjo_mind_care.ui.components.SimpleYouTubePlayer
+import tech.kjo.kjo_mind_care.ui.components.YouTubePlayerWebView
 import tech.kjo.kjo_mind_care.ui.components.getYouTubeVideoId
 import tech.kjo.kjo_mind_care.utils.Resource
 import java.util.Locale
@@ -64,7 +63,10 @@ fun DailyExerciseDetailScreen(
                 title = { Text(stringResource(R.string.exercise_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_button_desc))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button_desc)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -88,12 +90,19 @@ fun DailyExerciseDetailScreen(
                     CircularProgressIndicator()
                     Text(stringResource(R.string.loading_exercise))
                 }
+
                 is Resource.Success -> {
                     val exercise = (exerciseState as Resource.Success).data
                     if (exercise != null) {
-                        val title = exercise.localizedTitle[currentLanguage] ?: exercise.localizedTitle["en"] ?: stringResource(R.string.default_exercise_title)
-                        val description = exercise.localizedDescription[currentLanguage] ?: exercise.localizedDescription["en"] ?: stringResource(R.string.default_exercise_description)
-                        val contentText = exercise.localizedContentText[currentLanguage] ?: exercise.localizedContentText["en"] ?: stringResource(R.string.default_exercise_content_text)
+                        val title = exercise.localizedTitle[currentLanguage]
+                            ?: exercise.localizedTitle["en"]
+                            ?: stringResource(R.string.default_exercise_title)
+                        val description = exercise.localizedDescription[currentLanguage]
+                            ?: exercise.localizedDescription["en"]
+                            ?: stringResource(R.string.default_exercise_description)
+                        val contentText = exercise.localizedContentText[currentLanguage]
+                            ?: exercise.localizedContentText["en"]
+                            ?: stringResource(R.string.default_exercise_content_text)
 
                         Text(
                             text = title,
@@ -114,17 +123,11 @@ fun DailyExerciseDetailScreen(
                             ExerciseContentType.VIDEO -> {
                                 val videoId = getYouTubeVideoId(exercise.contentUrl)
                                 if (videoId != null) {
-                                    SimpleYouTubePlayer(
+                                    YouTubePlayerWebView(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(200.dp),
+                                            .height(350.dp),
                                         videoId = videoId,
-                                        onReady = {
-                                            Log.d("VideoPlayer", "Video ready.")
-                                        },
-                                        onError = { error ->
-                                            Log.e("VideoPlayer", "Error loading video: $error")
-                                        }
                                     )
                                 } else {
                                     Text(
@@ -133,13 +136,17 @@ fun DailyExerciseDetailScreen(
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     Button(onClick = {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(exercise.contentUrl))
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(exercise.contentUrl)
+                                        )
                                         context.startActivity(intent)
                                     }) {
                                         Text(stringResource(R.string.open_in_browser))
                                     }
                                 }
                             }
+
                             ExerciseContentType.AUDIO -> {
                                 Text(
                                     text = stringResource(R.string.audio_content),
@@ -148,12 +155,14 @@ fun DailyExerciseDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Button(onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(exercise.contentUrl))
+                                    val intent =
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(exercise.contentUrl))
                                     context.startActivity(intent)
                                 }) {
                                     Text(stringResource(R.string.listen_audio))
                                 }
                             }
+
                             ExerciseContentType.TEXT -> {
                                 Text(
                                     text = stringResource(R.string.text_content),
@@ -167,6 +176,7 @@ fun DailyExerciseDetailScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
+
                             ExerciseContentType.GAME -> {
                                 Text(
                                     text = stringResource(R.string.game_content),
@@ -180,7 +190,8 @@ fun DailyExerciseDetailScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Button(onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(exercise.contentUrl))
+                                    val intent =
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(exercise.contentUrl))
                                     context.startActivity(intent)
                                 }) {
                                     Text(stringResource(R.string.start_game))
@@ -191,13 +202,19 @@ fun DailyExerciseDetailScreen(
                         Text(stringResource(R.string.exercise_not_found_error))
                     }
                 }
+
                 is Resource.Error -> {
                     Text(
-                        text = stringResource(R.string.error_loading_exercise, (exerciseState as Resource.Error).message ?: "Unknown error"),
+                        text = stringResource(
+                            R.string.error_loading_exercise,
+                            (exerciseState as Resource.Error).message ?: "Unknown error"
+                        ),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-                else -> { /* Initial state or other states */ }
+
+                else -> { /* Initial state or other states */
+                }
             }
         }
     }
