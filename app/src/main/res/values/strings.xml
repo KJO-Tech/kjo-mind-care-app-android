@@ -50,6 +50,7 @@
     <string name="mood_sad">Triste</string>
     <string name="detailed_check_in">Registro detallado</string>
     <string name="recent_entries">Entradas Recientes</string>
+
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Actividades Diarias</string>
     <string name="breathing_exercise">Ejercicio de Respiración</string>
@@ -59,6 +60,39 @@
     <string name="journal">Diario</string>
     <string name="journal_description">Escribe tus pensamientos</string>
     <string name="percent_complete">%1$d%% completado</string>
+
+    <string name="welcome_message">Bienvenido, %s!</string>
+    <string name="daily_activities_title">Actividades Diarias Recomendadas</string>
+    <string name="no_activities_found">No se encontraron actividades diarias para hoy.</string>
+    <string name="activities_error_message">Error al cargar actividades: %s</string>
+
+    <string name="default_exercise_title">Ejercicio</string>
+    <string name="default_exercise_description">Descripción del ejercicio</string>
+    <string name="default_exercise_content_text">Contenido del ejercicio</string>
+
+    <string name="exercise_detail_title">Detalle del Ejercicio</string>
+    <string name="back_button_desc">Volver</string>
+    <string name="loading_exercise">Cargando ejercicio...</string>
+    <string name="exercise_not_found_error">Ejercicio no encontrado.</string>
+    <string name="error_loading_exercise">Error al cargar el ejercicio: %s</string>
+    <string name="video_content">Contenido de Video</string>
+    <string name="watch_video">Ver Video</string>
+    <string name="invalid_video_url">URL de video no válida o no compatible.</string>
+    <string name="open_in_browser">Abrir en el Navegador</string>
+    <string name="audio_content">Contenido de Audio</string>
+    <string name="listen_audio">Escuchar Audio</string>
+    <string name="text_content">Contenido de Texto</string>
+    <string name="game_content">Juego Interactivo</string>
+    <string name="game_description">Comienza el juego de \'%s\' para practicar.</string>
+    <string name="start_game">Iniciar Juego</string>
+
+    <string name="wellness_tip_gratitude_title">Practica la Gratitud Diariamente</string>
+    <string name="wellness_tip_gratitude_description">Tómate unos minutos cada día para escribir tres cosas por las que estés agradecido. Esta simple práctica puede cambiar tu enfoque hacia emociones y experiencias positivas, mejorando tu bienestar mental general.</string>
+    <string name="wellness_tip_gratitude_cta">Pruébalo hoy</string>
+
+    <string name="community_post_peace_title">Encontrando Paz en las Rutinas Diarias</string>
+    <string name="community_post_peace_author">Por Sarah Johnson</string>
+    <string name="community_post_peace_time_ago">Hace 2 horas</string>
 
     <!-- WellnessTipSection -->
     <string name="daily_wellness_tip">Consejo Diario de Bienestar</string>

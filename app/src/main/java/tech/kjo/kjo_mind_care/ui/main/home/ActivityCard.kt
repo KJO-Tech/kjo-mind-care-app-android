@@ -31,12 +31,12 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import tech.kjo.kjo_mind_care.R
 
-data class ActivityItemData(
-    val iconRes: Int,
-    val title: String,
-    val description: String,
-    val progress: Float
-)
+//data class ActivityItemData(
+//    val iconRes: Int,
+//    val title: String,
+//    val description: String,
+//    val progress: Float
+//)
 
 @Composable
 fun ActivityCard(

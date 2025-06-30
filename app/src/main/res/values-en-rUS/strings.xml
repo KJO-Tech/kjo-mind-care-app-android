@@ -45,6 +45,7 @@
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Sad</string>
     <string name="detailed_check_in">Detailed check-in</string>
+
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Daily Activities</string>
     <string name="breathing_exercise">Breathing Exercise</string>
@@ -54,6 +55,39 @@
     <string name="journal">Journal</string>
     <string name="journal_description">Write down your thoughts</string>
     <string name="percent_complete">%1$d%% complete</string>
+
+    <string name="welcome_message">Welcome, %s!</string>
+    <string name="daily_activities_title">Recommended Daily Activities</string>
+    <string name="no_activities_found">No daily activities found for today.</string>
+    <string name="activities_error_message">Error loading activities: %s</string>
+
+    <string name="default_exercise_title">Exercise</string>
+    <string name="default_exercise_description">Exercise description</string>
+    <string name="default_exercise_content_text">Exercise content</string>
+
+    <string name="exercise_detail_title">Exercise Details</string>
+    <string name="back_button_desc">Back</string>
+    <string name="loading_exercise">Loading exercise...</string>
+    <string name="exercise_not_found_error">Exercise not found.</string>
+    <string name="error_loading_exercise">Error loading exercise: %s</string>
+    <string name="video_content">Video Content</string>
+    <string name="watch_video">Watch Video</string>
+    <string name="invalid_video_url">Invalid or unsupported video URL.</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="audio_content">Audio Content</string>
+    <string name="listen_audio">Listen to Audio</string>
+    <string name="text_content">Text Content</string>
+    <string name="game_content">Interactive Game</string>
+    <string name="game_description">Start the \'%s\' game to practice.</string>
+    <string name="start_game">Start Game</string>
+
+    <string name="wellness_tip_gratitude_title">Practice Gratitude Daily</string>
+    <string name="wellness_tip_gratitude_description">Take a few minutes each day to write down three things you\'re grateful for. This simple practice can shift your focus toward positive emotions and experiences, improving your overall mental well-being.</string>
+    <string name="wellness_tip_gratitude_cta">Try this today</string>
+
+    <string name="community_post_peace_title">Finding Peace in Daily Routines</string>
+    <string name="community_post_peace_author">By Sarah Johnson</string>
+    <string name="community_post_peace_time_ago">2 hours ago</string>
 
     <!-- WellnessTipSection -->
     <string name="daily_wellness_tip">Daily Wellness Tip</string>

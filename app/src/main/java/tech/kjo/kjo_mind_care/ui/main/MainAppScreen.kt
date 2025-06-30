@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
+import tech.kjo.kjo_mind_care.ui.main.daily_exercise.DailyExerciseDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
@@ -123,6 +124,22 @@ fun MainAppScreen(
                         onNavigateToNotifications = { mainNavController.navigate(Screen.NotificationsScreen.route) },
                         navController = bottomNavController
                     )
+                }
+
+                composable(
+                    route = Screen.ExerciseDetail.route,
+                    arguments = listOf(navArgument("exerciseId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val exerciseId = backStackEntry.arguments?.getString("exerciseId")
+                    if (exerciseId != null) {
+                        DailyExerciseDetailScreen(
+                            exerciseId = exerciseId,
+                            onNavigateBack = { bottomNavController.popBackStack() }
+                        )
+                    } else {
+                        // Manejar el caso de ID nulo, tal vez navegar a una pantalla de error o a Home
+                        Text("Error: Exercise ID missing")
+                    }
                 }
             }
 
