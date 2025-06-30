@@ -2,8 +2,10 @@ package tech.kjo.kjo_mind_care.ui.main.daily_exercise
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.ExerciseContentType
-import tech.kjo.kjo_mind_care.ui.components.YouTubePlayerWebView
+import tech.kjo.kjo_mind_care.ui.components.SimpleYouTubePlayer
 import tech.kjo.kjo_mind_care.ui.components.getYouTubeVideoId
 import tech.kjo.kjo_mind_care.utils.Resource
 import java.util.Locale
@@ -68,7 +70,8 @@ fun DailyExerciseDetailScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
+                ),
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { paddingValues ->
@@ -111,11 +114,17 @@ fun DailyExerciseDetailScreen(
                             ExerciseContentType.VIDEO -> {
                                 val videoId = getYouTubeVideoId(exercise.contentUrl)
                                 if (videoId != null) {
-                                    YouTubePlayerWebView(
+                                    SimpleYouTubePlayer(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(200.dp),
-                                        videoId = videoId
+                                        videoId = videoId,
+                                        onReady = {
+                                            Log.d("VideoPlayer", "Video ready.")
+                                        },
+                                        onError = { error ->
+                                            Log.e("VideoPlayer", "Error loading video: $error")
+                                        }
                                     )
                                 } else {
                                     Text(
