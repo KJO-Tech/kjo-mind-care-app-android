@@ -4,15 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.data.model.ActivityCategory
 import tech.kjo.kjo_mind_care.data.model.DailyExercise
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
 import tech.kjo.kjo_mind_care.data.repository.IDailyActivityRepository
-import tech.kjo.kjo_mind_care.data.repository.impl.DailyActivityRepository
 import tech.kjo.kjo_mind_care.utils.Resource
 import java.time.LocalDate
 import javax.inject.Inject
@@ -43,9 +42,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchUserName()
-        viewModelScope.launch {
-            fetchDailyActivities()
-        }
+        fetchDailyActivities()
     }
 
     private fun fetchUserName() {
@@ -66,7 +63,7 @@ class HomeViewModel @Inject constructor(
 
             val currentDate = LocalDate.now()
 
-            // Si ya seleccionamos actividades hoy, las devolvemos de la caché
+            // Si ya seleccionamos actividades hoy Y la caché no está vacía, las devolvemos.
             if (currentDate == lastActivitySelectionDate && !cachedSelectedActivities.isNullOrEmpty()) {
                 _uiState.value = _uiState.value.copy(
                     selectedDailyActivities = cachedSelectedActivities!!,
@@ -75,60 +72,122 @@ class HomeViewModel @Inject constructor(
                 return@launch
             }
 
-            // Si no, o si es un nuevo día, generamos nuevas actividades
-            try {
-                val categoriesResource =
-                    dailyActivityRepository.getCategories().first()
-                Log.d("HomeViewModel", "Categories: $categoriesResource")
-                if (categoriesResource is Resource.Error) {
-                    _uiState.value = _uiState.value.copy(
-                        activitiesError = categoriesResource.message,
-                        isLoadingActivities = false
-                    )
-                    return@launch
-                }
-                val allCategories = categoriesResource.data ?: emptyList()
+            var allCategories: List<ActivityCategory> = emptyList()
+            var categoriesFetchError: String? = null
 
-                val selectedExercisesWithCategories = mutableListOf<DailyActivityWithCategory>()
-                val usedCategoryIds = mutableSetOf<String>()
+            val categoriesJob = launch {
+                dailyActivityRepository.getCategories().collect { categoriesResource ->
+                    when (categoriesResource) {
+                        is Resource.Loading -> {
+                        }
 
-                val availableCategories = allCategories.shuffled() // Aleatorio
+                        is Resource.Success -> {
+                            allCategories = categoriesResource.data ?: emptyList()
+                            this.cancel()
+                        }
 
-                for (category in availableCategories) {
-                    if (selectedExercisesWithCategories.size >= 3) break
-
-                    val exercisesResource =
-                        dailyActivityRepository.getExercisesByCategory(category.id).first()
-                    if (exercisesResource is Resource.Success && !exercisesResource.data.isNullOrEmpty()) {
-                        val availableExercises =
-                            exercisesResource.data.filter { it.categoryId == category.id }
-                        if (availableExercises.isNotEmpty()) {
-                            val selectedExercise =
-                                availableExercises.random()
-                            selectedExercisesWithCategories.add(
-                                DailyActivityWithCategory(
-                                    selectedExercise,
-                                    category
-                                )
+                        is Resource.Error -> {
+                            categoriesFetchError = categoriesResource.message
+                            _uiState.value = _uiState.value.copy(
+                                activitiesError = categoriesFetchError,
+                                isLoadingActivities = false
                             )
-                            usedCategoryIds.add(category.id)
+                            this.cancel()
                         }
                     }
                 }
+            }
+            categoriesJob.join()
 
+            if (categoriesFetchError != null) {
+                return@launch
+            }
+
+            if (allCategories.isEmpty()) {
+                _uiState.value = _uiState.value.copy(
+                    selectedDailyActivities = emptyList(),
+                    isLoadingActivities = false,
+                )
+                return@launch
+            }
+
+            val selectedExercisesWithCategories = mutableListOf<DailyActivityWithCategory>()
+
+            val availableCategories = allCategories.shuffled() // Aleatorio
+
+            for (category in availableCategories) {
+                if (selectedExercisesWithCategories.size >= 3) break
+
+                var currentExercises: List<DailyExercise>? = null
+                var exercisesFetchErrorForCategory: String? = null
+
+                val exercisesJob = launch {
+                    dailyActivityRepository.getExercisesByCategory(category.id)
+                        .collect { exercisesResource ->
+                            when (exercisesResource) {
+                                is Resource.Loading -> {
+                                }
+
+                                is Resource.Success -> {
+                                    currentExercises = exercisesResource.data ?: emptyList()
+                                    this.cancel()
+                                }
+
+                                is Resource.Error -> {
+                                    exercisesFetchErrorForCategory = exercisesResource.message
+                                    this.cancel()
+                                }
+                            }
+                        }
+                }
+                exercisesJob.join()
+
+                if (exercisesFetchErrorForCategory != null) {
+                    continue
+                }
+
+                if (!currentExercises.isNullOrEmpty()) {
+                    val availableExercises =
+                        currentExercises!!.filter { it.categoryId == category.id }
+                    if (availableExercises.isNotEmpty()) {
+                        val selectedExercise = availableExercises.random()
+                        selectedExercisesWithCategories.add(
+                            DailyActivityWithCategory(
+                                selectedExercise,
+                                category
+                            )
+                        )
+                    } else {
+                        Log.d(
+                            "HomeViewModel",
+                            "No hay ejercicios disponibles para la categoría: ${category.localizedName["en"]} después de filtrar."
+                        )
+                    }
+                } else {
+                    Log.d(
+                        "HomeViewModel",
+                        "No se encontraron ejercicios (o lista vacía) para la categoría: ${category.localizedName["en"]}"
+                    )
+                }
+            }
+
+            if (selectedExercisesWithCategories.isNotEmpty()) {
                 lastActivitySelectionDate = currentDate
                 cachedSelectedActivities = selectedExercisesWithCategories
                 _uiState.value = _uiState.value.copy(
                     selectedDailyActivities = selectedExercisesWithCategories,
-                    isLoadingActivities = false
+                    isLoadingActivities = false,
+                    activitiesError = null
                 )
-
-            } catch (e: Exception) {
+            } else {
+                Log.w(
+                    "HomeViewModel",
+                    "No se pudieron seleccionar actividades diarias para hoy. Caché no actualizada."
+                )
                 _uiState.value = _uiState.value.copy(
-                    activitiesError = e.localizedMessage ?: "Error fetching daily activities",
-                    isLoadingActivities = false
+                    selectedDailyActivities = emptyList(),
+                    isLoadingActivities = false,
                 )
-                e.printStackTrace()
             }
         }
     }
