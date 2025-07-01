@@ -288,4 +288,9 @@
     <string name="general_error_message">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo. Si el problema persiste, contacta con soporte.</string>
     <string name="try_again_button">Reintentar</string>
     <string name="contact_support_button">Contactar Soporte</string>
+
+    <!-- ComingSoonDialog -->
+    <string name="dialog_feature_soon_title">¡Próximamente Disponible!</string>
+    <string name="dialog_feature_soon_message">¡Gracias por tu paciencia! Estamos trabajando arduamente para que esta sección sea increíble y esté lista muy pronto. 🚀</string>
+    <string name="dialog_feature_soon_positive_button">Entendido</string>
 </resources>
