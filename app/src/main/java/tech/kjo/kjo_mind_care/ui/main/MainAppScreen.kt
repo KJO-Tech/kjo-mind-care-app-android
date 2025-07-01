@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import kotlinx.coroutines.delay
+import tech.kjo.kjo_mind_care.ui.components.ComingSoonDialog
 import tech.kjo.kjo_mind_care.ui.main.blog.BlogScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_detail.BlogPostDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
@@ -227,6 +228,8 @@ fun MainAppScreen(
                         },
                         onNavigateToMoodEntry = { }
                     )
+
+                    ComingSoonDialog()
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
@@ -243,6 +246,8 @@ fun MainAppScreen(
                             bottomNavController.popBackStack()
                         }
                     )
+
+                    ComingSoonDialog()
                 }
             }
 
@@ -259,6 +264,8 @@ fun MainAppScreen(
                             )
                         }
                     )
+
+                    ComingSoonDialog()
                 }
                 composable(
                     route = Screen.ResourceDetail.route,
@@ -292,6 +299,8 @@ fun MainAppScreen(
                             }
                         }
                     )
+
+                    ComingSoonDialog()
                 }
                 composable(Screen.EditProfile.route) {
                     val currentState = profileViewModel.uiState.collectAsState().value
@@ -302,6 +311,8 @@ fun MainAppScreen(
                         name = currentState.name,
                         email = currentState.email
                     )
+
+                    ComingSoonDialog()
                 }
             }
         }

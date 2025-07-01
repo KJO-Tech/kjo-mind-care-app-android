@@ -283,4 +283,9 @@
     <string name="general_error_message">An unexpected error occurred. Please try again. If the issue persists, please contact support.</string>
     <string name="try_again_button">Try Again</string>
     <string name="contact_support_button">Contact Support</string>
+
+    <!-- ComingSoonDialog -->
+    <string name="dialog_feature_soon_title">Coming Soon!</string>
+    <string name="dialog_feature_soon_message">Thank you for your patience! We\'re working hard to make this section amazing and it will be ready very soon. 🚀</string>
+    <string name="dialog_feature_soon_positive_button">Got It</string>
 </resources>
