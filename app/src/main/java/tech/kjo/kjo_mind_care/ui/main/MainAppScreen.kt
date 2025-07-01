@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -28,6 +29,7 @@ import tech.kjo.kjo_mind_care.ui.main.daily_exercise.DailyExerciseDetailScreen
 import tech.kjo.kjo_mind_care.ui.main.home.HomeScreen
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodEntryDetail
 import tech.kjo.kjo_mind_care.ui.main.mood.MoodTrackerStart
+import tech.kjo.kjo_mind_care.ui.main.profile.EditProfileScreen
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileScreen
 import tech.kjo.kjo_mind_care.ui.main.profile.ProfileViewModel
 import tech.kjo.kjo_mind_care.ui.main.resources.EmergencyResourcesScreen
@@ -292,10 +294,14 @@ fun MainAppScreen(
                     )
                 }
                 composable(Screen.EditProfile.route) {
-//                        EditProfileScreen(
-//                            onProfileSaved = { bottomNavController.popBackStack() },
-//                            onNavigateBack = { bottomNavController.popBackStack() }
-//                        )
+                    val currentState = profileViewModel.uiState.collectAsState().value
+                    EditProfileScreen(
+                        onProfileSaved = { bottomNavController.popBackStack() },
+                        onNavigateBack = { bottomNavController.popBackStack() },
+                        photoUrl = currentState.photoUrl,
+                        name = currentState.name,
+                        email = currentState.email
+                    )
                 }
             }
         }
