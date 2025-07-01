@@ -27,6 +27,10 @@ sealed class Screen(val route: String) {
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/home"
     }
 
+    object ExerciseDetail : Screen("exercise_detail/{exerciseId}") {
+        fun createRoute(exerciseId: String) = "exercise_detail/$exerciseId"
+    }
+
     object BlogList : Screen("blog_list") {
         const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/blogs"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/blogs"

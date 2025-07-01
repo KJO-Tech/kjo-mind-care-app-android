@@ -1,6 +1,5 @@
 package tech.kjo.kjo_mind_care.ui.main.home
 
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -16,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +26,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,20 +35,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
+import tech.kjo.kjo_mind_care.utils.loadDrawableResByName
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToNotifications: () -> Unit,
-    userName: String = "Friend",
-    navController: NavController
+    navController: NavController,
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
-
+    val uiState by homeViewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val currentLanguage = Locale.getDefault().language
 
     // Launcher para solicitar el permiso de notificación
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -69,6 +75,7 @@ fun HomeScreen(
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+//        homeViewModel.fetchDailyActivities()
     }
 
     Scaffold(
@@ -76,7 +83,7 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.welcome_title),
+                        text = stringResource(R.string.welcome_message, uiState.userName),
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -103,75 +110,76 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MoodSection(
-                onMoodSelected = {
-                },
+                onMoodSelected = { /* Actualizar estado de ánimo */ },
                 onDetailCheckInClicked = {
                     navController.navigate(Screen.MoodEntryDetail.route)
                 }
-
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-            DailyActivitiesSection(
-                activities = listOf(
-                    ActivityItemData(
-                        iconRes = R.drawable.ic_wind,
-                        title = "Breathing Exercise",
-                        description = "Practice deep breathing for 5 minutes",
-                        progress = 0.7f
-                    ),
-                    ActivityItemData(
-                        iconRes = R.drawable.ic_brain,
-                        title = "Mindfulness Meditation",
-                        description = "10 minute guided meditation",
-                        progress = 0.3f
-                    ),
-                    ActivityItemData(
-                        iconRes = R.drawable.ic_book,
-                        title = "Journal",
-                        description = "Write down your thoughts",
-                        progress = 0f
-                    )
+
+            if (uiState.isLoadingActivities) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else if (uiState.activitiesError != null) {
+                Text(
+                    text = stringResource(R.string.activities_error_message, uiState.activitiesError ?: "Unknown error"),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(16.dp)
                 )
-            )
+            } else if (uiState.selectedDailyActivities.isNotEmpty()) {
+                DailyActivitiesSection(
+                    activities = uiState.selectedDailyActivities.map {
+                        val activityTitle = it.exercise.localizedTitle[currentLanguage] ?: it.exercise.localizedTitle["en"] ?: stringResource(R.string.default_exercise_title)
+                        val activityDescription = it.exercise.localizedDescription[currentLanguage] ?: it.exercise.localizedDescription["en"] ?: stringResource(R.string.default_exercise_description)
+
+                        ActivityItemData(
+                            iconRes = context.loadDrawableResByName(it.category.iconResName),
+                            title = activityTitle,
+                            description = activityDescription,
+                            progress = 0f,
+                            exerciseId = it.exercise.id
+                        )
+                    },
+                    onActivityClick = { exerciseId ->
+                        navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId))
+                    }
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.no_activities_found),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
             WellnessTipSection(
                 data = WellnessTipData(
                     iconRes = R.drawable.ic_idea,
-                    title = "Practice Gratitude Daily",
-                    description = "Take a few minutes each day to write down three things you're grateful for. This simple practice can shift your focus toward positive emotions and experiences, improving your overall mental well-being.",
-                    callToAction = "Try this today"
+                    title = stringResource(R.string.wellness_tip_gratitude_title),
+                    description = stringResource(R.string.wellness_tip_gratitude_description),
+                    callToAction = stringResource(R.string.wellness_tip_gratitude_cta)
                 ),
-                onActionClick = {
-
-                }
+                onActionClick = { /* Acción al clickear el tip */ }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
             CommunitySection(
                 posts = listOf(
-                    //Posts
                     CommunityPostData(
                         imageRes = R.drawable.ic_mood_happy,
-                        title = "Finding Peace in Daily Routines",
-                        author = "By Sarah Johnson",
-                        timeAgo = "2 hours ago"
+                        title = stringResource(R.string.community_post_peace_title),
+                        author = stringResource(R.string.community_post_peace_author),
+                        timeAgo = stringResource(R.string.community_post_peace_time_ago)
                     )
-
                 ),
-                onSeeAllClick = {
-                    //Ir a ver mas
-                },
-                onPostClick = {
-                    //Abrir post
-                }
+                onSeeAllClick = { /* Navegar a ver más posts */ },
+                onPostClick = { /* Abrir post específico */ }
             )
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
-
