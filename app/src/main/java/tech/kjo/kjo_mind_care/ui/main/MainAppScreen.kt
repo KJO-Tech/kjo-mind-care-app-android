@@ -293,7 +293,7 @@ fun MainAppScreen(
                         onAccountSettings = {
                             //Logica
                         },
-                        onLogout = {
+                        onNavigateToLogin  = {
                             mainNavController.navigate(Screen.WelcomeLoginScreen.route) {
                                 popUpTo(0) { inclusive = true }
                             }

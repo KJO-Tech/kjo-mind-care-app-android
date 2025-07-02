@@ -20,7 +20,8 @@ internal fun ProfileContent(
     onToggleDarkMode: (Boolean) -> Unit,
     onHelpSupport: () -> Unit,
     onAbout: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    isLoggingOut: Boolean
 ) {
     Column(
         modifier = modifier
@@ -60,7 +61,7 @@ internal fun ProfileContent(
         Spacer(modifier = Modifier.height(24.dp))
 
 
-        LogoutButton(onLogout = onLogout)
+        LogoutButton(onLogout = onLogout, isLoggingOut = isLoggingOut)
 
         Spacer(modifier = Modifier.height(16.dp))
     }
