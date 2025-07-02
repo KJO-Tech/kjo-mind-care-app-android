@@ -1,11 +1,16 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
 import android.util.Log
+import androidx.core.app.PendingIntentCompat.send
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.model.User
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
@@ -45,8 +50,9 @@ class AuthRepository @Inject constructor(
                 val uid = firebaseUser.uid
                 val fullName = firebaseUser.displayName ?: ""
                 val email = firebaseUser.email ?: ""
+                val imageUrl = firebaseUser.photoUrl?.toString()
 
-                saveUserToFirestore(uid, fullName, email)
+                saveUserToFirestore(uid, fullName, email, imageUrl)
                 Resource.Success(true)
             } else {
                 Resource.Error("Firebase user is null after Google sign-in.")
@@ -70,7 +76,7 @@ class AuthRepository @Inject constructor(
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             result.user?.uid?.let { uid ->
-                saveUserToFirestore(uid, fullName, email)
+                saveUserToFirestore(uid, fullName, email, null)
             } ?: throw Exception("User UID is null after registration")
             Resource.Success("Registro exitoso")
         } catch (e: Exception) {
@@ -78,13 +84,14 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    private suspend fun saveUserToFirestore(uid: String, fullName: String, email: String) {
+    private suspend fun saveUserToFirestore(uid: String, fullName: String, email: String, imageUrl: String?) {
         try {
             val user = User(
                 uid = uid,
                 fullName = fullName,
                 email = email,
-                createdAt = Timestamp.now()
+                createdAt = Timestamp.now(),
+                profileImage = imageUrl
             )
             firestore.collection("users").document(uid).set(user).await()
         } catch (e: Exception) {
@@ -95,6 +102,33 @@ class AuthRepository @Inject constructor(
 
     override suspend fun getCurrentUserUid(): String? {
         return auth.currentUser?.uid
+    }
+
+    override suspend fun getCurrentUserDetails(): User? {
+        return try {
+            val userId = auth.currentUser?.uid ?: return null
+            val document = firestore.collection("users").document(userId).get().await()
+            document.toObject(User::class.java)?.copy(uid = document.id)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching current user details", e)
+            null
+        }
+    }
+
+    override fun observeCurrentUser(): Flow<User?> = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val firebaseUser = firebaseAuth.currentUser
+            if (firebaseUser != null) {
+                launch {
+                    val userDetails = getCurrentUserDetails()
+                    send(userDetails)
+                }
+            }
+        }
+        auth.addAuthStateListener(authStateListener)
+        awaitClose {
+            auth.removeAuthStateListener(authStateListener)
+        }
     }
 
     override suspend fun getUserDetails(uid: String): User? {
