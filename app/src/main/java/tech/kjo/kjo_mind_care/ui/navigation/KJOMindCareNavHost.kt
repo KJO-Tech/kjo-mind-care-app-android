@@ -18,6 +18,7 @@ import androidx.navigation.navDeepLink
 import kotlinx.coroutines.delay
 import tech.kjo.kjo_mind_care.ui.auth.login.LoginScreen
 import tech.kjo.kjo_mind_care.ui.auth.register.RegisterScreen
+import tech.kjo.kjo_mind_care.ui.components.ComingSoonDialog
 import tech.kjo.kjo_mind_care.ui.main.MainAppScreen
 import tech.kjo.kjo_mind_care.ui.main.blog_form.BlogFormScreen
 import tech.kjo.kjo_mind_care.ui.main.notifications.NotificationsScreen
@@ -208,6 +209,8 @@ fun KJOMindCareNavHost(profileViewModel: ProfileViewModel, deepLinkIntent: Inten
 
                 }
             )
+
+            ComingSoonDialog()
         }
     }
 }

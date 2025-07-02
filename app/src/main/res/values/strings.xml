@@ -267,6 +267,19 @@
     <string name="notification_type_system">Sistema</string>
     <string name="notification_type_new_blog">Nuevo Blog</string>
 
+    <string name="tap_to_change_photo">Toca para cambiar foto</string>
+    <string name="name_label">Nombre</string>
+    <string name="email_label">Correo electrónico</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="save_button">Guardar</string>
+    <string name="permission_needed_title">Permiso necesario</string>
+    <string name="image_permission_message">Necesitamos acceso a tus fotos para cambiar tu imagen de perfil.</string>
+    <string name="grant_permission">Conceder permiso</string>
+    <string name="permission_denied_title">Permiso denegado</string>
+    <string name="permission_denied_message">Para cambiar tu foto de perfil, necesitas habilitar el permiso en la configuración de la aplicación.</string>
+    <string name="go_to_settings">Ir a configuraciones</string>
+    <string name="understood_button">Entendido</string>
+
     <!-- SplashScreen -->
     <string name="splash_loading_message">Cargando...</string>
     <string name="network_error_title">Sin conexión a Internet</string>
@@ -275,4 +288,9 @@
     <string name="general_error_message">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo. Si el problema persiste, contacta con soporte.</string>
     <string name="try_again_button">Reintentar</string>
     <string name="contact_support_button">Contactar Soporte</string>
+
+    <!-- ComingSoonDialog -->
+    <string name="dialog_feature_soon_title">¡Próximamente Disponible!</string>
+    <string name="dialog_feature_soon_message">¡Gracias por tu paciencia! Estamos trabajando arduamente para que esta sección sea increíble y esté lista muy pronto. 🚀</string>
+    <string name="dialog_feature_soon_positive_button">Entendido</string>
 </resources>
