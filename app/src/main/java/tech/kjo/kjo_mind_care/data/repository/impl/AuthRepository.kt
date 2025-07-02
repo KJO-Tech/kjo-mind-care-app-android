@@ -1,8 +1,10 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
 import android.util.Log
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.model.User
@@ -32,6 +34,38 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    override suspend fun signInWithGoogle(account: GoogleSignInAccount): Resource<Boolean> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+
+            auth.signInWithCredential(credential).await()
+            val firebaseUser = auth.currentUser
+
+            if (firebaseUser != null) {
+                val uid = firebaseUser.uid
+                val fullName = firebaseUser.displayName ?: ""
+                val email = firebaseUser.email ?: ""
+
+                saveUserToFirestore(uid, fullName, email)
+                Resource.Success(true)
+            } else {
+                Resource.Error("Firebase user is null after Google sign-in.")
+            }
+        } catch (e: Exception) {
+            val errorMessage = when {
+                e.message?.contains("credential is null or malformed") == true ->
+                    "Credenciales de Google inválidas. Intenta de nuevo."
+                e.message?.contains("auth/network-request-failed") == true ->
+                    "Error de red al conectar con Firebase."
+                e.message?.contains("auth/invalid-credential") == true ->
+                    "Credenciales inválidas. (SHA-1 incorrecto o ID de cliente web no coincidente)."
+                else ->
+                    e.message ?: "Error desconocido al iniciar sesión con Google"
+            }
+            Resource.Error(errorMessage)
+        }
+    }
+
     override suspend fun register(fullName: String, email: String, password: String): Resource<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -55,7 +89,7 @@ class AuthRepository @Inject constructor(
             firestore.collection("users").document(uid).set(user).await()
         } catch (e: Exception) {
             Log.e("Firestore", "Error guardando usuario", e)
-            throw e // Re-throw to be caught by the register function's catch block
+            throw e
         }
     }
 
@@ -73,12 +107,12 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    override suspend fun logout(): Resource<Unit> {
+    override suspend fun logout(): Result<Unit> {
         return try {
             auth.signOut()
-            Resource.Success(Unit)
+            Result.success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al cerrar sesión")
+            Result.failure(e)
         }
     }
 }

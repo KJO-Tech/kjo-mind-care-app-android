@@ -1,15 +1,17 @@
 package tech.kjo.kjo_mind_care.ui.main.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+
 
 data class ProfileUiState(
     val photoUrl: String = "",
@@ -19,18 +21,33 @@ data class ProfileUiState(
     val posts: Int = 0,
     val badges: Int = 0,
     val notifications: Boolean = true,
-    val darkMode: Boolean = true
+    val darkMode: Boolean = true,
+    val isLoggingOut : Boolean = false,
+    val logoutError: String? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = viewModel(),
+    viewModel: ProfileViewModel = hiltViewModel(),
     onEditProfile: () -> Unit = {},
     onAccountSettings: () -> Unit = {},
-    onLogout: () -> Unit = {}
+    onNavigateToLogin: () -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
+    val logoutEvent by viewModel.logoutEvent.collectAsState(initial = Result.success(Unit))
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.logoutEvent.collect { result ->
+            result.onSuccess {
+                onNavigateToLogin()
+            }.onFailure { throwable ->
+                Toast.makeText(context, throwable.message ?: "Error desconocido", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     Scaffold(
 
     ) { padding ->
@@ -43,7 +60,8 @@ fun ProfileScreen(
             onToggleDarkMode = { enabled -> viewModel.toggleDarkMode(enabled) },
             onHelpSupport = { /*Logica*/ },
             onAbout = {/*Logica*/ },
-            onLogout = onLogout
+            onLogout = viewModel::logout,
+            isLoggingOut = uiState.isLoggingOut
         )
     }
 }
