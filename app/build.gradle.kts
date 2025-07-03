@@ -17,7 +17,7 @@ android {
         applicationId = "tech.kjo.kjo_mind_care"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "0.9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
