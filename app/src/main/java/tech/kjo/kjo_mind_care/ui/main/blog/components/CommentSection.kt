@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.ui.components.ThemedButton
 import tech.kjo.kjo_mind_care.data.model.Comment
@@ -57,13 +59,14 @@ fun CommentSection(
     onCommentTextChanged: (String) -> Unit,
     onSaveComment: () -> Unit,
     onCancelCommentInput: () -> Unit,
-    onAddCommentClick: () -> Unit
+    onAddCommentClick: () -> Unit,
+    countComments: Int,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(
                 R.string.comments_section_title,
-                comments.size
+                countComments
             ),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,

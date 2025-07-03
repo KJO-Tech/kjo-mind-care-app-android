@@ -316,7 +316,8 @@ fun BlogPostDetailScreen(
                             },
                             onSaveComment = { viewModel.onSaveComment() },
                             onCancelCommentInput = { viewModel.onCancelCommentInput() },
-                            onAddCommentClick = { viewModel.onAddCommentClick() }
+                            onAddCommentClick = { viewModel.onAddCommentClick() },
+                            countComments = uiState.commentCount
                         )
                     }
                 }

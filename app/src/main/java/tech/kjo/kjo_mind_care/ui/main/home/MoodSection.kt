@@ -86,7 +86,7 @@ fun MoodSection(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.clickable {
                             selectedIndex = index
-                            onMoodSelected(mood)
+                            onDetailCheckInClicked()
                         }
                     ) {
                         Surface(

@@ -1,5 +1,7 @@
 package tech.kjo.kjo_mind_care.ui.main.mood
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,17 +18,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,20 +43,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import tech.kjo.kjo_mind_care.R
 
 @Composable
 fun MoodEntryDetail(
     onCancel: () -> Unit = {},
-    onSave: (mood: MoodOption?, note: String) -> Unit = { _, _ -> }
+    viewModel: MoodViewModel = hiltViewModel(),
+    onMoodSaved: () -> Unit
 ) {
+    val uiState by viewModel.historyUiState.collectAsState()
+    val saveMoodResult by viewModel.saveMoodResult.collectAsState(initial = Result.success(Unit))
+    val context = LocalContext.current
+
+    var selectedMood by remember { mutableStateOf<MoodOption?>(null) }
+    var noteText by remember { mutableStateOf(TextFieldValue("")) }
+
+    LaunchedEffect(saveMoodResult) {
+        if (saveMoodResult.getOrNull() != Unit && saveMoodResult.getOrNull() != "consumed") {
+            saveMoodResult.onSuccess {
+                Toast.makeText(context, "Mood saved", Toast.LENGTH_SHORT).show()
+                onMoodSaved()
+                viewModel.consumeSaveResult()
+            }.onFailure { throwable ->
+                Toast.makeText(context, "Error: ${throwable.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                viewModel.consumeSaveResult()
+            }
+        }
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
 //            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
@@ -113,10 +146,10 @@ fun MoodEntryDetail(
             MoodOption(
                 title = stringResource(it.titleRes),
                 description = stringResource(it.descRes),
-                iconResId = it.iconRes
+                iconResId = it.iconRes,
+                titleRes = it.titleRes
             )
         }
-        var selectedMood by remember { mutableStateOf<MoodOption?>(null) }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -136,7 +169,6 @@ fun MoodEntryDetail(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        var noteText by remember { mutableStateOf(TextFieldValue("")) }
 
         OutlinedTextField(
             value = noteText,
@@ -148,6 +180,7 @@ fun MoodEntryDetail(
                 .fillMaxWidth()
                 .height(120.dp),
             textStyle = MaterialTheme.typography.bodyLarge,
+            enabled = !uiState.isSaving,
 //            colors = TextFieldDefaults.colors(
 //                focusedBorderColor = MaterialTheme.colorScheme.primary,
 //                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -172,14 +205,23 @@ fun MoodEntryDetail(
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
-                    onSave(selectedMood, noteText.text)
+                    selectedMood?.let {
+                        viewModel.saveMood(it, noteText.text)
+                    }
                 },
                 enabled = selectedMood != null,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
+                }
             }
         }
         Spacer(modifier = Modifier.height(100.dp))

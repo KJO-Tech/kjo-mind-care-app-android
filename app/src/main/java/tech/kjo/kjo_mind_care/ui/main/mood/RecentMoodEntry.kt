@@ -1,6 +1,5 @@
 package tech.kjo.kjo_mind_care.ui.main.mood
 
-import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,24 +10,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items  // Añadido
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Timestamp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.MoodEntry
-import tech.kjo.kjo_mind_care.ui.navigation.Screen
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -49,8 +43,17 @@ fun RecentEntries(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            entries.forEach { entry ->
-                MoodEntryCard(entry, onClick = { onEntryClick(entry) })
+            if (entries.isEmpty()) {
+                Text(
+                    text = "No entries found",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            } else {
+                entries.forEach { entry ->
+                    MoodEntryCard(entry, onClick = { onEntryClick(entry) })
+                }
             }
         }
     }
@@ -92,25 +95,24 @@ fun MoodEntryCard(
                 )
 
                 Text(
-                    text = formatDate(entry.timestamp),
+                    text = entry.getTimeAgo(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
-                Text(
-                    text = entry.note,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (entry.note.isNotBlank()) {
+                    Text(
+                        text = entry.note,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
         }
     }
 }
 
-@Composable
-private fun formatDate(date: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("MMM d, h:mm a", Locale.getDefault())
-    return date.format(formatter)
-}
+
+

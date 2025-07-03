@@ -242,7 +242,7 @@ fun MainAppScreen(
 //                        )
                     MoodEntryDetail(
                         onCancel = { bottomNavController.popBackStack() },
-                        onSave = { mood, note ->
+                        onMoodSaved = {
                             bottomNavController.popBackStack()
                         }
                     )
