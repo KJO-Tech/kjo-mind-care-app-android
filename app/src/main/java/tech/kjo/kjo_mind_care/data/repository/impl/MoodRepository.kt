@@ -52,4 +52,19 @@ class MoodRepository @Inject constructor(
         }
     }
 
+    override fun getMoodEntriesCountByUserId(userId: String): Flow<Long> = callbackFlow {
+        val query = moodCollection.whereEqualTo("userId", userId)
+        val subscription = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            val count = snapshot?.size()?.toLong() ?: 0L
+            trySend(count).isSuccess
+        }
+        awaitClose {
+            subscription.remove()
+        }
+    }
+
 }

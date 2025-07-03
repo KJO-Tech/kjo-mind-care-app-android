@@ -10,5 +10,5 @@ interface IBlogRepository {
     suspend fun createBlog(blogPost: Blog): Result<String>
     suspend fun updateBlog(blogPost: Blog): Result<Unit>
     suspend fun updateBlogStatus(blogId: String, status: BlogStatus): Result<Unit>
-
+    fun getUserPostsCount(userId: String): Flow<Long>
 }
