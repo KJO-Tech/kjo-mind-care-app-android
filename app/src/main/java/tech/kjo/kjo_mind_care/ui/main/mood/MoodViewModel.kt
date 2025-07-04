@@ -74,12 +74,13 @@ class MoodViewModel @Inject constructor(
     private fun mapMoodOptionToMoodType(moodOption: MoodOption): MoodType {
         return when (moodOption.titleRes) {
             R.string.mood_joyful_title -> MoodType.Joyful
+            R.string.mood_happy_title -> MoodType.Happy
             R.string.mood_neutral_title -> MoodType.Neutral
-            R.string.mood_tired_title -> MoodType.Sad
-            R.string.mood_sad_title -> MoodType.Sad
+            R.string.mood_tired_title -> MoodType.Tired
+            R.string.mood_angry_title -> MoodType.Angry
             R.string.mood_anxious_title -> MoodType.Anxious
             R.string.mood_angry_title -> MoodType.Sad
-            R.string.mood_frustrated_title -> MoodType.Sad
+            R.string.mood_frustrated_title -> MoodType.Frustrated
             else -> MoodType.Neutral
         }
     }

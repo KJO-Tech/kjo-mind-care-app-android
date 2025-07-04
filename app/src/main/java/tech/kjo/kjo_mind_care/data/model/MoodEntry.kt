@@ -62,10 +62,13 @@ data class MoodEntry(
 
 enum class MoodType(val iconResId: Int, val nameResId: Int) {
     Happy(R.drawable.ic_mood_happy, R.string.mood_happy),
+    Tired(R.drawable.ic_mood_tired, R.string.mood_tired_title),
+    Angry(R.drawable.ic_mood_angry, R.string.mood_angry_title),
     Anxious(R.drawable.ic_mood_anxious, R.string.mood_anxious),
     Sad(R.drawable.ic_mood_sad, R.string.mood_sad),
     Neutral(R.drawable.ic_mood_neutral, R.string.mood_neutral),
-    Joyful(R.drawable.ic_mood_joyful, R.string.mood_joyful)
+    Joyful(R.drawable.ic_mood_joyful, R.string.mood_joyful),
+    Frustrated(R.drawable.ic_mood_frustrated, R.string.mood_frustrated_title)
 }
 /*Example
 fun sampleEntries() = listOf(

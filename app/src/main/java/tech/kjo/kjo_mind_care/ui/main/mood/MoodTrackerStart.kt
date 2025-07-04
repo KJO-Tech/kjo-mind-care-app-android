@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.ui.main.mood
 
+import android.R.attr.entries
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,7 +85,7 @@ fun MoodTrackerStart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
@@ -115,8 +116,8 @@ fun MoodTrackerStart(
                 .height(200.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        MoodInsights(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(24.dp))
+        //MoodInsights(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp)) */
         RecentEntries(
             entries = uiState.moodEntries.take(5),
             modifier = Modifier.fillMaxWidth(),

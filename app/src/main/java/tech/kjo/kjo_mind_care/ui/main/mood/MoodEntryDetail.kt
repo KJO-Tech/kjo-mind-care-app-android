@@ -106,41 +106,14 @@ fun MoodEntryDetail(
         Spacer(modifier = Modifier.height(16.dp))
 
         val moodOptionResources = listOf(
-            MoodOptionResource(
-                R.string.mood_joyful_title,
-                R.string.mood_joyful_desc,
-                R.drawable.ic_mood_joyful
-            ),
-            MoodOptionResource(
-                R.string.mood_neutral_title,
-                R.string.mood_neutral_desc,
-                R.drawable.ic_mood_neutral
-            ),
-            MoodOptionResource(
-                R.string.mood_tired_title,
-                R.string.mood_tired_desc,
-                R.drawable.ic_mood_tired
-            ),
-            MoodOptionResource(
-                R.string.mood_sad_title,
-                R.string.mood_sad_desc,
-                R.drawable.ic_mood_sad
-            ),
-            MoodOptionResource(
-                R.string.mood_anxious_title,
-                R.string.mood_anxious_desc,
-                R.drawable.ic_mood_anxious
-            ),
-            MoodOptionResource(
-                R.string.mood_angry_title,
-                R.string.mood_angry_desc,
-                R.drawable.ic_mood_angry
-            ),
-            MoodOptionResource(
-                R.string.mood_frustrated_title,
-                R.string.mood_frustrated_desc,
-                R.drawable.ic_mood_frustrated
-            )
+            MoodOptionResource(R.string.mood_joyful_title, R.string.mood_joyful_desc, R.drawable.ic_mood_joyful),
+            MoodOptionResource(R.string.mood_happy_title, R.string.mood_happy_desc, R.drawable.ic_mood_happy),
+            MoodOptionResource( R.string.mood_neutral_title, R.string.mood_neutral_desc, R.drawable.ic_mood_neutral),
+            MoodOptionResource( R.string.mood_tired_title, R.string.mood_tired_desc, R.drawable.ic_mood_tired),
+            MoodOptionResource( R.string.mood_sad_title, R.string.mood_sad_desc, R.drawable.ic_mood_sad),
+            MoodOptionResource( R.string.mood_angry_title, R.string.mood_angry_desc, R.drawable.ic_mood_angry),
+            MoodOptionResource( R.string.mood_anxious_title, R.string.mood_anxious_desc, R.drawable.ic_mood_anxious),
+            MoodOptionResource( R.string.mood_frustrated_title, R.string.mood_frustrated_desc, R.drawable.ic_mood_frustrated)
         )
         val moodOptions = moodOptionResources.map {
             MoodOption(

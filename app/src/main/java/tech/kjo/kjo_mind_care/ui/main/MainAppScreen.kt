@@ -229,7 +229,6 @@ fun MainAppScreen(
                         onNavigateToMoodEntry = { }
                     )
 
-                    ComingSoonDialog()
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
@@ -247,7 +246,6 @@ fun MainAppScreen(
                         }
                     )
 
-                    ComingSoonDialog()
                 }
             }
 
