@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.ui.main.mood
 
+import android.R.attr.entries
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,25 +17,33 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.sampleEntries
 
 
 @Composable
 fun MoodTrackerStart(
     modifier: Modifier = Modifier,
+    viewModel: MoodViewModel = hiltViewModel(),
     onRecordMoodClicked: () -> Unit = {},
     onNavigateToMoodEntry: () -> Unit
 ) {
+    val uiState: MoodViewModel.MoodHistoryUiState by viewModel.historyUiState.collectAsState()
 
     Column(
         modifier = modifier
@@ -76,20 +85,20 @@ fun MoodTrackerStart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
-            val selectedOption = "Week"
+            var selectedOption by remember { mutableStateOf("Week") }
             ChoiceChip(
                 selected = selectedOption == "Week",
-                onClick = { /* … */ },
+                onClick = { selectedOption = "Week"  },
                 label = { Text("Week") },
                 modifier = Modifier.padding(end = 8.dp)
             )
             ChoiceChip(
                 selected = selectedOption == "Month",
-                onClick = { /* … */ },
+                onClick = { selectedOption = "Month" },
                 label = { Text("Month") }
             )
         }
@@ -107,15 +116,24 @@ fun MoodTrackerStart(
                 .height(200.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        MoodInsights(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(24.dp))
+        //MoodInsights(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp)) */
         RecentEntries(
-            entries = sampleEntries(),
+            entries = uiState.moodEntries.take(5),
             modifier = Modifier.fillMaxWidth(),
             onEntryClick = {  }
         )
     }
 
+    if (uiState.isLoading) {
+        CircularProgressIndicator(modifier = Modifier.fillMaxWidth().height(150.dp))
+    } else if (uiState.error != null) {
+        Text(
+            text = "Error: ${uiState.error}",
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+        )
+    }
 
 }
 

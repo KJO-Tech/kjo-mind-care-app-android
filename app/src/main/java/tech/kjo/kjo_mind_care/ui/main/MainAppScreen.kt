@@ -229,7 +229,6 @@ fun MainAppScreen(
                         onNavigateToMoodEntry = { }
                     )
 
-                    ComingSoonDialog()
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
@@ -242,12 +241,11 @@ fun MainAppScreen(
 //                        )
                     MoodEntryDetail(
                         onCancel = { bottomNavController.popBackStack() },
-                        onSave = { mood, note ->
+                        onMoodSaved = {
                             bottomNavController.popBackStack()
                         }
                     )
 
-                    ComingSoonDialog()
                 }
             }
 

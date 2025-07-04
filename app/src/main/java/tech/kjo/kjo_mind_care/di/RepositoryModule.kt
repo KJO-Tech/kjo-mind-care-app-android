@@ -9,12 +9,14 @@ import tech.kjo.kjo_mind_care.data.repository.ICategoryRepository
 import tech.kjo.kjo_mind_care.data.repository.ICommentRepository
 import tech.kjo.kjo_mind_care.data.repository.IDailyActivityRepository
 import tech.kjo.kjo_mind_care.data.repository.IMediaUploadRepository
+import tech.kjo.kjo_mind_care.data.repository.IMoodRepository
 import tech.kjo.kjo_mind_care.data.repository.IReactionRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.BlogRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.CategoryRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.CommentRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.DailyActivityRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.MediaUploadRepository
+import tech.kjo.kjo_mind_care.data.repository.impl.MoodRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.ReactionRepository
 import javax.inject.Singleton
 
@@ -57,4 +59,10 @@ abstract class RepositoryModule {
     abstract fun bindDailyActivityRepository(
         dailyActivityRepositoryImpl: DailyActivityRepository
     ): IDailyActivityRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMoodRepository(
+        moodRepositoryImpl: MoodRepository
+    ): IMoodRepository
 }
