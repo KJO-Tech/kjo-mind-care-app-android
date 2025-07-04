@@ -1,6 +1,7 @@
 package tech.kjo.kjo_mind_care.ui.main.resources
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,17 +48,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.maps.android.compose.GoogleMap
+import tech.kjo.kjo_mind_care.data.model.Emergency
 import tech.kjo.kjo_mind_care.ui.components.GoogleMaps
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmergencyResourcesScreen(
-    onNavigateToResourceDetail: (String) -> Unit
+    onNavigateToResourceDetail: (String) -> Unit,
+    viewModel: EmergencyResourcesViewModel = hiltViewModel()
 ) {
     var searchQuery by remember { mutableStateOf("") }
-
+    val recursos by viewModel.resources.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,49 +103,20 @@ fun EmergencyResourcesScreen(
         }
 
 
-        EmergencyResourcesList()
+        EmergencyResourcesList(
+            resources = recursos,
+            onClickPhone = { phone ->
+                // Lógica para llamar
+            }
+        )
     }
 }
 
 @Composable
-fun EmergencyResourcesList() {
-    val resources = remember {
-        listOf(
-            EmergencyResource(
-                id = 1,
-                name = "Centro de Salud Mental Juvenil",
-                address = "Av. Principal 123, Ciudad",
-                phone = "+1234567890",
-                distance = "1.2 km",
-                isOpen = true
-            ),
-            EmergencyResource(
-                id = 2,
-                name = "Hospital General - Unidad de Psiquiatría",
-                address = "Calle Central 456, Ciudad",
-                phone = "+1234567891",
-                distance = "3.5 km",
-                isOpen = true
-            ),
-            EmergencyResource(
-                id = 3,
-                name = "Clínica de Bienestar Emocional",
-                address = "Plaza Mayor 789, Ciudad",
-                phone = "+1234567892",
-                distance = "5.0 km",
-                isOpen = false
-            ),
-            EmergencyResource(
-                id = 4,
-                name = "Línea de Ayuda 24/7",
-                address = "Servicio telefónico",
-                phone = "+1234567893",
-                distance = "N/A",
-                isOpen = true
-            )
-        )
-    }
-
+fun EmergencyResourcesList(
+    resources: List<Emergency>,
+    onClickPhone: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,11 +129,12 @@ fun EmergencyResourcesList() {
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(resources) { resource ->
-                EmergencyResourceCard(resource = resource)
+                EmergencyResourceCard(
+                    resource = resource,
+                    onCallClick = { onClickPhone(resource.contactos[0]) }
+                )
             }
         }
     }
@@ -165,87 +142,37 @@ fun EmergencyResourcesList() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmergencyResourceCard(resource: EmergencyResource) {
+fun EmergencyResourceCard(
+    resource: Emergency,
+    onCallClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {  },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (resource.isOpen)
-                MaterialTheme.colorScheme.surface
-            else
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        ),
-        onClick = { /* TODO: Mostrar detalles del recurso */ }
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.errorContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
+        Column(modifier = Modifier.padding(16.dp)) {
 
-                Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = resource.name,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
 
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = resource.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+            Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        text = resource.address,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-
-                    if (resource.distance != "N/A") {
-                        Text(
-                            text = "A ${resource.distance} de tu ubicación",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                if (!resource.isOpen) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color.Gray.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "Cerrado",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                    }
-                }
-            }
+            Text(
+                text = resource.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedButton(
-                onClick = { /* TODO: Llamar al número de teléfono */ },
+                onClick = onCallClick,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -254,10 +181,8 @@ fun EmergencyResourceCard(resource: EmergencyResource) {
                     contentDescription = "Llamar",
                     modifier = Modifier.size(16.dp)
                 )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(text = resource.phone)
+                Spacer(Modifier.width(8.dp))
+                Text(text = resource.contactos.getOrNull(0) ?: "Sin teléfono")
             }
         }
     }
