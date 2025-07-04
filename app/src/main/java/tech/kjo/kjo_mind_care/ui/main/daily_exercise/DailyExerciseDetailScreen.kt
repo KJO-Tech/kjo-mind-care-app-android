@@ -5,11 +5,15 @@ import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,12 +33,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.ExerciseContentType
 import tech.kjo.kjo_mind_care.ui.components.YouTubePlayerWebView
@@ -164,6 +171,18 @@ fun DailyExerciseDetailScreen(
                             }
 
                             ExerciseContentType.TEXT -> {
+                                if (exercise.thumbnailUrl.isNotEmpty()) {
+                                    AsyncImage(
+                                        model = exercise.thumbnailUrl,
+                                        contentDescription = "Profile photo",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(16f / 9f)
+                                            .clip(RoundedCornerShape(8.dp)),
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
                                 Text(
                                     text = stringResource(R.string.text_content),
                                     style = MaterialTheme.typography.titleMedium,

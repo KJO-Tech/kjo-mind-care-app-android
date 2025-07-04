@@ -1,5 +1,6 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -96,6 +97,27 @@ class BlogRepository @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override fun getUserPostsCount(userId: String): Flow<Long> = callbackFlow {
+        if (userId.isEmpty()) {
+            trySend(0L).isSuccess
+            awaitClose {}
+            return@callbackFlow
+        }
+        val query = blogPostsCollection.whereEqualTo("author.uid", userId)
+        val subscription = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+
+            val count = snapshot?.size()?.toLong() ?: 0L
+            trySend(count).isSuccess
+        }
+        awaitClose {
+            subscription.remove()
         }
     }
 
