@@ -9,14 +9,18 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
+import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserDetailsUseCase
 import tech.kjo.kjo_mind_care.usecase.user.LogoutUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val authRepository: IAuthRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -37,6 +41,21 @@ class ProfileViewModel @Inject constructor(
 
     private val _logoutEvent = MutableSharedFlow<Result<Unit>>(extraBufferCapacity = 1)
     val logoutEvent: SharedFlow<Result<Unit>> = _logoutEvent.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            authRepository.observeCurrentUser()
+                .collectLatest { user ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            name = user?.fullName ?: "–",
+                            email = user?.email ?: "–",
+                            photoUrl = user?.profileImage ?: "",
+                        )
+                    }
+                }
+        }
+    }
 
     fun toggleNotifications(enabled: Boolean) {
         viewModelScope.launch {
