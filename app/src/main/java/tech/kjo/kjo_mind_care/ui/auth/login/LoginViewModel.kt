@@ -10,13 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.usecase.user.LoginUseCase
 import tech.kjo.kjo_mind_care.usecase.user.SignInWithGoogleUseCase
+import tech.kjo.kjo_mind_care.usecase.user.UpdateUserTokenUseCase
 import tech.kjo.kjo_mind_care.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val updateUserTokenUseCase: UpdateUserTokenUseCase
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<Resource<String>?>(null)
@@ -33,7 +35,11 @@ class LoginViewModel @Inject constructor(
             }
             viewModelScope.launch {
                 _loginState.value = Resource.Loading()
-                _loginState.value = loginUseCase(email, password)
+                val result = loginUseCase(email, password)
+                if (result is Resource.Success) {
+                    updateUserTokenUseCase()
+                }
+                _loginState.value = result
             }
         } catch (e: Exception) {
             _loginState.value = Resource.Error(e.message ?: "Error al iniciar sesión", null)
@@ -46,6 +52,9 @@ class LoginViewModel @Inject constructor(
             _googleSignInState.value = Resource.Loading()
             val result = signInWithGoogleUseCase(account)
             Log.d("LoginViewModel", "Resultado de signInWithGoogleUseCase: $result")
+            if (result is Resource.Success) {
+                updateUserTokenUseCase()
+            }
             _googleSignInState.value = result
         }
     }

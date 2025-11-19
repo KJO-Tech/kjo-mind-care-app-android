@@ -1,4 +1,4 @@
-package tech.kjo.kjo_mind_care.data.repository
+/*package tech.kjo.kjo_mind_care.data.repository
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.Notification
-import tech.kjo.kjo_mind_care.data.model.NotificationStatus
-import tech.kjo.kjo_mind_care.data.model.NotificationType
+import tech.kjo.kjo_mind_care.data.enums.NotificationStatus
+import tech.kjo.kjo_mind_care.data.enums.NotificationType
 import tech.kjo.kjo_mind_care.data.model.StaticBlogData
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import java.time.LocalDateTime
@@ -173,4 +173,4 @@ fun createTestNotification(context: Context, type: String): Notification {
             targetRoute = Screen.HomeStart.route
         )
     }
-}
+} */

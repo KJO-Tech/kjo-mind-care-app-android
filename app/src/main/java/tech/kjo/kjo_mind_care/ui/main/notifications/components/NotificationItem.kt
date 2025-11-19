@@ -29,20 +29,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.data.model.Notification
-import tech.kjo.kjo_mind_care.data.model.NotificationStatus
-import tech.kjo.kjo_mind_care.data.model.NotificationType
-import tech.kjo.kjo_mind_care.utils.TimeAgoFormatter // Necesitarás un TimeAgoFormatter
+import tech.kjo.kjo_mind_care.data.enums.NotificationStatus
+import tech.kjo.kjo_mind_care.data.enums.NotificationType
+import tech.kjo.kjo_mind_care.utils.TimeAgoFormatter
 import tech.kjo.kjo_mind_care.utils.getCurrentLanguageCode
+import java.time.ZoneId
 
 @Composable
 fun NotificationItem(
     notification: Notification,
-    onNotificationClick: (String) -> Unit // Callback para navegar al destino
+    onNotificationClick: (String) -> Unit
 ) {
+    val context = LocalContext.current // Obtener el contexto actual
     val languageCode = getCurrentLanguageCode()
     val isNew = notification.status == NotificationStatus.NEW
     val backgroundColor = if (isNew) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface
@@ -61,7 +64,6 @@ fun NotificationItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icono de Notificación (personalizado por tipo)
             NotificationIcon(notificationType = notification.type)
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -70,7 +72,8 @@ fun NotificationItem(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = notification.getFormattedTitle(),
+                        // CORREGIDO: Pasar el contexto a la función
+                        text = notification.getFormattedTitle(context),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = if (isNew) FontWeight.Bold else FontWeight.Normal,
                         color = textColor,
@@ -80,7 +83,6 @@ fun NotificationItem(
                     )
                     if (isNew) {
                         Spacer(modifier = Modifier.width(8.dp))
-                        // Indicador de "Nuevo" (un pequeño círculo o texto)
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
@@ -91,7 +93,8 @@ fun NotificationItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = notification.getFormattedBody(),
+                    // CORREGIDO: Pasar el contexto a la función
+                    text = notification.getFormattedBody(context),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor,
                     maxLines = 2,
@@ -99,7 +102,7 @@ fun NotificationItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = TimeAgoFormatter.format(notification.timestamp, languageCode),
+                    text = TimeAgoFormatter.format(notification.timestamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), languageCode),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -110,35 +113,17 @@ fun NotificationItem(
 
 @Composable
 fun NotificationIcon(notificationType: NotificationType) {
-    val icon: ImageVector
-    val tint: Color
-
-    when (notificationType) {
-        NotificationType.LIKE -> {
-            icon = Icons.Default.ThumbUp
-            tint = MaterialTheme.colorScheme.primary
-        }
-        NotificationType.COMMENT -> {
-            icon = Icons.Default.Comment
-            tint = MaterialTheme.colorScheme.secondary
-        }
-        NotificationType.MOOD_REMINDER, NotificationType.ACTIVITY_REMINDER -> {
-            icon = Icons.Default.Alarm
-            tint = MaterialTheme.colorScheme.tertiary
-        }
-        NotificationType.SYSTEM -> {
-            icon = Icons.Default.Info
-            tint = MaterialTheme.colorScheme.onSurface
-        }
-        NotificationType.NEW_BLOG_POST -> {
-            icon = Icons.Default.Article
-            tint = MaterialTheme.colorScheme.surfaceTint
-        }
+    val (icon, tint) = when (notificationType) {
+        NotificationType.LIKE -> Icons.Default.ThumbUp to MaterialTheme.colorScheme.primary
+        NotificationType.COMMENT -> Icons.Default.Comment to MaterialTheme.colorScheme.secondary
+        NotificationType.MOOD_REMINDER, NotificationType.ACTIVITY_REMINDER -> Icons.Default.Alarm to MaterialTheme.colorScheme.tertiary
+        NotificationType.NEW_BLOG_POST -> Icons.Default.Article to MaterialTheme.colorScheme.surfaceTint
+        NotificationType.SYSTEM, NotificationType.UNKNOWN -> Icons.Default.Info to MaterialTheme.colorScheme.onSurface
     }
 
     Icon(
         imageVector = icon,
-        contentDescription = null, // Content description se maneja en el título/cuerpo
+        contentDescription = null,
         tint = tint,
         modifier = Modifier.size(32.dp)
     )

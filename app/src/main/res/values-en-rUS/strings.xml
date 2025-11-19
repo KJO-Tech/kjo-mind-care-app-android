@@ -288,4 +288,6 @@
     <string name="dialog_feature_soon_title">Coming Soon!</string>
     <string name="dialog_feature_soon_message">Thank you for your patience! We\'re working hard to make this section amazing and it will be ready very soon. 🚀</string>
     <string name="dialog_feature_soon_positive_button">Got It</string>
+    <string name="notification_default_body">New notification available.</string>
+    <string name="notification_default_title">New notification available.</string>
 </resources>

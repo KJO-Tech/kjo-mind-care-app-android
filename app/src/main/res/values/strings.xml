@@ -293,4 +293,6 @@
     <string name="dialog_feature_soon_title">¡Próximamente Disponible!</string>
     <string name="dialog_feature_soon_message">¡Gracias por tu paciencia! Estamos trabajando arduamente para que esta sección sea increíble y esté lista muy pronto. 🚀</string>
     <string name="dialog_feature_soon_positive_button">Entendido</string>
+    <string name="notification_default_body">Nueva notificacion disponible.</string>
+    <string name="notification_default_title">Nueva notificacion disponible.</string>
 </resources>

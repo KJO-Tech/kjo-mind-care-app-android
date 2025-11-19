@@ -2,11 +2,12 @@ package tech.kjo.kjo_mind_care.ui.main.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,9 +17,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
+import tech.kjo.kjo_mind_care.service.MyFirebaseMessagingService
 import tech.kjo.kjo_mind_care.usecase.blog.GetUserPostsCountUseCase
 import tech.kjo.kjo_mind_care.usecase.mood.GetMoodEntriesCountUseCase
-import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
 import tech.kjo.kjo_mind_care.usecase.user.LogoutUseCase
 import javax.inject.Inject
 
@@ -46,7 +47,7 @@ class ProfileViewModel @Inject constructor(
 
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-    private val _logoutEvent = MutableSharedFlow<Result<Unit>>(extraBufferCapacity = 1)
+    private val _logoutEvent = kotlinx.coroutines.flow.MutableSharedFlow<Result<Unit>>(extraBufferCapacity = 1)
     val logoutEvent: SharedFlow<Result<Unit>> = _logoutEvent.asSharedFlow()
 
 
@@ -110,6 +111,14 @@ class ProfileViewModel @Inject constructor(
 
     fun logout() {
         if (_uiState.value.isLoggingOut) return
+
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                MyFirebaseMessagingService().onUserLogout(userId, token)
+            }
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoggingOut = true, logoutError = null) }
             val result = logoutUseCase()
