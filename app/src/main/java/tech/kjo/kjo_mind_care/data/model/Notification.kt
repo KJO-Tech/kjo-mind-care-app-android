@@ -55,7 +55,9 @@ data class Notification(
                     context.getString(R.string.notification_like_blog_body, likerName, blogTitle)
                 }
                 NotificationType.COMMENT -> {
-                    args.getOrNull(1) ?: ""
+                    val commenterName = args.getOrNull(0) ?: "Alguien"
+                    val commentContent = args.getOrNull(1) ?: "Escribio algo"
+                    context.getString(R.string.notification_comment_blog_body, commenterName,commentContent)
                 }
                 NotificationType.MOOD_REMINDER -> context.getString(R.string.notification_mood_reminder_body)
                 NotificationType.ACTIVITY_REMINDER -> context.getString(R.string.notification_activity_reminder_body)
