@@ -236,7 +236,6 @@
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
-    <string name="content_description_back_button">Back button</string>
     <string name="no_notifications_yet">You have no notifications at the moment.</string>
     <string name="all_notifications_read">All notifications marked as read.</string>
     <string name="mark_all_as_read">Mark All as Read</string>
