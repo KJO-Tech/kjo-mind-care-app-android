@@ -163,7 +163,7 @@ fun NetworkErrorScreen(onTryAgain: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = onTryAgain) {
-                    Text(stringResource(R.string.try_again_button), color = Light.text)
+                    Text(stringResource(R.string.try_again_button))
                 }
             }
         }
@@ -214,7 +214,7 @@ fun GeneralErrorScreen(onTryAgain: () -> Unit, onContactSupport: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = onTryAgain) {
-                    Text(stringResource(R.string.try_again_button), color = Light.text)
+                    Text(stringResource(R.string.try_again_button))
                 }
             }
         }

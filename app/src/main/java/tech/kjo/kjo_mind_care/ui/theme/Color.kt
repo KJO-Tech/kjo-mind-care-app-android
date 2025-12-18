@@ -3,21 +3,21 @@ package tech.kjo.kjo_mind_care.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Light.primary
-val onPrimaryLight = Light.primarySoft
+val onPrimaryLight = Light.primaryContent
 val primaryContainerLight = Light.primary
-val onPrimaryContainerLight = Light.primarySoft
+val onPrimaryContainerLight = Light.primaryContent
 val secondaryLight = Light.secondary
-val onSecondaryLight = Color(0xFFFFFFFF)
+val onSecondaryLight = Light.secondaryContent
 val secondaryContainerLight = Light.secondary
-val onSecondaryContainerLight = Color(0xFFFCFCFF)
+val onSecondaryContainerLight = Light.secondaryContent
 val tertiaryLight = Light.accent
-val onTertiaryLight = Color(0xFFFFFFFF)
+val onTertiaryLight = Light.accentContent
 val tertiaryContainerLight = Light.accent
-val onTertiaryContainerLight = Color(0xFF462E1A)
+val onTertiaryContainerLight = Light.accentContent
 val errorLight = Light.error
-val onErrorLight = Color(0xFFFFFFFF)
+val onErrorLight = Light.errorContent
 val errorContainerLight = Light.error
-val onErrorContainerLight = Color(0xFFFFF9F8)
+val onErrorContainerLight = Light.errorContent
 val backgroundLight = Light.background
 val onBackgroundLight = Light.text
 val surfaceLight = Light.card
@@ -39,21 +39,21 @@ val surfaceContainerHighLight = Color(0xFFEBE7E7)
 val surfaceContainerHighestLight = Color(0xFFE5E2E1)
 
 val primaryDark = Dark.primary
-val onPrimaryDark = Dark.primarySoft
+val onPrimaryDark = Dark.primaryContent
 val primaryContainerDark = Dark.primary
-val onPrimaryContainerDark = Dark.primarySoft
+val onPrimaryContainerDark = Dark.primaryContent
 val secondaryDark = Dark.secondary
-val onSecondaryDark = Color(0xFF23323F)
+val onSecondaryDark = Dark.secondaryContent
 val secondaryContainerDark = Dark.secondary
-val onSecondaryContainerDark = Color(0xFF142430)
+val onSecondaryContainerDark = Dark.secondaryContent
 val tertiaryDark = Dark.accent
-val onTertiaryDark = Color(0xFF432B17)
+val onTertiaryDark = Dark.accentContent
 val tertiaryContainerDark = Dark.accent
-val onTertiaryContainerDark = Color(0xFF462E1A)
+val onTertiaryContainerDark = Dark.accentContent
 val errorDark = Dark.error
-val onErrorDark = Color(0xFF680015)
+val onErrorDark = Dark.errorContent
 val errorContainerDark = Dark.error
-val onErrorContainerDark = Color(0xFFFFF9F8)
+val onErrorContainerDark = Dark.errorContent
 val backgroundDark = Dark.background
 val onBackgroundDark = Dark.text
 val surfaceDark = Dark.card
@@ -75,57 +75,63 @@ val surfaceContainerHighDark = Color(0xFF2A2A2A)
 val surfaceContainerHighestDark = Color(0xFF353534)
 
 object Light {
-    val primary = Color(0xFF669A8F)
-    val primaryLight = Color(0xFF8BB3A8)
-    val primaryDark = Color(0xFF4F7A70)
-    val primarySoft = Color(0xFFF4F8F7)
+    val primary = Color(0xFF9172FE)
+    val primaryContent = Color(0xFFFFF6F6)
+    val primarySoft = Color(0xFFFFF6F6)
     // Secondary
-    val secondary = Color(0xFF7B8B9A)
-    val accent = Color(0xFFB8957A)
+    val secondary = Color(0xFF00B6FE)
+    val secondaryContent = Color(0xFFFFF6F6)
+    val accent = Color(0xFFFA8CD7)
+    val accentContent = Color(0xFF0F090A)
     // Background
-    val background = Color(0xFFF6F9F8)
-    val backgroundAlt = Color(0xFFF0F5F4)
-    val card = Color(0xFFFFFFFF)
-    val surface = Color(0xFFFAFCFB)
+    val background = Color(0xFFF3F4FC)
+    val card = Color(0xFFE4E7F6)
+    val surface = Color(0xFFCCD4E9)
     // Text
-    val text = Color(0xFF2A3F3B)
-    val textSecondary = Color(0xFF5A6B67)
-    val textMuted = Color(0xFF8A9B97)
+    val text = Color(0xFF1A172C)
+    val textSecondary = Color(0xFF575268)
     // Utility
-    val border = Color(0xFFD4E3E0)
-    val divider = Color(0xFFE8F1EF)
+    val border = Color(0xFFCCD4E9)
+    val divider = Color(0xFF4A4C5E)
     val shadow = Color(0x26669A8F)
     // Status
-    val error = Color(0xFFD63447)
-    val success = Color(0xFF4F9A85)
-    val warning = Color(0xFFE6A45C)
-    val info = Color(0xFF5B8DBE)
+    val error = Color(0xFFF46EB4)
+    val errorContent = Color(0xFFFFF6F6)
+    val success = Color(0xFF00CD9E)
+    val successContent = Color(0xFFF4FAF5)
+    val warning = Color(0xFFFF9642)
+    val warningContent = Color(0xFF0E0A07)
+    val info = Color(0xFF00B6F3)
+    val infoContent = Color(0xFFF2FAFE)
 }
 
 object Dark {
-    val primary = Color(0xFF7BB3A8)
-    val primaryLight = Color(0xFF9BC7BC)
-    val primaryDark = Color(0xFF5F8D82)
-    val primarySoft = Color(0xFF1E2826)
+    val primary = Color(0xFFB186FF)
+    val primaryContent = Color(0xFFFFF6F5)
+    val primarySoft = Color(0xFFFFF6F5)
     // Secondary
-    val secondary = Color(0xFF8B9BA0)
-    val accent = Color(0xFFD4A87E)
+    val secondary = Color(0xFF00D2FF)
+    val secondaryContent = Color(0xFFFFF6F5)
+    val accent = Color(0xFFFF94F6)
+    val accentContent = Color(0xFF0F0A09)
     // Background
-    val background = Color(0xFF181C1B)
-    val backgroundAlt = Color(0xFF1F2423)
-    val card = Color(0xFF242B29)
-    val surface = Color(0xFF2A322F)
+    val background = Color(0xFF020107)
+    val card = Color(0xFF060516)
+    val surface = Color(0xFF12132C)
     // Text
-    val text = Color(0xFFF4F8F7)
-    val textSecondary = Color(0xFFB8C5C2)
-    val textMuted = Color(0xFF8A9B97)
+    val text = Color(0xFFD4D6E5)
+    val textSecondary = Color(0xFFC7C0DD)
     // Utility
-    val border = Color(0xFF3A453F)
-    val divider = Color(0xFF2F3A35)
+    val border = Color(0xFF12132C)
+    val divider = Color(0xFF303142)
     val shadow = Color(0x66000000)
     // Status
-    val error = Color(0xFFE74C5C)
-    val success = Color(0xFF66C2A5)
-    val warning = Color(0xFFF39C5A)
-    val info = Color(0xFF74A3D4)
+    val error = Color(0xFFFF77D1)
+    val errorContent = Color(0xFFFFF6F6)
+    val success = Color(0xFF00ECB0)
+    val successContent = Color(0xFFF4FAF5)
+    val warning = Color(0xFFFF9C20)
+    val warningContent = Color(0xFF0E0A07)
+    val info = Color(0xFF00D4FF)
+    val infoContent = Color(0xFFF2FAFE)
 }

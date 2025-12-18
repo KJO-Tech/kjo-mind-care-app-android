@@ -119,7 +119,7 @@ fun MoodTrackerStart(
         //MoodInsights(modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(24.dp)) */
         RecentEntries(
-            entries = uiState.moodEntries.take(5),
+            entries = uiState.moodEntries.take(14),
             modifier = Modifier.fillMaxWidth(),
             onEntryClick = {  }
         )
