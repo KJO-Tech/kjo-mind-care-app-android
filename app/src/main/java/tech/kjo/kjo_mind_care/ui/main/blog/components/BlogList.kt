@@ -30,10 +30,11 @@ fun BlogList(
 ) {
     val listState = rememberLazyListState()
 
-    // Este LaunchedEffect asegura que el scroll se reinicie a la parte superior
-    // cada vez que la pestaña seleccionada cambie.
-    LaunchedEffect(selectedTabIndex) {
-        listState.scrollToItem(0)
+    // Se reinicia el scroll al cambiar de pestaña o cuando la lista (su tamaño) cambia.
+    LaunchedEffect(selectedTabIndex, blogs.size) {
+        if (blogs.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+        }
     }
 
     val pullRefreshState = rememberPullToRefreshState()
@@ -44,14 +45,7 @@ fun BlogList(
         modifier = Modifier.fillMaxSize(),
         state = pullRefreshState,
         contentAlignment = Alignment.TopCenter,
-        // Puedes personalizar el 'indicator' si quieres, por defecto usa PullToRefreshDefaults.Indicator
-        // indicator = {
-        //     PullToRefreshDefaults.Indicator(
-        //         state = pullRefreshState,
-        //         isRefreshing = isRefreshing
-        //     )
-        // }
-    ) {
+    ) { 
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
