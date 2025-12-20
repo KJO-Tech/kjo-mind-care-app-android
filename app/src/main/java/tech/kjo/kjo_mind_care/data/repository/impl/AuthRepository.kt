@@ -1,7 +1,6 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
 import android.util.Log
-import androidx.core.app.PendingIntentCompat.send
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -42,21 +41,31 @@ class AuthRepository @Inject constructor(
     override suspend fun signInWithGoogle(account: GoogleSignInAccount): Resource<Boolean> {
         return try {
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-
             auth.signInWithCredential(credential).await()
+
             val firebaseUser = auth.currentUser
-
-            if (firebaseUser != null) {
-                val uid = firebaseUser.uid
-                val fullName = firebaseUser.displayName ?: ""
-                val email = firebaseUser.email ?: ""
-                val imageUrl = firebaseUser.photoUrl?.toString()
-
-                saveUserToFirestore(uid, fullName, email, imageUrl)
-                Resource.Success(true)
-            } else {
-                Resource.Error("Firebase user is null after Google sign-in.")
+            if (firebaseUser == null) {
+                return Resource.Error("Firebase user is null after Google sign-in.")
             }
+
+            val userDocRef = firestore.collection("users").document(firebaseUser.uid)
+            val userDocument = userDocRef.get().await()
+
+            if (!userDocument.exists()) {
+                // El usuario no existe, crearlo
+                val newUser = User(
+                    uid = firebaseUser.uid,
+                    fullName = firebaseUser.displayName ?: "",
+                    email = firebaseUser.email ?: "",
+                    createdAt = Timestamp.now(),
+                    profileImage = firebaseUser.photoUrl?.toString(),
+                    role = "user" // Rol por defecto
+                )
+                userDocRef.set(newUser).await()
+            }
+            // Si el usuario ya existe, no se hace nada, solo se completa el login.
+            Resource.Success(true)
+
         } catch (e: Exception) {
             val errorMessage = when {
                 e.message?.contains("credential is null or malformed") == true ->
@@ -75,8 +84,8 @@ class AuthRepository @Inject constructor(
     override suspend fun register(fullName: String, email: String, password: String): Resource<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
-            result.user?.uid?.let { uid ->
-                saveUserToFirestore(uid, fullName, email, null)
+            result.user?.uid?.let {
+                uid -> saveUserToFirestore(uid, fullName, email, null)
             } ?: throw Exception("User UID is null after registration")
             Resource.Success("Registro exitoso")
         } catch (e: Exception) {
@@ -91,7 +100,8 @@ class AuthRepository @Inject constructor(
                 fullName = fullName,
                 email = email,
                 createdAt = Timestamp.now(),
-                profileImage = imageUrl
+                profileImage = imageUrl,
+                role = "user"
             )
             firestore.collection("users").document(uid).set(user).await()
         } catch (e: Exception) {
@@ -121,8 +131,10 @@ class AuthRepository @Inject constructor(
             if (firebaseUser != null) {
                 launch {
                     val userDetails = getCurrentUserDetails()
-                    send(userDetails)
+                    trySend(userDetails)
                 }
+            } else {
+                trySend(null)
             }
         }
         auth.addAuthStateListener(authStateListener)
