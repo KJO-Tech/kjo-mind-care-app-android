@@ -1,8 +1,10 @@
 package tech.kjo.kjo_mind_care.ui.main.profile
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,8 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -20,18 +23,34 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import tech.kjo.kjo_mind_care.R
+import java.util.Calendar
 
 @Composable
 fun ProfileSettings(
     notificationsEnabled: Boolean,
     darkModeEnabled: Boolean,
-    onAccountSettings: () -> Unit,
+    reminderTime: Pair<Int, Int>,
+    onEditProfile: () -> Unit,
     onToggleNotifications: (Boolean) -> Unit,
-    onToggleDarkMode: (Boolean) -> Unit
+    onToggleDarkMode: (Boolean) -> Unit,
+    onTimeSelected: (Int, Int) -> Unit
 ) {
+    val context = LocalContext.current
+
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            onTimeSelected(hourOfDay, minute)
+        },
+        reminderTime.first,
+        reminderTime.second,
+        false
+    )
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             stringResource(R.string.account_section),
@@ -40,13 +59,13 @@ fun ProfileSettings(
         )
 
         ListItem(
-            headlineContent = { Text(stringResource(R.string.account_settings)) },
-            leadingContent = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+            headlineContent = { Text(stringResource(R.string.edit_profile)) },
+            leadingContent = { Icon(Icons.Outlined.Edit, contentDescription = null) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                .clickable(onClick = onAccountSettings)
+                .clickable(onClick = onEditProfile)
 
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -64,6 +83,19 @@ fun ProfileSettings(
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
         )
+        if (notificationsEnabled) {
+            Spacer(modifier = Modifier.height(16.dp))
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.mood_reminder_time)) },
+                leadingContent = { Icon(Icons.Outlined.Timer, contentDescription = null) },
+                trailingContent = { Text(String.format("%02d:%02d", reminderTime.first, reminderTime.second)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                    .clickable { timePickerDialog.show() }
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         ListItem(
             headlineContent = { Text(stringResource(R.string.dark_mode)) },

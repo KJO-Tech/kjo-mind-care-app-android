@@ -6,10 +6,10 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.model.User
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
-): IAuthRepository {
+) : IAuthRepository {
 
     override suspend fun login(email: String, password: String): Resource<String> {
         return try {
@@ -52,18 +52,16 @@ class AuthRepository @Inject constructor(
             val userDocument = userDocRef.get().await()
 
             if (!userDocument.exists()) {
-                // El usuario no existe, crearlo
                 val newUser = User(
                     uid = firebaseUser.uid,
                     fullName = firebaseUser.displayName ?: "",
                     email = firebaseUser.email ?: "",
                     createdAt = Timestamp.now(),
                     profileImage = firebaseUser.photoUrl?.toString(),
-                    role = "user" // Rol por defecto
+                    role = "user"
                 )
                 userDocRef.set(newUser).await()
             }
-            // Si el usuario ya existe, no se hace nada, solo se completa el login.
             Resource.Success(true)
 
         } catch (e: Exception) {
@@ -126,22 +124,39 @@ class AuthRepository @Inject constructor(
     }
 
     override fun observeCurrentUser(): Flow<User?> = callbackFlow {
-        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        var userDocListener: ListenerRegistration? = null
+
+        val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val firebaseUser = firebaseAuth.currentUser
-            if (firebaseUser != null) {
-                launch {
-                    val userDetails = getCurrentUserDetails()
-                    trySend(userDetails)
-                }
+            userDocListener?.remove() // Limpiar el listener anterior
+
+            if (firebaseUser == null) {
+                trySend(null) // Usuario ha cerrado sesión
             } else {
-                trySend(null)
+                // Usuario ha iniciado sesión, adjuntar un nuevo listener a su documento
+                userDocListener = firestore.collection("users").document(firebaseUser.uid)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
+                        if (snapshot != null && snapshot.exists()) {
+                            trySend(snapshot.toObject(User::class.java)?.copy(uid = snapshot.id))
+                        } else {
+                            trySend(null) // El documento del usuario puede no existir aún
+                        }
+                    }
             }
         }
-        auth.addAuthStateListener(authStateListener)
+
+        auth.addAuthStateListener(authListener)
+
         awaitClose {
-            auth.removeAuthStateListener(authStateListener)
+            auth.removeAuthStateListener(authListener)
+            userDocListener?.remove()
         }
     }
+
 
     override suspend fun getUserDetails(uid: String): User? {
         return try {
@@ -156,6 +171,15 @@ class AuthRepository @Inject constructor(
     override suspend fun logout(): Result<Unit> {
         return try {
             auth.signOut()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateUser(user: User): Result<Unit> {
+        return try {
+            firestore.collection("users").document(user.uid).set(user).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

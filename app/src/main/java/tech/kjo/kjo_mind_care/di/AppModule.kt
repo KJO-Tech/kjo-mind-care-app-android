@@ -1,6 +1,7 @@
 package tech.kjo.kjo_mind_care.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -10,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
 import tech.kjo.kjo_mind_care.data.repository.impl.AuthRepository
+import tech.kjo.kjo_mind_care.service.NotificationScheduler
 import tech.kjo.kjo_mind_care.utils.AndroidNetworkMonitor
 import javax.inject.Singleton
 
@@ -31,6 +33,18 @@ object AppModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): IAuthRepository = AuthRepository(auth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("kjo_mind_care_prefs", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationScheduler(@ApplicationContext context: Context): NotificationScheduler {
+        return NotificationScheduler(context)
+    }
 
     @Provides
     @Singleton

@@ -51,6 +51,7 @@
     <string name="record_mood_title">Record Mood</string>
     <string name="mood_note_placeholder">What\'s on your mind?</string>
     <string name="log_mood_button">Log Mood</string>
+    <string name="mood_reminder_time">Reminder Time</string>
 
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Daily Activities</string>

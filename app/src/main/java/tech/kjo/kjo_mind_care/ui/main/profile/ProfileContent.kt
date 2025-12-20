@@ -15,9 +15,9 @@ internal fun ProfileContent(
     state: ProfileUiState,
     modifier: Modifier = Modifier,
     onEditProfile: () -> Unit,
-    onAccountSettings: () -> Unit,
     onToggleNotifications: (Boolean) -> Unit,
     onToggleDarkMode: (Boolean) -> Unit,
+    onTimeSelected: (Int, Int) -> Unit,
     onHelpSupport: () -> Unit,
     onAbout: () -> Unit,
     onLogout: () -> Unit,
@@ -32,8 +32,7 @@ internal fun ProfileContent(
         ProfileHeader(
             photoUrl = state.photoUrl,
             name = state.name,
-            email = state.email,
-            onEditProfile = onEditProfile
+            email = state.email
         )
         Spacer(modifier = Modifier.height(12.dp))
         ProfileStats(
@@ -47,9 +46,11 @@ internal fun ProfileContent(
         ProfileSettings(
             notificationsEnabled = state.notifications,
             darkModeEnabled = state.darkMode,
-            onAccountSettings = onAccountSettings,
+            reminderTime = state.reminderTime,
+            onEditProfile = onEditProfile,
             onToggleNotifications = onToggleNotifications,
-            onToggleDarkMode = onToggleDarkMode
+            onToggleDarkMode = onToggleDarkMode,
+            onTimeSelected = onTimeSelected
         )
 
 

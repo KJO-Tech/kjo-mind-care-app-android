@@ -7,14 +7,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.runtime.getValue
-
 
 data class ProfileUiState(
-    val photoUrl: String = "",
+    val photoUrl: String? = null,
     val name: String = "–",
     val email: String = "–",
     val checkIns: Int = 0,
@@ -22,6 +21,7 @@ data class ProfileUiState(
     val badges: Int = 0,
     val notifications: Boolean = true,
     val darkMode: Boolean = true,
+    val reminderTime: Pair<Int, Int> = Pair(20, 0),
     val isLoggingOut : Boolean = false,
     val logoutError: String? = null
 )
@@ -31,33 +31,32 @@ data class ProfileUiState(
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onEditProfile: () -> Unit = {},
-    onAccountSettings: () -> Unit = {},
     onNavigateToLogin: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val logoutEvent by viewModel.logoutEvent.collectAsState(initial = Result.success(Unit))
+    val logoutEvent by viewModel.logoutEvent.collectAsState(initial = null)
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.logoutEvent.collect { result ->
-            result.onSuccess {
-                onNavigateToLogin()
-            }.onFailure { throwable ->
-                Toast.makeText(context, throwable.message ?: "Error desconocido", Toast.LENGTH_SHORT).show()
-            }
+    LaunchedEffect(logoutEvent) {
+        logoutEvent?.onSuccess {
+            onNavigateToLogin()
+        }?.onFailure { throwable ->
+            Toast.makeText(context, throwable.message ?: "Error desconocido", Toast.LENGTH_SHORT).show()
         }
     }
 
-    Scaffold(
-
-    ) { padding ->
+    Scaffold {
+        padding ->
         ProfileContent(
             state = uiState,
             modifier = Modifier.padding(padding),
-            onEditProfile = onEditProfile,
-            onAccountSettings = onAccountSettings,
-            onToggleNotifications = { enabled -> viewModel.toggleNotifications(enabled) },
-            onToggleDarkMode = { enabled -> viewModel.toggleDarkMode(enabled) },
+            onEditProfile = {
+                onEditProfile()
+                viewModel.refreshUserDetails()
+            },
+            onToggleNotifications = viewModel::toggleNotifications,
+            onToggleDarkMode = viewModel::toggleDarkMode,
+            onTimeSelected = viewModel::onTimeSelected,
             onHelpSupport = { /*Logica*/ },
             onAbout = {/*Logica*/ },
             onLogout = viewModel::logout,

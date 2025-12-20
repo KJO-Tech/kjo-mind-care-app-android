@@ -63,32 +63,42 @@ fun KJOMindCareNavHost(profileViewModel: ProfileViewModel, deepLinkIntent: Inten
                 }
 
                 if (!finalTargetRoute.isNullOrBlank()) {
-                    // Ahora, navega usando el navController global
-                    when {
-                        finalTargetRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) ||
-                                finalTargetRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> {
-                            navController.navigate(
-                                "${Screen.MainAppScreen.route}?deepLinkRoute=" + Uri.encode(finalTargetRoute)
-                            ) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true
+                    // Verificar si YA estamos en MainAppScreen para evitar recarga
+                    val currentRoute = navController.currentDestination?.route
+                    val isMainAppActive = currentRoute?.startsWith(Screen.MainAppScreen.route) == true
+
+                    if (isMainAppActive) {
+                         // Si ya estamos en MainApp, pasamos la ruta por SavedStateHandle
+                         // Esto disparará la reacción en MainAppScreen sin recomponer todo el NavHost
+                         navController.currentBackStackEntry?.savedStateHandle?.set("deepLinkRoute", finalTargetRoute)
+                    } else {
+                        // Navegación normal si no estamos en MainApp
+                        when {
+                            finalTargetRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) ||
+                                    finalTargetRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> {
+                                navController.navigate(
+                                    "${Screen.MainAppScreen.route}?deepLinkRoute=" + Uri.encode(finalTargetRoute)
+                                ) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
-                        // Ruta que va directamente a NotificationsScreen
-                        finalTargetRoute == Screen.NotificationsScreen.route -> {
-                            navController.navigate(Screen.NotificationsScreen.route) {
-                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                                launchSingleTop = true
+                            // Ruta que va directamente a NotificationsScreen
+                            finalTargetRoute == Screen.NotificationsScreen.route -> {
+                                navController.navigate(Screen.NotificationsScreen.route) {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             }
-                        }
-                        // Agrega otros casos de deep links globales aquí si es necesario
-                        else -> {
-                            // En caso de una ruta inesperada, navega a la pantalla principal como fallback
-                            navController.navigate(Screen.MainAppScreen.route) {
-                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                                launchSingleTop = true
+                            // Agrega otros casos de deep links globales aquí si es necesario
+                            else -> {
+                                // En caso de una ruta inesperada, navega a la pantalla principal como fallback
+                                navController.navigate(Screen.MainAppScreen.route) {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             }
                         }
                     }

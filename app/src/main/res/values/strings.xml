@@ -56,6 +56,7 @@
     <string name="record_mood_title">Registrar Estado de Ánimo</string>
     <string name="mood_note_placeholder">¿Qué tienes en mente?</string>
     <string name="log_mood_button">Registrar estado de ánimo</string>
+    <string name="mood_reminder_time">Hora del recordatorio</string>
 
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Actividades Diarias</string>
