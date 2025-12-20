@@ -281,11 +281,7 @@ class BlogViewModel @Inject constructor(
             putExtra(Intent.EXTRA_TEXT, "Echa un vistazo a este blog: \"$blogTitle\"\n$shareLink")
             type = "text/plain"
         }
-        context.startActivity(
-            Intent.createChooser(
-                shareIntent,
-                context.getString(R.string.share_blog_title)
-            )
-        )
+        val chooserIntent = Intent.createChooser(shareIntent, context.getString(R.string.share_blog_title))
+        context.startActivity(chooserIntent)
     }
 }

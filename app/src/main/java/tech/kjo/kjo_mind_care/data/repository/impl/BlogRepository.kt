@@ -70,7 +70,7 @@ class BlogRepository @Inject constructor(
     override suspend fun createBlog(blogPost: Blog): Result<String> {
         return try {
             val docRef = blogPostsCollection.document()
-            val newBlog = blogPost.copy(id = docRef.id, createdAt = Timestamp.now(), status = BlogStatus.PUBLISHED)
+            val newBlog = blogPost.copy(id = docRef.id, createdAt = Timestamp.now(), status = BlogStatus.PENDING)
             docRef.set(newBlog).await()
             Result.success(docRef.id)
         } catch (e: Exception) {

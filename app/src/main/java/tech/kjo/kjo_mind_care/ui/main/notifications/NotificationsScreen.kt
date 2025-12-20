@@ -13,12 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,13 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.firebase.Timestamp
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.enums.NotificationStatus
-import tech.kjo.kjo_mind_care.data.enums.NotificationType
-import tech.kjo.kjo_mind_care.data.model.Notification
 import tech.kjo.kjo_mind_care.ui.main.notifications.components.NotificationItem
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,10 +63,7 @@ fun NotificationsScreen(
                 actions = {
                     if (uiState.notifications.any { it.status == NotificationStatus.NEW }) {
                         TextButton(onClick = { viewModel.showMarkAllAsReadConfirmation(true) }) {
-                            Text(
-                                stringResource(R.string.mark_all_as_read),
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            Text(stringResource(R.string.mark_all_as_read))
                         }
                     }
                 },
@@ -80,19 +71,10 @@ fun NotificationsScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
             )
-        }, /*
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.addDummyNotification(
-                    createTestNotification("LIKE")
-                )
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Dummy Notification")
-            }
-        },*/
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             modifier = Modifier
@@ -137,8 +119,8 @@ fun NotificationsScreen(
                         items(uiState.notifications, key = { it.id }) { notification ->
                             NotificationItem(
                                 notification = notification,
-                                onNotificationClick = { notificationId ->
-                                    viewModel.markNotificationAsRead(notificationId)
+                                onNotificationClick = {
+                                    viewModel.markNotificationAsRead(notification.id)
                                     if (notification.targetRoute.isNotBlank()) {
                                         onNavigateToRoute(notification.targetRoute)
                                     }
@@ -158,51 +140,18 @@ fun NotificationsScreen(
             title = { Text(stringResource(R.string.mark_all_as_read)) },
             text = { Text(stringResource(R.string.all_notifications_read)) },
             confirmButton = {
-                Button(onClick = viewModel::markAllAsRead) {
+                Button(onClick = {
+                    viewModel.markAllAsRead()
+                    viewModel.showMarkAllAsReadConfirmation(false)
+                }) {
                     Text(stringResource(R.string.mark_all_as_read))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.showMarkAllAsReadConfirmation(false) }) {
-                    Text(stringResource(R.string.cancel_comment_button))
+                    Text(stringResource(R.string.cancel_button))
                 }
             }
         )
     }
 }
-/*
-private fun createTestNotification(type: String): Notification {
-    val id = UUID.randomUUID().toString()
-    val notificationType = try {
-        NotificationType.valueOf(type.uppercase())
-    } catch (e: IllegalArgumentException) {
-        NotificationType.UNKNOWN
-    }
-
-    return when (notificationType) {
-        NotificationType.LIKE -> Notification(
-            id = id,
-            type = NotificationType.LIKE,
-            titleKey = R.string.notification_like_blog_title,
-            bodyKey = R.string.notification_like_blog_body,
-            args = listOf("John Doe", "un post increíble"),
-            timestamp = Timestamp.now(),
-            status = NotificationStatus.NEW,
-            targetRoute = "blog_post_detail/someBlogId1",
-            targetId = "someBlogId1"
-        )
-
-        else -> Notification(
-            id = id,
-            type = notificationType,
-            titleKey = R.string.notification_comment_blog_title,
-            bodyKey = R.string.notification_comment_blog_body,
-            args = listOf("Jane Doe", "Your amazing post"),
-            timestamp = Timestamp.now(),
-            status = NotificationStatus.NEW,
-            targetRoute = "blog_post_detail/someBlogId2",
-            targetId = "someBlogId2"
-        )
-    }
-}
-*/

@@ -266,12 +266,19 @@
     <string name="notification_system_update_body">Hemos lanzado nuevas funciones. ¡Descúbrelas ahora!</string>
     <string name="notification_new_blog_post_title">Nuevo Blog Publicado</string>
     <string name="notification_new_blog_post_body">Un nuevo blog de %1$s ha sido publicado: "%2$s".</string>
+    <string name="notification_blog_approved_title">¡Tu blog ha sido aprobado!</string>
+    <string name="notification_blog_approved_body">Tu publicación "%1$s" ahora está visible para toda la comunidad.</string>
+    <string name="notification_blog_rejected_title">Tu blog ha sido rechazado</string>
+    <string name="notification_blog_rejected_body">Tu publicación "%1$s" no cumple con nuestras políticas. Por favor, revisa y edita tu contenido.</string>
 
     <string name="notification_type_like">Me Gusta</string>
     <string name="notification_type_comment">Comentario</string>
     <string name="notification_type_reminder">Recordatorio</string>
     <string name="notification_type_system">Sistema</string>
     <string name="notification_type_new_blog">Nuevo Blog</string>
+    <string name="notification_type_blog_approved">Blog Aprobado</string>
+    <string name="notification_type_blog_rejected">Blog Rechazado</string>
+
 
     <string name="tap_to_change_photo">Toca para cambiar foto</string>
     <string name="name_label">Nombre</string>

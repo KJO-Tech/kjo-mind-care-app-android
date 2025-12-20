@@ -37,90 +37,26 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!--            <intent-filter android:autoVerify="true">-->
-            <!--                <action android:name="android.intent.action.VIEW" />-->
-
-            <!--                <category android:name="android.intent.category.DEFAULT" />-->
-            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-            <!--                <data android:scheme="https" />-->
-            <!--                <data android:host="app.kjo-mind-care.com" />-->
-            <!--                <data android:host="kjo-mind-care.com" />-->
-            <!--                <data android:pathPrefix="/blog" />-->
-            <!--            </intent-filter>-->
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.VIEW" />-->
-
-            <!--                <category android:name="android.intent.category.DEFAULT" />-->
-            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-            <!--                <data android:scheme="kjoapp" />-->
-            <!--                <data android:host="app.kjo-mind-care.com" />-->
-            <!--                <data android:host="kjo-mind-care.com" />-->
-            <!--                <data android:pathPrefix="/blog" />-->
-            <!--            </intent-filter>-->
-
-            <!--            <intent-filter android:autoVerify="true">-->
-            <!--                <action android:name="android.intent.action.VIEW" />-->
-
-            <!--                <category android:name="android.intent.category.DEFAULT" />-->
-            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-            <!--                <data-->
-            <!--                    android:host="kjo-mind-care.com"-->
-            <!--                    android:pathPrefix="/mood"-->
-            <!--                    android:scheme="https" />-->
-            <!--                <data-->
-            <!--                    android:host="app.kjo-mind-care.com"-->
-            <!--                    android:pathPrefix="/mood"-->
-            <!--                    android:scheme="kjoapp" />-->
-            <!--            </intent-filter>-->
-
-            <!--            <intent-filter android:autoVerify="true">-->
-            <!--                <action android:name="android.intent.action.VIEW" />-->
-
-            <!--                <category android:name="android.intent.category.DEFAULT" />-->
-            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-            <!--                <data-->
-            <!--                    android:host="kjo-mind-care.com"-->
-            <!--                    android:pathPrefix="/notifications"-->
-            <!--                    android:scheme="https" />-->
-            <!--                <data-->
-            <!--                    android:host="app.kjo-mind-care.com"-->
-            <!--                    android:pathPrefix="/notifications"-->
-            <!--                    android:scheme="kjoapp" />-->
-            <!--            </intent-filter>-->
-
-            <!-- Intent filter para deeplinks WEB (verificación automática) -->
+            <!-- App Links para tu dominio de Netlify -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Tu dominio web -->
-                <data
-                    android:host="kjo-mind-care.com"
-                    android:scheme="https" />
+                <data android:scheme="https" />
+                <data android:host="kjomindcare.netlify.app" />
             </intent-filter>
 
-            <!-- Intent filter para deeplinks de la APP -->
+            <!-- Deep Link para el esquema personalizado -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Tu esquema personalizado -->
-                <data
-                    android:host="app.kjo-mind-care.com"
-                    android:scheme="kjoapp" />
+                <data android:scheme="kjoapp" />
             </intent-filter>
+
         </activity>
         <service
             android:name=".service.MyFirebaseMessagingService"

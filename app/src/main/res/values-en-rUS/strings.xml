@@ -260,12 +260,19 @@
     <string name="notification_system_update_body">We\'ve released new features. Check them out now!</string>
     <string name="notification_new_blog_post_title">New Blog Post</string>
     <string name="notification_new_blog_post_body">A new blog from %1$s has been published: \"%2$s\".</string>
+    <string name="notification_blog_approved_title">Your blog has been approved!</string>
+    <string name="notification_blog_approved_body">Your post \"%1$s\" is now visible to the entire community.</string>
+    <string name="notification_blog_rejected_title">Your blog has been rejected</string>
+    <string name="notification_blog_rejected_body">Your post \"%1$s\" does not meet our policy guidelines. Please review and edit your content.</string>
 
     <string name="notification_type_like">Like</string>
     <string name="notification_type_comment">Comment</string>
     <string name="notification_type_reminder">Reminder</string>
     <string name="notification_type_system">System</string>
     <string name="notification_type_new_blog">New Blog</string>
+    <string name="notification_type_blog_approved">Blog Approved</string>
+    <string name="notification_type_blog_rejected">Blog Rejected</string>
+
 
     <string name="tap_to_change_photo">Tap to change photo</string>
     <string name="name_label">Name</string>
