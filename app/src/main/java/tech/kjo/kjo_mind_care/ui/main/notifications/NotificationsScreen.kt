@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -26,34 +28,31 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.firebase.Timestamp
 import tech.kjo.kjo_mind_care.R
-import tech.kjo.kjo_mind_care.data.model.NotificationStatus
-import tech.kjo.kjo_mind_care.data.repository.createTestNotification
+import tech.kjo.kjo_mind_care.data.enums.NotificationStatus
+import tech.kjo.kjo_mind_care.data.enums.NotificationType
+import tech.kjo.kjo_mind_care.data.model.Notification
 import tech.kjo.kjo_mind_care.ui.main.notifications.components.NotificationItem
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToRoute: (String) -> Unit,
-    viewModel: NotificationsViewModel = viewModel()
+    viewModel: NotificationsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    val context = LocalContext.current
-
-    val pullRefreshState = rememberPullToRefreshState()
 
     Scaffold(
         topBar = {
@@ -68,7 +67,7 @@ fun NotificationsScreen(
                     }
                 },
                 actions = {
-                    if (uiState.notifications.any { it.status == NotificationStatus.NEW }) { // Solo si hay nuevas
+                    if (uiState.notifications.any { it.status == NotificationStatus.NEW }) {
                         TextButton(onClick = { viewModel.showMarkAllAsReadConfirmation(true) }) {
                             Text(
                                 stringResource(R.string.mark_all_as_read),
@@ -84,62 +83,54 @@ fun NotificationsScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
             )
-        },
-        // Botón flotante para añadir una notificación de prueba (solo para desarrollo)
-
-        // Para probar rápidamente nuevas notificaciones, puedes descomentar esto en desarrollo
+        }, /*
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 viewModel.addDummyNotification(
-                    context,
-                    createTestNotification(context, "blog_like")
+                    createTestNotification("LIKE")
                 )
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Dummy Notification")
             }
-        },
+        },*/
     ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.notifications.isEmpty()) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.no_notifications_yet),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        } else {
+        PullToRefreshBox(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = viewModel::refreshNotifications,
+        ) {
+            when {
+                uiState.isLoading && !uiState.isRefreshing -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-            ) {
-                PullToRefreshBox(
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = { viewModel.refreshNotifications() },
-                    modifier = Modifier.fillMaxSize(),
-                    state = pullRefreshState,
-                    contentAlignment = Alignment.TopCenter,
-                ) {
-                    LazyColumn(
+                uiState.notifications.isEmpty() -> {
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_notifications_yet),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -148,7 +139,6 @@ fun NotificationsScreen(
                                 notification = notification,
                                 onNotificationClick = { notificationId ->
                                     viewModel.markNotificationAsRead(notificationId)
-                                    // Primero cerrar NotificationsScreen, luego navegar
                                     if (notification.targetRoute.isNotBlank()) {
                                         onNavigateToRoute(notification.targetRoute)
                                     }
@@ -162,14 +152,13 @@ fun NotificationsScreen(
         }
     }
 
-    // Diálogo de confirmación para "Marcar todo como leído"
     if (uiState.showMarkAllAsReadConfirmation) {
         AlertDialog(
             onDismissRequest = { viewModel.showMarkAllAsReadConfirmation(false) },
             title = { Text(stringResource(R.string.mark_all_as_read)) },
             text = { Text(stringResource(R.string.all_notifications_read)) },
             confirmButton = {
-                Button(onClick = { viewModel.markAllAsRead() }) {
+                Button(onClick = viewModel::markAllAsRead) {
                     Text(stringResource(R.string.mark_all_as_read))
                 }
             },
@@ -180,5 +169,40 @@ fun NotificationsScreen(
             }
         )
     }
-
 }
+/*
+private fun createTestNotification(type: String): Notification {
+    val id = UUID.randomUUID().toString()
+    val notificationType = try {
+        NotificationType.valueOf(type.uppercase())
+    } catch (e: IllegalArgumentException) {
+        NotificationType.UNKNOWN
+    }
+
+    return when (notificationType) {
+        NotificationType.LIKE -> Notification(
+            id = id,
+            type = NotificationType.LIKE,
+            titleKey = R.string.notification_like_blog_title,
+            bodyKey = R.string.notification_like_blog_body,
+            args = listOf("John Doe", "un post increíble"),
+            timestamp = Timestamp.now(),
+            status = NotificationStatus.NEW,
+            targetRoute = "blog_post_detail/someBlogId1",
+            targetId = "someBlogId1"
+        )
+
+        else -> Notification(
+            id = id,
+            type = notificationType,
+            titleKey = R.string.notification_comment_blog_title,
+            bodyKey = R.string.notification_comment_blog_body,
+            args = listOf("Jane Doe", "Your amazing post"),
+            timestamp = Timestamp.now(),
+            status = NotificationStatus.NEW,
+            targetRoute = "blog_post_detail/someBlogId2",
+            targetId = "someBlogId2"
+        )
+    }
+}
+*/

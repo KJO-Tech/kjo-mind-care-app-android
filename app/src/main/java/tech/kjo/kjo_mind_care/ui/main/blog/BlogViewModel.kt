@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,16 +19,21 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.data.enums.NotificationStatus
+import tech.kjo.kjo_mind_care.data.enums.NotificationType
 import tech.kjo.kjo_mind_care.data.model.Blog
 import tech.kjo.kjo_mind_care.data.model.Category
+import tech.kjo.kjo_mind_care.data.model.Notification
 import tech.kjo.kjo_mind_care.data.model.User
 import tech.kjo.kjo_mind_care.data.repository.IReactionRepository
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.usecase.blog.GetBlogUseCase
-import tech.kjo.kjo_mind_care.usecase.reaction.ToggleBlogLikeUseCase
 import tech.kjo.kjo_mind_care.usecase.category.GetCategoriesUseCase
 import tech.kjo.kjo_mind_care.usecase.comments.GetCommentsForBlogUseCase
+import tech.kjo.kjo_mind_care.usecase.notification.AddNotificationUseCase
+import tech.kjo.kjo_mind_care.usecase.reaction.ToggleBlogLikeUseCase
 import tech.kjo.kjo_mind_care.usecase.user.GetCurrentUserUseCase
+import java.util.UUID
 import javax.inject.Inject
 
 data class BlogUiState(
@@ -51,7 +57,8 @@ class BlogViewModel @Inject constructor(
     private val toggleBlogLikeUseCase: ToggleBlogLikeUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getCommentsForBlogUseCase: GetCommentsForBlogUseCase,
-    private val reactionRepository: IReactionRepository
+    private val reactionRepository: IReactionRepository,
+    private val addNotificationUseCase: AddNotificationUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BlogUiState())
@@ -230,8 +237,7 @@ class BlogViewModel @Inject constructor(
                                     blog.copy(
                                         reaction = initialReactionCount,
                                         isLiked = initialIsLiked
-                                    )
-                                } else {
+                                    )} else {
                                     blog
                                 }
                             },

@@ -236,7 +236,6 @@
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
-    <string name="content_description_back_button">Back button</string>
     <string name="no_notifications_yet">You have no notifications at the moment.</string>
     <string name="all_notifications_read">All notifications marked as read.</string>
     <string name="mark_all_as_read">Mark All as Read</string>
@@ -288,4 +287,6 @@
     <string name="dialog_feature_soon_title">Coming Soon!</string>
     <string name="dialog_feature_soon_message">Thank you for your patience! We\'re working hard to make this section amazing and it will be ready very soon. 🚀</string>
     <string name="dialog_feature_soon_positive_button">Got It</string>
+    <string name="notification_default_body">New notification available.</string>
+    <string name="notification_default_title">New notification available.</string>
 </resources>

@@ -209,8 +209,6 @@ fun KJOMindCareNavHost(profileViewModel: ProfileViewModel, deepLinkIntent: Inten
 
                 }
             )
-
-            ComingSoonDialog()
         }
     }
 }

@@ -13,21 +13,18 @@ import tech.kjo.kjo_mind_care.MainActivity
 import tech.kjo.kjo_mind_care.R
 import tech.kjo.kjo_mind_care.data.model.Notification
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 object NotificationUtils {
 
     const val CHANNEL_ID = "kjo_mind_care_notifications_channel"
     const val CHANNEL_NAME = "KJO Mind Care Notifications"
     const val CHANNEL_DESCRIPTION = "General notifications for KJO Mind Care app."
-
     // Extra para pasar el deeplink route
     const val EXTRA_DEEPLINK_ROUTE = "extra_deeplink_route"
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT // Puedes ajustar esto
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
                 description = CHANNEL_DESCRIPTION
             }
@@ -50,10 +47,7 @@ object NotificationUtils {
 
             // Pasar la ruta de destino como extra
             putExtra(EXTRA_DEEPLINK_ROUTE, notification.targetRoute)
-
-            // También crear el data URI para deeplinks externos
             if (notification.targetRoute.isNotBlank()) {
-                // Crear URI que MainAppScreen pueda procesar
                 val deepLinkUri = Uri.parse(
                     "${Screen.MainAppScreen.route}?deepLinkRoute=" + Uri.encode(notification.targetRoute)
                 )
@@ -77,23 +71,22 @@ object NotificationUtils {
             )
         }
 
-        val formattedTime =
-            notification.timestamp.format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()))
+        val formattedTitle = notification.getFormattedTitle(context)
+        val formattedBody = notification.getFormattedBody(context)
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_kjo)
-            .setContentTitle(notification.getFormattedTitle())
-            .setContentText(notification.getFormattedBody())
-            .setStyle(NotificationCompat.BigTextStyle().bigText(notification.getFormattedBody()))
+            .setContentTitle(formattedTitle)
+            .setContentText(formattedBody)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(formattedBody))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setWhen(
-                notification.timestamp.atZone(java.time.ZoneId.systemDefault()).toInstant()
-                    .toEpochMilli()
-            )
+            .setWhen(notification.timestamp.toDate().time)
             .setShowWhen(true)
 
         notificationManager.notify(notification.id.hashCode(), builder.build())
     }
+
+    // Las funciones de ayuda privadas ya no son necesarias, se han eliminado.
 }
