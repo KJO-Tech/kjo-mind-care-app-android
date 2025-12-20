@@ -62,7 +62,7 @@ fun MainAppScreen(
                 initialDeepLinkRoute.startsWith(Screen.EditBlog.route.substringBefore("/{")) -> Screen.BlogGraph.route
 
                 initialDeepLinkRoute.startsWith(Screen.MoodTrackerStart.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
-                initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/")) -> Screen.MoodTrackingGraph.route
 
                 initialDeepLinkRoute.startsWith(Screen.ResourcesList.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
                 initialDeepLinkRoute.startsWith(Screen.ResourceDetail.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
@@ -224,7 +224,7 @@ fun MainAppScreen(
                 composable(Screen.MoodTrackerStart.route) {
                     MoodTrackerStart(
                         onRecordMoodClicked = {
-                            bottomNavController.navigate(Screen.MoodEntryDetail.route)
+                            bottomNavController.navigate(Screen.MoodEntryDetail.createRoute(null))
                         },
                         onNavigateToMoodEntry = { }
                     )
@@ -232,20 +232,19 @@ fun MainAppScreen(
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
-//                        arguments = listOf(navArgument("entryId") { type = NavType.StringType })
+                    arguments = listOf(navArgument("moodId") {
+                        type = NavType.StringType
+                        nullable = true
+                    })
                 ) { backStackEntry ->
-                    val entryId = backStackEntry.arguments?.getString("entryId")
-//                        MoodEntryDetailScreen(
-//                            entryId = entryId ?: "N/A",
-//                            onNavigateBack = { bottomNavController.popBackStack() }
-//                        )
+                    val moodId = backStackEntry.arguments?.getString("moodId")
                     MoodEntryDetail(
+                        moodId = moodId,
                         onCancel = { bottomNavController.popBackStack() },
                         onMoodSaved = {
                             bottomNavController.popBackStack()
                         }
                     )
-
                 }
             }
 

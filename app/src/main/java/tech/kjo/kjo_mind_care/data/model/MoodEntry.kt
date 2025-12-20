@@ -4,25 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.google.firebase.Timestamp
 import tech.kjo.kjo_mind_care.R
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 data class MoodEntry(
     val id: String = "",
-    val mood: MoodType = MoodType.Neutral,
+    val moodId: String = "",
     val createdAt: Timestamp = Timestamp.now(),
     val note: String = "",
     val userId: String = ""
 ) {
-    fun getLocalDateTime(): LocalDateTime {
-        return LocalDateTime.ofEpochSecond(createdAt.seconds, createdAt.nanoseconds, ZoneOffset.UTC)
+    private fun getZonedDateTime(): ZonedDateTime {
+        val instant = Instant.ofEpochSecond(createdAt.seconds, createdAt.nanoseconds.toLong())
+        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
     }
 
     @Composable
     fun getTimeAgo(): String {
-        val now = LocalDateTime.now()
-        val postDateTime = getLocalDateTime()
+        val now = ZonedDateTime.now()
+        val postDateTime = getZonedDateTime()
         val minutes = ChronoUnit.MINUTES.between(postDateTime, now)
         val hours = ChronoUnit.HOURS.between(postDateTime, now)
         val days = ChronoUnit.DAYS.between(postDateTime, now)
@@ -59,20 +61,3 @@ data class MoodEntry(
         }
     }
 }
-
-enum class MoodType(val iconResId: Int, val nameResId: Int) {
-    Happy(R.drawable.ic_mood_happy, R.string.mood_happy),
-    Tired(R.drawable.ic_mood_tired, R.string.mood_tired_title),
-    Angry(R.drawable.ic_mood_angry, R.string.mood_angry_title),
-    Anxious(R.drawable.ic_mood_anxious, R.string.mood_anxious),
-    Sad(R.drawable.ic_mood_sad, R.string.mood_sad),
-    Neutral(R.drawable.ic_mood_neutral, R.string.mood_neutral),
-    Joyful(R.drawable.ic_mood_joyful, R.string.mood_joyful),
-    Frustrated(R.drawable.ic_mood_frustrated, R.string.mood_frustrated_title)
-}
-/*Example
-fun sampleEntries() = listOf(
-    MoodEntry(MoodType.Happy, LocalDateTime.now().minusDays(1), "Had a great day at work!"),
-    MoodEntry(MoodType.Anxious, LocalDateTime.now().minusDays(2), "Worried about upcoming presentation"),
-    MoodEntry(MoodType.Sad, LocalDateTime.now().minusDays(3), "Missing friends and family")
-)*/

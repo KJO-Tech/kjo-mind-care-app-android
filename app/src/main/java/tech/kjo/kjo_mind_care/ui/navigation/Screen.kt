@@ -56,8 +56,8 @@ sealed class Screen(val route: String) {
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/mood-tracker"
     }
 
-    object MoodEntryDetail : Screen("mood_entry_detail/{entryId}") {
-        fun createRoute(entryId: String) = "mood_entry_detail/$entryId"
+    object MoodEntryDetail : Screen("mood_entry_detail?moodId={moodId}") {
+        fun createRoute(moodId: String?) = "mood_entry_detail?moodId=$moodId"
 
         const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/mood-entry/{entryId}"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/mood-entry/{entryId}"
@@ -85,4 +85,3 @@ sealed class Screen(val route: String) {
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/profile/edit"
     }
 }
-

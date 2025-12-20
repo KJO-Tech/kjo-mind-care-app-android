@@ -32,6 +32,7 @@
     <string name="show_password">Mostrar contraseña</string>
     <string name="hide_password">Ocultar contraseña</string>
     <string name="app_logo">Logo de la aplicación</string>
+    <string name="add_new">"Añadir nuevo"</string>
 
     <!-- Barra de navegación-->
     <string name="home_bottom_navigation">Inicio</string>
@@ -50,6 +51,11 @@
     <string name="mood_sad">Triste</string>
     <string name="detailed_check_in">Registro detallado</string>
     <string name="recent_entries">Entradas Recientes</string>
+    <string name="mood_tracker_title">Seguimiento de Ánimo</string>
+    <string name="record_mood_button">Registrar Ánimo</string>
+    <string name="record_mood_title">Registrar Estado de Ánimo</string>
+    <string name="mood_note_placeholder">¿Qué tienes en mente?</string>
+    <string name="log_mood_button">Registrar estado de ánimo</string>
 
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Actividades Diarias</string>

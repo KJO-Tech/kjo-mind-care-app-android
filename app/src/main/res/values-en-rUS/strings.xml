@@ -28,6 +28,7 @@
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
     <string name="app_logo">App logo</string>
+    <string name="add_new">Add New</string>
 
     <!-- Barra de navegación-->
     <string name="home_bottom_navigation">Home</string>
@@ -45,6 +46,11 @@
     <string name="mood_neutral">Neutral</string>
     <string name="mood_sad">Sad</string>
     <string name="detailed_check_in">Detailed check-in</string>
+    <string name="mood_tracker_title">Mood Tracker</string>
+    <string name="record_mood_button">Record Mood</string>
+    <string name="record_mood_title">Record Mood</string>
+    <string name="mood_note_placeholder">What\'s on your mind?</string>
+    <string name="log_mood_button">Log Mood</string>
 
     <!-- DailyActivitiesSection -->
     <string name="daily_activities">Daily Activities</string>
@@ -243,17 +249,17 @@
     <string name="notification_item_read">Read</string>
 
     <string name="notification_like_blog_title">New Like on Your Blog</string>
-    <string name="notification_like_blog_body">%1$s liked your blog: "%2$s"</string>
+    <string name="notification_like_blog_body">%1$s liked your blog: \"%2$s\"</string>
     <string name="notification_comment_blog_title">New Comment on Your Blog</string>
-    <string name="notification_comment_blog_body">%1$s commented on your blog: "%2$s"</string>
+    <string name="notification_comment_blog_body">%1$s commented on your blog: \"%2$s\"</string>
     <string name="notification_mood_reminder_title">Mood Reminder!</string>
     <string name="notification_mood_reminder_body">It\'s time to log your mood. Take a moment to reflect.</string>
     <string name="notification_activity_reminder_title">Activity Reminder!</string>
-    <string name="notification_activity_reminder_body">Don\'t forget to complete your daily activity: "%1$s".</string>
+    <string name="notification_activity_reminder_body">Don\'t forget to complete your daily activity: \"%1$s\".</string>
     <string name="notification_system_update_title">System Update</string>
     <string name="notification_system_update_body">We\'ve released new features. Check them out now!</string>
     <string name="notification_new_blog_post_title">New Blog Post</string>
-    <string name="notification_new_blog_post_body">A new blog from %1$s has been published: "%2$s".</string>
+    <string name="notification_new_blog_post_body">A new blog from %1$s has been published: \"%2$s\".</string>
 
     <string name="notification_type_like">Like</string>
     <string name="notification_type_comment">Comment</string>
