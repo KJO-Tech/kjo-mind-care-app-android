@@ -47,9 +47,20 @@ class MoodRepository @Inject constructor(
 
     override suspend fun saveMoodEntry(moodEntry: MoodEntry): Result<String> {
         return try {
-            val docRef =
-                moodEntryCollection.add(moodEntry.copy(createdAt = Timestamp.now())).await()
-            Result.success(docRef.id)
+            val collection = moodEntryCollection
+            val document = if (moodEntry.id.isEmpty()) {
+                collection.document()
+            } else {
+                collection.document(moodEntry.id)
+            }
+            // Ensure the id mapping is correct
+            val entryToSave = if (moodEntry.id.isEmpty()) {
+                moodEntry.copy(id = document.id, createdAt = Timestamp.now())
+            } else {
+                moodEntry
+            }
+            document.set(entryToSave).await()
+            Result.success(document.id)
         } catch (e: Exception) {
             Result.failure(e)
         }
