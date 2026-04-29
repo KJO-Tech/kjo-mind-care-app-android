@@ -1,0 +1,67 @@
+package tech.kjo.kjo_mind_care.ui.main.blog.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import tech.kjo.kjo_mind_care.data.model.Blog
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BlogList(
+    blogs: List<Blog>,
+    onBlogClick: (String) -> Unit,
+    onToggleLike: (String) -> Unit,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    selectedTabIndex: Int,
+    onBlogShare: (String, String) -> Unit,
+    commentCounts: Map<String, Int>
+) {
+    val listState = rememberLazyListState()
+
+    // Se reinicia el scroll al cambiar de pestaña o cuando la lista (su tamaño) cambia.
+    LaunchedEffect(selectedTabIndex, blogs.size) {
+        if (blogs.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+        }
+    }
+
+    val pullRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize(),
+        state = pullRefreshState,
+        contentAlignment = Alignment.TopCenter,
+    ) { 
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(blogs, key = { it.id }) { blog ->
+                val currentCommentCount = commentCounts[blog.id] ?: 0
+                BlogPostCard(
+                    blog = blog,
+                    onBlogClick = onBlogClick,
+                    onToggleLike = onToggleLike,
+                    onBlogShare = onBlogShare,
+                    commentCount = currentCommentCount
+                )
+            }
+        }
+    }
+}

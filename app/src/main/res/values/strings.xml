@@ -1,3 +1,316 @@
 <resources>
     <string name="app_name">KJO Mind Care</string>
+
+    <!-- HomeScreen -->
+    <string name="welcome_title">Bienvenido a Inicio</string>
+    <string name="notifications">Notificaciones</string>
+
+    <!-- Pantalla de inicio de sesión -->
+    <string name="login_title">Bienvenido de nuevo</string>
+    <string name="login_subtitle">Inicie sesión para continuar con su cuenta</string>
+    <string name="login_email">Correo</string>
+    <string name="login_password">Contraseña</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_no_account">¿No tienes una cuenta?</string>
+    <string name="login_register">Regístrate</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_with_google">Iniciar sesión con Google</string>
+
+
+    <!-- Pantalla de registro -->
+    <string name="register_title">Crea una cuenta</string>
+    <string name="register_subtitle">Únase a nuestra comunidad de bienestar mental</string>
+    <string name="register_fullname">Nombre Completo</string>
+    <string name="register_email">Correo</string>
+    <string name="register_password">Contraseña</string>
+    <string name="register_confirm_password">Confirmar Contraseña</string>
+    <string name="register_button">Crear cuenta</string>
+    <string name="register_terms">Al registrarse, acepta nuestras Condiciones de servicio y Política de privacidad.</string>
+
+    <!-- Componentes comunes -->
+    <string name="back">Atrás</string>
+    <string name="show_password">Mostrar contraseña</string>
+    <string name="hide_password">Ocultar contraseña</string>
+    <string name="app_logo">Logo de la aplicación</string>
+    <string name="add_new">"Añadir nuevo"</string>
+
+    <!-- Barra de navegación-->
+    <string name="home_bottom_navigation">Inicio</string>
+    <string name="mood_bottom_navigation">Mi Estado</string>
+    <string name="blog_bottom_navigation">Comunidad</string>
+    <string name="resources_bottom_navigation">Recursos</string>
+    <string name="profile_bottom_navigation">Perfil</string>
+
+
+    <!-- MoodSection -->
+    <string name="mood_question">¿Cómo te sientes?</string>
+    <string name="mood_joyful">Alegre</string>
+    <string name="mood_happy">Feliz</string>
+    <string name="mood_anxious">Ansioso</string>
+    <string name="mood_neutral">Neutral</string>
+    <string name="mood_sad">Triste</string>
+    <string name="detailed_check_in">Registro detallado</string>
+    <string name="recent_entries">Entradas Recientes</string>
+    <string name="mood_tracker_title">Seguimiento de Ánimo</string>
+    <string name="record_mood_button">Registrar Ánimo</string>
+    <string name="record_mood_title">Registrar Estado de Ánimo</string>
+    <string name="mood_note_placeholder">¿Qué tienes en mente?</string>
+    <string name="log_mood_button">Registrar estado de ánimo</string>
+    <string name="mood_reminder_time">Hora del recordatorio</string>
+
+    <!-- DailyActivitiesSection -->
+    <string name="daily_activities">Actividades Diarias</string>
+    <string name="breathing_exercise">Ejercicio de Respiración</string>
+    <string name="breathing_description">Practica respiración profunda por 5 minutos</string>
+    <string name="meditation">Meditación Consciente</string>
+    <string name="meditation_description">Meditación guiada de 10 minutos</string>
+    <string name="journal">Diario</string>
+    <string name="journal_description">Escribe tus pensamientos</string>
+    <string name="percent_complete">%1$d%% completado</string>
+
+    <string name="welcome_message">Bienvenido, %s!</string>
+    <string name="daily_activities_title">Actividades Diarias Recomendadas</string>
+    <string name="no_activities_found">No se encontraron actividades diarias para hoy.</string>
+    <string name="activities_error_message">Error al cargar actividades: %s</string>
+
+    <string name="default_exercise_title">Ejercicio</string>
+    <string name="default_exercise_description">Descripción del ejercicio</string>
+    <string name="default_exercise_content_text">Contenido del ejercicio</string>
+
+    <string name="exercise_detail_title">Detalle del Ejercicio</string>
+    <string name="back_button_desc">Volver</string>
+    <string name="loading_exercise">Cargando ejercicio...</string>
+    <string name="exercise_not_found_error">Ejercicio no encontrado.</string>
+    <string name="error_loading_exercise">Error al cargar el ejercicio: %s</string>
+    <string name="video_content">Contenido de Video</string>
+    <string name="watch_video">Ver Video</string>
+    <string name="invalid_video_url">URL de video no válida o no compatible.</string>
+    <string name="open_in_browser">Abrir en el Navegador</string>
+    <string name="audio_content">Contenido de Audio</string>
+    <string name="listen_audio">Escuchar Audio</string>
+    <string name="text_content">Contenido de Texto</string>
+    <string name="game_content">Juego Interactivo</string>
+    <string name="game_description">Comienza el juego de \'%s\' para practicar.</string>
+    <string name="start_game">Iniciar Juego</string>
+
+    <string name="wellness_tip_gratitude_title">Practica la Gratitud Diariamente</string>
+    <string name="wellness_tip_gratitude_description">Tómate unos minutos cada día para escribir tres cosas por las que estés agradecido. Esta simple práctica puede cambiar tu enfoque hacia emociones y experiencias positivas, mejorando tu bienestar mental general.</string>
+    <string name="wellness_tip_gratitude_cta">Pruébalo hoy</string>
+
+    <string name="community_post_peace_title">Encontrando Paz en las Rutinas Diarias</string>
+    <string name="community_post_peace_author">Por Sarah Johnson</string>
+    <string name="community_post_peace_time_ago">Hace 2 horas</string>
+
+    <!-- WellnessTipSection -->
+    <string name="daily_wellness_tip">Consejo Diario de Bienestar</string>
+    <string name="gratitude_title">Practica la Gratitud Diariamente</string>
+    <string name="gratitude_description">Tómate unos minutos cada día para escribir tres cosas por las que estás agradecido. Esta simple práctica puede cambiar tu enfoque hacia emociones y experiencias positivas, mejorando tu bienestar mental general.</string>
+    <string name="try_today">Prueba esto hoy</string>
+
+    <!-- CommunitySection -->
+    <string name="from_community">De la Comunidad</string>
+    <string name="see_all">Ver Todo</string>
+    <string name="community_post_title">Encontrar Paz en las Rutinas Diarias</string>
+    <string name="community_post_author">Por Sarah Johnson</string>
+    <string name="time_ago">hace 2 horas</string>
+
+
+    <!--Mood Section-->
+
+    <string name="mood_joyful_title">Alegre</string>
+    <string name="mood_joyful_desc">Sintiendo gran alegría o deleite</string>
+    <string name="mood_happy_title">Feliz</string>
+    <string name="mood_happy_desc">Contento, complacido</string>
+    <string name="mood_excited_title">Emocionado</string>
+    <string name="mood_excited_desc">Entusiasmado, ansioso</string>
+    <string name="mood_neutral_title">Neutral</string>
+    <string name="mood_neutral_desc">Ni bien ni mal</string>
+    <string name="mood_tired_title">Cansado</string>
+    <string name="mood_tired_desc">Fatigado, con poca energía</string>
+    <string name="mood_sad_title">Triste</string>
+    <string name="mood_sad_desc">Infeliz, decaído</string>
+    <string name="mood_anxious_title">Ansioso</string>
+    <string name="mood_anxious_desc">Preocupado, intranquilo</string>
+    <string name="mood_angry_title">Enojado</string>
+    <string name="mood_angry_desc">Furioso, molesto</string>
+    <string name="mood_frustrated_title">Frustrado</string>
+    <string name="mood_frustrated_desc">Irritado, molesto</string>
+
+    <!-- BlogScreen -->
+    <string name="blog_community_title">Blog Comunitario</string>
+    <string name="search_blogs_placeholder">Buscar blogs...</string>
+    <string name="tab_all_blogs">Todo</string>
+    <string name="tab_popular_blogs">Populares</string>
+    <string name="tab_latest_blogs">Recientes</string>
+    <string name="tab_my_blogs">Mis Blogs</string>
+
+    <string name="content_description_like_button">Botón Me gusta</string>
+    <string name="content_description_comment_button">Botón Comentarios</string>
+    <string name="content_description_share_button">Botón Compartir</string>
+    <string name="time_ago_now">Ahora</string>
+    <string name="time_ago_minute">Hace 1 minuto</string>
+    <string name="time_ago_minutes">Hace %d minutos</string>
+    <string name="time_ago_hour">Hace 1 hora</string>
+    <string name="time_ago_hours">Hace %d horas</string>
+    <string name="time_ago_day">Hace 1 día</string>
+    <string name="time_ago_days">Hace %d días</string>
+    <string name="time_ago_month">Hace 1 mes</string>
+    <string name="time_ago_months">Hace %d meses</string>
+    <string name="time_ago_year">Hace 1 año</string>
+    <string name="time_ago_years">Hace %d años</string>
+    <string name="content_description_blog_preview_image">Imagen de vista previa del blog</string>
+    <string name="content_description_blog_preview_video">Video de vista previa del blog</string>
+    <string name="content_description_play_video">Reproducir video</string>
+
+    <string name="blog_detail_title">Detalles del Blog</string>
+    <string name="content_description_back_button">Botón de atrás</string>
+    <string name="loading_blog">Cargando blog...</string>
+    <string name="error_loading_blog">Error al cargar el blog: %s</string>
+    <string name="blog_not_found">Blog no encontrado.</string>
+    <string name="comments_section_title">Comentarios (%d)</string>
+    <string name="add_comment_button">Añadir comentario</string>
+    <string name="reply_comment_button">Responder</string>
+    <string name="edit_comment_button">Editar</string>
+    <string name="delete_comment_button">Eliminar</string>
+    <string name="write_comment_placeholder">Escribe tu comentario...</string>
+    <string name="save_comment_button">Guardar</string>
+    <string name="cancel_comment_button">Cancelar</string>
+    <string name="content_description_avatar">Avatar de %s</string>
+    <string name="content_description_reply">Responder al comentario</string>
+    <string name="content_description_edit">Editar comentario</string>
+    <string name="content_description_delete">Eliminar comentario</string>
+    <string name="content_description_add_comment">Añadir nuevo comentario</string>
+
+    <string name="content_description_search_icon">Icono de búsqueda</string>
+
+    <string name="delete_comment_dialog_title">Eliminar comentario</string>
+    <string name="delete_comment_dialog_message">¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer.</string>
+    <string name="delete_comment_dialog_confirm">Eliminar</string>
+    <string name="delete_comment_dialog_cancel">Cancelar</string>
+
+    <string name="content_description_filter_button">Botón Filtrar por categoría</string>
+    <string name="filter_dialog_title">Filtrar por categoría</string>
+    <string name="filter_dialog_clear_selection">Borrar selección</string>
+    <string name="filter_dialog_apply_filters">Aplicar filtros</string>
+    <string name="pull_to_refresh_content_description">Arrastrar para recargar</string>
+
+    <string name="share_blog_content_description">Compartir blog</string>
+    <string name="share_blog_title">Compartir Blog</string>
+
+    <!-- BlogFormScreen -->
+    <string name="blog_status_pending">Pendiente</string>
+    <string name="blog_status_published">Publicado</string>
+    <string name="blog_status_deleted">Eliminado</string>
+
+    <string name="create_blog_title">Crear Nuevo Blog</string>
+    <string name="edit_blog_title">Editar Blog</string>
+    <string name="blog_title_hint">Título del blog</string>
+    <string name="blog_content_hint">Contenido del blog</string>
+    <string name="blog_category_label">Categoría</string>
+    <string name="select_category_placeholder">Seleccionar categoría</string>
+    <string name="blog_media_label">Imagen/Video (Opcional)</string>
+    <string name="select_media_button">Seleccionar Imagen o Video</string>
+    <string name="clear_media_button">Borrar Medio</string>
+    <string name="blog_status_label">Estado</string>
+    <string name="publish_button">Publicar Blog</string>
+    <string name="save_changes_button">Guardar Cambios</string>
+    <string name="upload_failed">Fallo al subir: %s</string>
+    <string name="blog_created_success">Blog creado exitosamente!</string>
+    <string name="blog_updated_success">Blog actualizado exitosamente!</string>
+    <string name="error_saving_blog">Error al guardar el blog: %s</string>
+    <string name="required_field_error">Este campo es requerido</string>
+    <string name="blog_title_error">El título no puede estar vacío</string>
+    <string name="blog_content_error">El contenido no puede estar vacío</string>
+    <string name="blog_category_error">Debe seleccionar una categoría</string>
+
+    <string name="edit_blog_button">Editar Blog</string>
+    <string name="delete_blog_button">Eliminar Blog</string>
+    <string name="delete_blog_dialog_title">Eliminar Blog</string>
+    <string name="delete_blog_dialog_message">¿Estás seguro de que quieres eliminar este blog? Esta acción no se puede deshacer.</string>
+    <string name="delete_blog_dialog_confirm">Eliminar</string>
+    <string name="dialog_add_comment_title">Añadir Comentario</string>
+    <string name="comment_input_placeholder">Escribe tu comentario...</string>
+    <string name="send_comment_button">Enviar Comentario</string>
+
+    <!-- Sección de Perfil -->
+    <string name="logout">Cerrar sesión</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="account_settings">Configuración de Cuenta</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="help_support">Ayuda y Soporte</string>
+    <string name="about">Acerca de KJO Mind Care</string>
+    <string name="profile_title">Perfil</string>
+    <!-- Más elementos de la sección de perfil -->
+    <string name="support_section">Soporte</string>
+    <string name="account_section">Cuenta</string>
+    <string name="check_ins">Check-ins</string>
+    <string name="posts">Publicaciones</string>
+    <string name="badges">Insignias</string>
+
+    <!-- Notificaciones -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="no_notifications_yet">No tienes notificaciones por el momento.</string>
+    <string name="all_notifications_read">Todas las notificaciones marcadas como leídas.</string>
+    <string name="mark_all_as_read">Marcar todo como leído</string>
+    <string name="notification_item_new">Nueva</string>
+    <string name="notification_item_read">Leída</string>
+
+    <string name="notification_like_blog_title">Nuevo Me Gusta en tu Blog</string>
+    <string name="notification_like_blog_body">%1$s le ha dado me gusta a tu blog: "%2$s"</string>
+    <string name="notification_comment_blog_title">Nuevo Comentario en tu Blog</string>
+    <string name="notification_comment_blog_body">%1$s ha comentado en tu blog: "%2$s"</string>
+    <string name="notification_mood_reminder_title">¡Recordatorio de Ánimo!</string>
+    <string name="notification_mood_reminder_body">Es hora de registrar tu estado de ánimo. Tómate un momento para reflexionar.</string>
+    <string name="notification_activity_reminder_title">¡Recordatorio de Actividad!</string>
+    <string name="notification_activity_reminder_body">No olvides realizar tu actividad diaria: "%1$s".</string>
+    <string name="notification_system_update_title">Actualización del Sistema</string>
+    <string name="notification_system_update_body">Hemos lanzado nuevas funciones. ¡Descúbrelas ahora!</string>
+    <string name="notification_new_blog_post_title">Nuevo Blog Publicado</string>
+    <string name="notification_new_blog_post_body">Un nuevo blog de %1$s ha sido publicado: "%2$s".</string>
+    <string name="notification_blog_approved_title">¡Tu blog ha sido aprobado!</string>
+    <string name="notification_blog_approved_body">Tu publicación "%1$s" ahora está visible para toda la comunidad.</string>
+    <string name="notification_blog_rejected_title">Tu blog ha sido rechazado</string>
+    <string name="notification_blog_rejected_body">Tu publicación "%1$s" no cumple con nuestras políticas. Por favor, revisa y edita tu contenido.</string>
+
+    <string name="notification_type_like">Me Gusta</string>
+    <string name="notification_type_comment">Comentario</string>
+    <string name="notification_type_reminder">Recordatorio</string>
+    <string name="notification_type_system">Sistema</string>
+    <string name="notification_type_new_blog">Nuevo Blog</string>
+    <string name="notification_type_blog_approved">Blog Aprobado</string>
+    <string name="notification_type_blog_rejected">Blog Rechazado</string>
+
+
+    <string name="tap_to_change_photo">Toca para cambiar foto</string>
+    <string name="name_label">Nombre</string>
+    <string name="email_label">Correo electrónico</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="save_button">Guardar</string>
+    <string name="permission_needed_title">Permiso necesario</string>
+    <string name="image_permission_message">Necesitamos acceso a tus fotos para cambiar tu imagen de perfil.</string>
+    <string name="grant_permission">Conceder permiso</string>
+    <string name="permission_denied_title">Permiso denegado</string>
+    <string name="permission_denied_message">Para cambiar tu foto de perfil, necesitas habilitar el permiso en la configuración de la aplicación.</string>
+    <string name="go_to_settings">Ir a configuraciones</string>
+    <string name="understood_button">Entendido</string>
+
+    <!-- SplashScreen -->
+    <string name="splash_loading_message">Cargando...</string>
+    <string name="network_error_title">Sin conexión a Internet</string>
+    <string name="network_error_message">Parece que no tienes conexión a Internet. Por favor, revisa tu conexión y vuelve a intentarlo.</string>
+    <string name="general_error_title">Ha ocurrido un error</string>
+    <string name="general_error_message">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo. Si el problema persiste, contacta con soporte.</string>
+    <string name="try_again_button">Reintentar</string>
+    <string name="contact_support_button">Contactar Soporte</string>
+
+    <!-- ComingSoonDialog -->
+    <string name="dialog_feature_soon_title">¡Próximamente Disponible!</string>
+    <string name="dialog_feature_soon_message">¡Gracias por tu paciencia! Estamos trabajando arduamente para que esta sección sea increíble y esté lista muy pronto. 🚀</string>
+    <string name="dialog_feature_soon_positive_button">Entendido</string>
+    <string name="notification_default_body">Nueva notificacion disponible.</string>
+    <string name="notification_default_title">Nueva notificacion disponible.</string>
+
+    <!-- Notification Channel -->
+    <string name="default_notification_channel_id" translatable="false">kjo_mind_care_default_channel</string>
+    <string name="default_notification_channel_name" translatable="false">General</string>
 </resources>

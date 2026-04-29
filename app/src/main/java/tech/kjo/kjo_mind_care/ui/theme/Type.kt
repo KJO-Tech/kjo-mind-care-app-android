@@ -30,6 +30,15 @@ val displayFontFamily = FontFamily(
     )
 )
 
+val logoFontFamily = FontFamily(
+    androidx.compose.ui.text.font.Font(
+        R.font.righteous_regular,
+        FontWeight.Normal,
+//        googleFont = GoogleFont("Righteous Static"),
+//        fontProvider = provider,
+    )
+)
+
 // Default Material 3 typography values
 val baseline = Typography()
 
