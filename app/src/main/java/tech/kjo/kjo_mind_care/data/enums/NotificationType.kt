@@ -7,6 +7,7 @@ enum class NotificationType {
     ACTIVITY_REMINDER,
     SYSTEM,
     NEW_BLOG_POST,
+    BLOG_APPROVED,
+    BLOG_REJECTED,
     UNKNOWN
 }
-

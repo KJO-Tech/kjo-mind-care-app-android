@@ -1,16 +1,15 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
 import android.util.Log
-import androidx.core.app.PendingIntentCompat.send
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.model.User
 import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
@@ -20,7 +19,7 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
-): IAuthRepository {
+) : IAuthRepository {
 
     override suspend fun login(email: String, password: String): Resource<String> {
         return try {
@@ -42,21 +41,29 @@ class AuthRepository @Inject constructor(
     override suspend fun signInWithGoogle(account: GoogleSignInAccount): Resource<Boolean> {
         return try {
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-
             auth.signInWithCredential(credential).await()
+
             val firebaseUser = auth.currentUser
-
-            if (firebaseUser != null) {
-                val uid = firebaseUser.uid
-                val fullName = firebaseUser.displayName ?: ""
-                val email = firebaseUser.email ?: ""
-                val imageUrl = firebaseUser.photoUrl?.toString()
-
-                saveUserToFirestore(uid, fullName, email, imageUrl)
-                Resource.Success(true)
-            } else {
-                Resource.Error("Firebase user is null after Google sign-in.")
+            if (firebaseUser == null) {
+                return Resource.Error("Firebase user is null after Google sign-in.")
             }
+
+            val userDocRef = firestore.collection("users").document(firebaseUser.uid)
+            val userDocument = userDocRef.get().await()
+
+            if (!userDocument.exists()) {
+                val newUser = User(
+                    uid = firebaseUser.uid,
+                    fullName = firebaseUser.displayName ?: "",
+                    email = firebaseUser.email ?: "",
+                    createdAt = Timestamp.now(),
+                    profileImage = firebaseUser.photoUrl?.toString(),
+                    role = "user"
+                )
+                userDocRef.set(newUser).await()
+            }
+            Resource.Success(true)
+
         } catch (e: Exception) {
             val errorMessage = when {
                 e.message?.contains("credential is null or malformed") == true ->
@@ -75,8 +82,8 @@ class AuthRepository @Inject constructor(
     override suspend fun register(fullName: String, email: String, password: String): Resource<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
-            result.user?.uid?.let { uid ->
-                saveUserToFirestore(uid, fullName, email, null)
+            result.user?.uid?.let {
+                uid -> saveUserToFirestore(uid, fullName, email, null)
             } ?: throw Exception("User UID is null after registration")
             Resource.Success("Registro exitoso")
         } catch (e: Exception) {
@@ -91,7 +98,8 @@ class AuthRepository @Inject constructor(
                 fullName = fullName,
                 email = email,
                 createdAt = Timestamp.now(),
-                profileImage = imageUrl
+                profileImage = imageUrl,
+                role = "user"
             )
             firestore.collection("users").document(uid).set(user).await()
         } catch (e: Exception) {
@@ -116,20 +124,39 @@ class AuthRepository @Inject constructor(
     }
 
     override fun observeCurrentUser(): Flow<User?> = callbackFlow {
-        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        var userDocListener: ListenerRegistration? = null
+
+        val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val firebaseUser = firebaseAuth.currentUser
-            if (firebaseUser != null) {
-                launch {
-                    val userDetails = getCurrentUserDetails()
-                    send(userDetails)
-                }
+            userDocListener?.remove() // Limpiar el listener anterior
+
+            if (firebaseUser == null) {
+                trySend(null) // Usuario ha cerrado sesión
+            } else {
+                // Usuario ha iniciado sesión, adjuntar un nuevo listener a su documento
+                userDocListener = firestore.collection("users").document(firebaseUser.uid)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
+                        if (snapshot != null && snapshot.exists()) {
+                            trySend(snapshot.toObject(User::class.java)?.copy(uid = snapshot.id))
+                        } else {
+                            trySend(null) // El documento del usuario puede no existir aún
+                        }
+                    }
             }
         }
-        auth.addAuthStateListener(authStateListener)
+
+        auth.addAuthStateListener(authListener)
+
         awaitClose {
-            auth.removeAuthStateListener(authStateListener)
+            auth.removeAuthStateListener(authListener)
+            userDocListener?.remove()
         }
     }
+
 
     override suspend fun getUserDetails(uid: String): User? {
         return try {
@@ -144,6 +171,15 @@ class AuthRepository @Inject constructor(
     override suspend fun logout(): Result<Unit> {
         return try {
             auth.signOut()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateUser(user: User): Result<Unit> {
+        return try {
+            firestore.collection("users").document(user.uid).set(user).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

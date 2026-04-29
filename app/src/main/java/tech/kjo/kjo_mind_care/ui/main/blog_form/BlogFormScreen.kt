@@ -243,34 +243,6 @@ fun BlogFormScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                if (uiState.blogId != null) {
-                    Text(
-                        stringResource(R.string.blog_status_label),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        BlogStatus.entries.forEach { status ->
-                            Row(
-                                modifier = Modifier.weight(1f), // Distribuir el espacio equitativamente
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = uiState.status == status,
-                                    onClick = { viewModel.onStatusSelected(status) }
-                                )
-                                Text(status.getLocalizedName())
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
-
                 Button(
                     onClick = viewModel::saveBlog,
                     modifier = Modifier.fillMaxWidth(),

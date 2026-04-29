@@ -9,8 +9,7 @@ sealed class Screen(val route: String) {
 
     object CreateBlogScreen : Screen("create_blog_screen")
     object NotificationsScreen : Screen("notifications_screen") {
-        // Deeplinks para notificaciones
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/notifications"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/notifications"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/notifications"
     }
 
@@ -23,7 +22,7 @@ sealed class Screen(val route: String) {
 
     // Rutas específicas dentro de cada sub-grafo
     object HomeStart : Screen("home_start") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/home"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/home"
     }
 
@@ -32,14 +31,14 @@ sealed class Screen(val route: String) {
     }
 
     object BlogList : Screen("blog_list") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/blogs"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/community"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/blogs"
     }
 
     object BlogPostDetail : Screen("blog_post_detail/{blogId}") {
         fun createRoute(blogId: String) = "blog_post_detail/$blogId"
 
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/blog/{blogId}" // Tu dominio web
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/community/post/{blogId}" // Tu dominio web
         const val DEEPLINK_APP_PATTERN =
             "kjoapp://app.kjo-mind-care.com/blog/{blogId}" // Tu esquema personalizado
     }
@@ -47,42 +46,41 @@ sealed class Screen(val route: String) {
     object EditBlog : Screen("edit_blog/{blogId}") {
         fun createRoute(blogId: String) = "edit_blog/$blogId"
 
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/blog/{blogId}/edit"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/community/post?id={blogId}"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/blog/{blogId}/edit"
     }
 
     object MoodTrackerStart : Screen("mood_tracker_start") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/mood-tracker"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/mood/history"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/mood-tracker"
     }
 
-    object MoodEntryDetail : Screen("mood_entry_detail/{entryId}") {
-        fun createRoute(entryId: String) = "mood_entry_detail/$entryId"
+    object MoodEntryDetail : Screen("mood_entry_detail?moodId={moodId}") {
+        fun createRoute(moodId: String?) = "mood_entry_detail?moodId=$moodId"
 
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/mood-entry/{entryId}"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/mood/register?moodId={entryId}"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/mood-entry/{entryId}"
     }
 
     object ResourcesList : Screen("resources_list") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/resources"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/exercises"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/resources"
     }
 
     object ResourceDetail : Screen("resource_detail/{resourceId}") {
         fun createRoute(resourceId: String) = "resource_detail/$resourceId"
 
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/resource/{resourceId}"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/exercises/{resourceId}"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/resource/{resourceId}"
     }
 
     object ProfileDetails : Screen("profile_details") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/profile"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/profile"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/profile"
     }
 
     object EditProfile : Screen("edit_profile") {
-        const val DEEPLINK_WEB_PATTERN = "https://kjo-mind-care.com/profile/edit"
+        const val DEEPLINK_WEB_PATTERN = "https://kjomindcare.netlify.app/app/profile/edit"
         const val DEEPLINK_APP_PATTERN = "kjoapp://app.kjo-mind-care.com/profile/edit"
     }
 }
-

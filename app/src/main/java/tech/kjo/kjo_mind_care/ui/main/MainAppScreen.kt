@@ -50,26 +50,37 @@ fun MainAppScreen(
     val bottomNavController = rememberNavController() // NavController para las pestañas
 
     // Manejar el deep link inicial con mejor lógica
-    LaunchedEffect(initialDeepLinkRoute) {
-        if (initialDeepLinkRoute != null && initialDeepLinkRoute.isNotBlank()) {
+    // Observar deep links pasados via SavedStateHandle (para cuando la app ya está abierta)
+    val deepLinkFromSavedState = mainNavController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>("deepLinkRoute", null)
+        ?.collectAsState()
+        ?.value
+
+    // La ruta efectiva a procesar es la que venga del SavedState (prioridad) o la inicial
+    val targetDeepLink = deepLinkFromSavedState ?: initialDeepLinkRoute
+
+    // Manejar el deep link (inicial o nuevo)
+    LaunchedEffect(targetDeepLink) {
+        if (targetDeepLink != null && targetDeepLink.isNotBlank()) {
             // Pequeño delay para asegurar que la UI esté completamente inicializada
             delay(200)
 
             // Determinar el grafo correcto basado en la ruta
             val targetGraphRoute = when {
-                initialDeepLinkRoute.startsWith(Screen.BlogList.route.substringBefore("/{")) -> Screen.BlogGraph.route
-                initialDeepLinkRoute.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
-                initialDeepLinkRoute.startsWith(Screen.EditBlog.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                targetDeepLink.startsWith(Screen.BlogList.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                targetDeepLink.startsWith(Screen.BlogPostDetail.route.substringBefore("/{")) -> Screen.BlogGraph.route
+                targetDeepLink.startsWith(Screen.EditBlog.route.substringBefore("/{")) -> Screen.BlogGraph.route
 
-                initialDeepLinkRoute.startsWith(Screen.MoodTrackerStart.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
-                initialDeepLinkRoute.startsWith(Screen.MoodEntryDetail.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                targetDeepLink.startsWith(Screen.MoodTrackerStart.route.substringBefore("/{")) -> Screen.MoodTrackingGraph.route
+                targetDeepLink.startsWith(Screen.MoodEntryDetail.route.substringBefore("/")) -> Screen.MoodTrackingGraph.route
 
-                initialDeepLinkRoute.startsWith(Screen.ResourcesList.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
-                initialDeepLinkRoute.startsWith(Screen.ResourceDetail.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+                targetDeepLink.startsWith(Screen.ResourcesList.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
+                targetDeepLink.startsWith(Screen.ResourceDetail.route.substringBefore("/{")) -> Screen.ResourcesGraph.route
 
-                initialDeepLinkRoute.startsWith(Screen.ProfileDetails.route.substringBefore("/{")) -> Screen.ProfileGraph.route
+                targetDeepLink.startsWith(Screen.ProfileDetails.route.substringBefore("/{")) -> Screen.ProfileGraph.route
 
-                initialDeepLinkRoute == Screen.HomeStart.route -> Screen.HomeGraph.route
+                targetDeepLink == Screen.HomeStart.route -> Screen.HomeGraph.route
 
                 else -> Screen.HomeGraph.route // Default
             }
@@ -82,10 +93,15 @@ fun MainAppScreen(
                 restoreState = true
             }
 
-            if (initialDeepLinkRoute != targetGraphRoute) {
-                bottomNavController.navigate(initialDeepLinkRoute) {
+            if (targetDeepLink != targetGraphRoute) {
+                bottomNavController.navigate(targetDeepLink) {
                     launchSingleTop = true
                 }
+            }
+            
+            // Limpiar el estado guardado si ya fue procesado para no re-ejecutar al rotar
+            if (deepLinkFromSavedState != null) {
+                mainNavController.currentBackStackEntry?.savedStateHandle?.remove<String>("deepLinkRoute")
             }
         }
     }
@@ -224,7 +240,7 @@ fun MainAppScreen(
                 composable(Screen.MoodTrackerStart.route) {
                     MoodTrackerStart(
                         onRecordMoodClicked = {
-                            bottomNavController.navigate(Screen.MoodEntryDetail.route)
+                            bottomNavController.navigate(Screen.MoodEntryDetail.createRoute(null))
                         },
                         onNavigateToMoodEntry = { }
                     )
@@ -232,20 +248,19 @@ fun MainAppScreen(
                 }
                 composable(
                     route = Screen.MoodEntryDetail.route,
-//                        arguments = listOf(navArgument("entryId") { type = NavType.StringType })
+                    arguments = listOf(navArgument("moodId") {
+                        type = NavType.StringType
+                        nullable = true
+                    })
                 ) { backStackEntry ->
-                    val entryId = backStackEntry.arguments?.getString("entryId")
-//                        MoodEntryDetailScreen(
-//                            entryId = entryId ?: "N/A",
-//                            onNavigateBack = { bottomNavController.popBackStack() }
-//                        )
+                    val moodId = backStackEntry.arguments?.getString("moodId")
                     MoodEntryDetail(
+                        moodId = moodId,
                         onCancel = { bottomNavController.popBackStack() },
                         onMoodSaved = {
                             bottomNavController.popBackStack()
                         }
                     )
-
                 }
             }
 
@@ -288,29 +303,18 @@ fun MainAppScreen(
                         onEditProfile = {
                             bottomNavController.navigate(Screen.EditProfile.route)
                         },
-                        onAccountSettings = {
-                            //Logica
-                        },
                         onNavigateToLogin  = {
                             mainNavController.navigate(Screen.WelcomeLoginScreen.route) {
                                 popUpTo(0) { inclusive = true }
                             }
                         }
                     )
-
-                    ComingSoonDialog()
                 }
                 composable(Screen.EditProfile.route) {
-                    val currentState = profileViewModel.uiState.collectAsState().value
                     EditProfileScreen(
                         onProfileSaved = { bottomNavController.popBackStack() },
                         onNavigateBack = { bottomNavController.popBackStack() },
-                        photoUrl = currentState.photoUrl,
-                        name = currentState.name,
-                        email = currentState.email
                     )
-
-                    ComingSoonDialog()
                 }
             }
         }

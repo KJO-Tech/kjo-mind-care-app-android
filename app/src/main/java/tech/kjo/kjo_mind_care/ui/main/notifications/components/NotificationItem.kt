@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -72,7 +74,6 @@ fun NotificationItem(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        // CORREGIDO: Pasar el contexto a la función
                         text = notification.getFormattedTitle(context),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = if (isNew) FontWeight.Bold else FontWeight.Normal,
@@ -93,7 +94,6 @@ fun NotificationItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    // CORREGIDO: Pasar el contexto a la función
                     text = notification.getFormattedBody(context),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor,
@@ -118,6 +118,8 @@ fun NotificationIcon(notificationType: NotificationType) {
         NotificationType.COMMENT -> Icons.Default.Comment to MaterialTheme.colorScheme.secondary
         NotificationType.MOOD_REMINDER, NotificationType.ACTIVITY_REMINDER -> Icons.Default.Alarm to MaterialTheme.colorScheme.tertiary
         NotificationType.NEW_BLOG_POST -> Icons.Default.Article to MaterialTheme.colorScheme.surfaceTint
+        NotificationType.BLOG_APPROVED -> Icons.Default.CheckCircle to Color(0xFF4CAF50)
+        NotificationType.BLOG_REJECTED -> Icons.Default.Cancel to MaterialTheme.colorScheme.error
         NotificationType.SYSTEM, NotificationType.UNKNOWN -> Icons.Default.Info to MaterialTheme.colorScheme.onSurface
     }
 

@@ -1,56 +1,67 @@
 package tech.kjo.kjo_mind_care.data.repository.impl
 
-import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import tech.kjo.kjo_mind_care.data.enums.BlogStatus
 import tech.kjo.kjo_mind_care.data.model.Blog
+import tech.kjo.kjo_mind_care.data.repository.IAuthRepository
 import tech.kjo.kjo_mind_care.data.repository.IBlogRepository
 import javax.inject.Inject
-import kotlin.jvm.java
 
 class BlogRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
+    private val authRepository: IAuthRepository
 ) : IBlogRepository {
 
     private val blogPostsCollection = firestore.collection("blogs")
 
-    override fun getBlogPosts(): Flow<List<Blog>> = callbackFlow {
-        val subscription = blogPostsCollection
+    override fun getBlogPosts(): Flow<List<Blog>> = flow {
+        val userId = authRepository.getCurrentUserUid()
+        val snapshot = blogPostsCollection
             .whereEqualTo("status", BlogStatus.PUBLISHED.name)
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
+            .get().await()
 
-                if (snapshot != null) {
-                    val blogPosts = snapshot.documents.mapNotNull { document ->
-                        try {
-                            document.toObject(Blog::class.java)?.copy(id = document.id)
-                        } catch (e: Exception) {
-                            null
+        val blogPosts = coroutineScope {
+            snapshot.documents.map { document ->
+                async {
+                    val blog = document.toObject(Blog::class.java)?.copy(id = document.id)
+                    blog?.apply {
+                        val likedBy = document.get("likedBy") as? List<*> ?: emptyList<String>()
+                        likes = likedBy.size
+                        if (userId != null) {
+                            isLiked = likedBy.contains(userId)
                         }
+                        val commentsSnapshot = blogPostsCollection.document(id).collection("comments").get().await()
+                        comments = commentsSnapshot.size()
                     }
-                    trySend(blogPosts).isSuccess
-                } else {
-                    trySend(emptyList()).isSuccess
                 }
-            }
-        awaitClose { subscription.remove() }
+            }.awaitAll().filterNotNull()
+        }
+
+        emit(blogPosts.filterIsInstance<Blog>()) // Asegurarse de emitir una lista de Blogs
     }
 
     override suspend fun getBlogById(blogId: String): Blog? {
         return try {
             val document = blogPostsCollection.document(blogId).get().await()
-            document.toObject(Blog::class.java)?.copy(id = document.id)
+            document.toObject(Blog::class.java)?.copy(id = document.id)?.apply {
+                val userId = authRepository.getCurrentUserUid()
+                val likedBy = document.get("likedBy") as? List<*> ?: emptyList<String>()
+                likes = likedBy.size
+                if (userId != null) {
+                    isLiked = likedBy.contains(userId)
+                }
+                val commentsSnapshot = blogPostsCollection.document(id).collection("comments").get().await()
+                comments = commentsSnapshot.size()
+            }
         } catch (e: Exception) {
             null
         }
@@ -58,7 +69,9 @@ class BlogRepository @Inject constructor(
 
     override suspend fun createBlog(blogPost: Blog): Result<String> {
         return try {
-            val docRef = blogPostsCollection.add(blogPost.copy(createdAt = Timestamp.now(), status = BlogStatus.PUBLISHED)).await()
+            val docRef = blogPostsCollection.document()
+            val newBlog = blogPost.copy(id = docRef.id, createdAt = Timestamp.now(), status = BlogStatus.PENDING)
+            docRef.set(newBlog).await()
             Result.success(docRef.id)
         } catch (e: Exception) {
             Result.failure(e)
@@ -74,9 +87,6 @@ class BlogRepository @Inject constructor(
                 "mediaType" to blogPost.mediaType,
                 "categoryId" to blogPost.categoryId,
                 "status" to blogPost.status.name,
-                "likes" to blogPost.likes,
-                "comments" to blogPost.comments,
-                "isLiked" to blogPost.isLiked,
                 "updatedAt" to Timestamp.now()
             )
             blogPostsCollection.document(blogPost.id).update(updates).await()
@@ -100,26 +110,12 @@ class BlogRepository @Inject constructor(
         }
     }
 
-    override fun getUserPostsCount(userId: String): Flow<Long> = callbackFlow {
+    override fun getUserPostsCount(userId: String): Flow<Long> = flow {
         if (userId.isEmpty()) {
-            trySend(0L).isSuccess
-            awaitClose {}
-            return@callbackFlow
+            emit(0L)
+            return@flow
         }
-        val query = blogPostsCollection.whereEqualTo("author.uid", userId)
-        val subscription = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
-            }
-
-            val count = snapshot?.size()?.toLong() ?: 0L
-            trySend(count).isSuccess
-        }
-        awaitClose {
-            subscription.remove()
-        }
+        val snapshot = blogPostsCollection.whereEqualTo("author.uid", userId).get().await()
+        emit(snapshot.size().toLong())
     }
-
-
 }

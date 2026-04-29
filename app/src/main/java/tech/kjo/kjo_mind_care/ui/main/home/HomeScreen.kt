@@ -38,6 +38,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import tech.kjo.kjo_mind_care.R
+import tech.kjo.kjo_mind_care.ui.main.mood.MoodViewModel
 import tech.kjo.kjo_mind_care.ui.navigation.Screen
 import tech.kjo.kjo_mind_care.utils.loadDrawableResByName
 import java.util.Locale
@@ -47,21 +48,22 @@ import java.util.Locale
 fun HomeScreen(
     onNavigateToNotifications: () -> Unit,
     navController: NavController,
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    moodViewModel: MoodViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
     val uiState by homeViewModel.uiState.collectAsState()
+    val moodUiState by moodViewModel.moodsUiState.collectAsState()
     val context = LocalContext.current
     val currentLanguage = Locale.getDefault().language
 
-    // Launcher para solicitar el permiso de notificación
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permiso concedido, puedes enviar notificaciones
+            // Permission granted
         } else {
-            // Permiso denegado, notifica al usuario si las notificaciones son importantes
+            // Permission denied
         }
     }
 
@@ -75,7 +77,6 @@ fun HomeScreen(
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-//        homeViewModel.fetchDailyActivities()
     }
 
     Scaffold(
@@ -114,9 +115,12 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MoodSection(
-                onMoodSelected = { /* Actualizar estado de ánimo */ },
-                onDetailCheckInClicked = {
-                    navController.navigate(Screen.MoodEntryDetail.route)
+                moods = moodUiState.moods,
+                selectedMood = moodUiState.selectedMood,
+                onMoodSelected = { mood -> moodViewModel.onMoodSelected(mood) },
+                onLogMoodClicked = {
+                    val route = Screen.MoodEntryDetail.createRoute(moodUiState.selectedMood?.id)
+                    navController.navigate(route)
                 }
             )
 
@@ -126,15 +130,22 @@ fun HomeScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else if (uiState.activitiesError != null) {
                 Text(
-                    text = stringResource(R.string.activities_error_message, uiState.activitiesError ?: "Unknown error"),
+                    text = stringResource(
+                        R.string.activities_error_message,
+                        uiState.activitiesError ?: "Unknown error"
+                    ),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(16.dp)
                 )
             } else if (uiState.selectedDailyActivities.isNotEmpty()) {
                 DailyActivitiesSection(
                     activities = uiState.selectedDailyActivities.map {
-                        val activityTitle = it.exercise.localizedTitle[currentLanguage] ?: it.exercise.localizedTitle["en"] ?: stringResource(R.string.default_exercise_title)
-                        val activityDescription = it.exercise.localizedDescription[currentLanguage] ?: it.exercise.localizedDescription["en"] ?: stringResource(R.string.default_exercise_description)
+                        val activityTitle = it.exercise.localizedTitle[currentLanguage]
+                            ?: it.exercise.localizedTitle["en"]
+                            ?: stringResource(R.string.default_exercise_title)
+                        val activityDescription = it.exercise.localizedDescription[currentLanguage]
+                            ?: it.exercise.localizedDescription["en"]
+                            ?: stringResource(R.string.default_exercise_description)
 
                         ActivityItemData(
                             iconRes = context.loadDrawableResByName(it.category.iconResName),
